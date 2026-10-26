@@ -3624,3 +3624,86 @@ fn floating_card_clips_the_frost_to_its_rounded_outline() {
     assert!(alpha_at(8, 8) > 200, "curve interior stays solid");
     clear_backdrop();
 }
+
+#[test]
+fn sparkline_parser_reads_points_and_leaves_gaps() {
+    use super::theme_rendering::parse_sparkline_points;
+
+    assert_eq!(
+        parse_sparkline_points("10,20.5,30"),
+        vec![Some(10.0), Some(20.5), Some(30.0)]
+    );
+    // A missing hour is a gap, never a dip to zero.
+    assert_eq!(
+        parse_sparkline_points("10,,30"),
+        vec![Some(10.0), None, Some(30.0)]
+    );
+    assert_eq!(
+        parse_sparkline_points(" 5 , junk ,-3,250"),
+        vec![Some(5.0), None, Some(0.0), Some(100.0)]
+    );
+    assert_eq!(parse_sparkline_points(""), vec![None]);
+    assert_eq!(parse_sparkline_points("NaN,inf"), vec![None, None]);
+}
+
+fn sparkline_pixels(series: &str) -> Vec<u32> {
+    use super::theme_rendering::render_object_content;
+
+    let mut object = SceneObject::object("sparkline-test", "Sparkline");
+    object.width = 84.0.into();
+    object.height = 10.0.into();
+    object.content = SceneContent::Sparkline {
+        source: "claude.session.history".into(),
+        color: Paint {
+            color: "#D97757FF".into(),
+            opacity: 1.0.into(),
+        },
+        fill: Paint {
+            color: "#D9775726".into(),
+            opacity: 1.0.into(),
+        },
+    };
+    let resolved = ResolvedObject {
+        source: &object,
+        x: 0.0,
+        y: 0.0,
+        width: 84.0,
+        height: 10.0,
+        parent_width: 84.0,
+        parent_height: 10.0,
+        gap: 0.0,
+        opacity: 1.0,
+        rotation: 0.0,
+        clip: Vec::new(),
+    };
+    let mut context = DataContext::default();
+    context.insert_string("claude.session.history", series);
+    let mut pixels = vec![0u32; 84 * 10];
+    let mut warnings = Vec::new();
+    render_object_content(&resolved, &context, 1.0, &mut pixels, 84, 10, &mut warnings);
+    assert!(warnings.is_empty(), "{warnings:?}");
+    pixels
+}
+
+#[test]
+fn sparkline_draws_a_line_for_a_series_and_nothing_for_empty_data() {
+    let painted = sparkline_pixels("10,40,20,80,55");
+    assert!(
+        painted.iter().filter(|pixel| **pixel != 0).count() >= 20,
+        "a non-empty series must paint the line"
+    );
+    // The top and bottom of the box stay clear of a 10..80 series.
+    assert!(painted[0] == 0);
+
+    for empty in ["", "   ", ",,,"] {
+        let pixels = sparkline_pixels(empty);
+        assert!(
+            pixels.iter().all(|pixel| *pixel == 0),
+            "empty data must draw nothing"
+        );
+    }
+
+    // A single hour still leaves a dot behind.
+    let single = sparkline_pixels("42");
+    assert!(single.iter().any(|pixel| *pixel != 0));
+}

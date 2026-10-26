@@ -774,11 +774,13 @@ pub(super) fn layer_properties_inspector(
         language.text("None (Container)"),
         language.text("Text"),
         language.text("Data bar"),
+        language.text("Sparkline"),
     ];
     let mut kind = match object.content {
         SceneContent::None => 0,
         SceneContent::Text { .. } => 1,
         SceneContent::Progress { .. } => 2,
+        SceneContent::Sparkline { .. } => 3,
     };
     let previous_kind = kind;
     labeled(ui, language.text("Content type"), |ui| {
@@ -812,6 +814,11 @@ pub(super) fn layer_properties_inspector(
                 segments: 0,
                 segments_expression: None,
                 segment_gap: 2.0.into(),
+            },
+            3 => SceneContent::Sparkline {
+                source: "claude.session.history".into(),
+                color: Paint::new("#D97757FF"),
+                fill: Paint::new("#D9775726"),
             },
             _ => SceneContent::None,
         };
@@ -1070,6 +1077,21 @@ pub(super) fn content_inspector(
                     ExpressionField::ProgressSegmentGap,
                 ));
             }
+        }
+        SceneContent::Sparkline {
+            source,
+            color,
+            fill,
+        } => {
+            labeled(ui, language.text("Series binding"), |ui| {
+                ui.add(
+                    crate::ui::components::text_field::singleline(source)
+                        .id(id.with("sparkline-source"))
+                        .desired_width(inspector_control_width(ui)),
+                );
+            });
+            paint_control(ui, language.text("Colour"), color);
+            paint_control(ui, language.text("Fill"), fill);
         }
     }
     requested

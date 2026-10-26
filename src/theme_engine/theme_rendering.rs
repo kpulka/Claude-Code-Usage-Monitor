@@ -1139,6 +1139,182 @@ pub(super) fn render_object_content(
                 color.resolve(context),
             );
         }
+        SceneContent::Sparkline {
+            source,
+            color,
+            fill,
+        } => {
+            // A binding name resolves to the series string; anything else is
+            // treated as a template so a theme can inline its own values.
+            let raw = context
+                .get_string(source)
+                .map(str::to_owned)
+                .unwrap_or_else(|| format_template(source, context));
+            let points = parse_sparkline_points(&raw);
+            let fill = fill.resolve(context);
+            draw_sparkline(
+                pixels,
+                width,
+                height,
+                &points,
+                color.resolve(context),
+                // A fully transparent fill means "line only".
+                (fill.a > 0).then_some(fill),
+            );
+        }
+    }
+}
+
+/// Parse a comma-separated series of percentages; anything unreadable becomes
+/// a gap so a missing hour never draws a line through zero.
+pub(super) fn parse_sparkline_points(raw: &str) -> Vec<Option<f64>> {
+    raw.split(',')
+        .map(|token| {
+            token
+                .trim()
+                .parse::<f64>()
+                .ok()
+                .filter(|value| value.is_finite())
+                .map(|value| value.clamp(0.0, 100.0))
+        })
+        .collect()
+}
+
+/// Draw a sparkline inside `pixels`, which is already the element's own box, so
+/// the polyline is clipped to the element by construction.
+pub(super) fn draw_sparkline(
+    pixels: &mut [u32],
+    width: u32,
+    height: u32,
+    points: &[Option<f64>],
+    line: Rgba,
+    fill: Option<Rgba>,
+) {
+    if width == 0 || height == 0 || points.is_empty() || points.iter().all(Option::is_none) {
+        return;
+    }
+    let x_of = |index: usize| -> f64 {
+        if points.len() == 1 {
+            width as f64 / 2.0
+        } else {
+            index as f64 * (width as f64 - 1.0) / (points.len() - 1) as f64
+        }
+    };
+    let y_of = |percent: f64| -> f64 { (height as f64 - 1.0) * (1.0 - percent / 100.0) };
+    if let Some(fill) = fill {
+        let source = premultiply(fill);
+        for x in 0..width {
+            let Some(percent) = sparkline_value_at(points, width, x as f64) else {
+                continue;
+            };
+            let top = y_of(percent).round().clamp(0.0, height as f64 - 1.0) as u32;
+            for y in top..height {
+                blend(&mut pixels[(y * width + x) as usize], source, 1.0);
+            }
+        }
+    }
+    let source = premultiply(line);
+    for index in 0..points.len() {
+        let Some(percent) = points[index] else {
+            continue;
+        };
+        let current = (x_of(index), y_of(percent));
+        let previous = index.checked_sub(1).and_then(|previous| points[previous]);
+        let next = points.get(index + 1).copied().flatten();
+        match previous {
+            // Only join neighbours that both have a sample: a gap stays a gap.
+            Some(previous) => draw_sparkline_segment(
+                pixels,
+                width,
+                height,
+                (x_of(index - 1), y_of(previous)),
+                current,
+                source,
+            ),
+            // A sample with no neighbour on either side is still worth a dot.
+            None if next.is_none() => {
+                paint_sparkline_dot(pixels, width, height, current, 1.0, source)
+            }
+            None => {}
+        }
+    }
+}
+
+/// Series value at pixel column `x`, interpolated between neighbouring samples.
+fn sparkline_value_at(points: &[Option<f64>], width: u32, x: f64) -> Option<f64> {
+    if points.len() == 1 {
+        return points[0];
+    }
+    let last = points.len() - 1;
+    let span = (width as f64 - 1.0).max(1.0);
+    let position = (x / span * last as f64).clamp(0.0, last as f64);
+    let left = position.floor() as usize;
+    let right = (left + 1).min(last);
+    let left_value = points[left]?;
+    let right_value = if right == left {
+        left_value
+    } else {
+        points[right]?
+    };
+    let amount = position - left as f64;
+    Some(left_value + (right_value - left_value) * amount)
+}
+
+fn draw_sparkline_segment(
+    pixels: &mut [u32],
+    width: u32,
+    height: u32,
+    from: (f64, f64),
+    to: (f64, f64),
+    source: u32,
+) {
+    let length = ((to.0 - from.0).powi(2) + (to.1 - from.1).powi(2)).sqrt();
+    if length <= 0.0 {
+        paint_sparkline_dot(pixels, width, height, from, 1.0, source);
+        return;
+    }
+    let steps = (length * 2.0).ceil().max(1.0) as u32;
+    for step in 0..=steps {
+        let amount = step as f64 / steps as f64;
+        let point = (
+            from.0 + (to.0 - from.0) * amount,
+            from.1 + (to.1 - from.1) * amount,
+        );
+        paint_sparkline_dot(pixels, width, height, point, 0.7, source);
+    }
+}
+
+/// Blend a soft dot so a sloped polyline does not look like a staircase.
+fn paint_sparkline_dot(
+    pixels: &mut [u32],
+    width: u32,
+    height: u32,
+    center: (f64, f64),
+    radius: f64,
+    source: u32,
+) {
+    let min_x = (center.0 - radius - 1.0).floor().max(0.0) as u32;
+    let max_x = (center.0 + radius + 1.0)
+        .ceil()
+        .min(width as f64 - 1.0)
+        .max(0.0) as u32;
+    let min_y = (center.1 - radius - 1.0).floor().max(0.0) as u32;
+    let max_y = (center.1 + radius + 1.0)
+        .ceil()
+        .min(height as f64 - 1.0)
+        .max(0.0) as u32;
+    for y in min_y..=max_y {
+        for x in min_x..=max_x {
+            let dx = x as f64 + 0.5 - center.0;
+            let dy = y as f64 + 0.5 - center.1;
+            let coverage = (radius + 0.5 - (dx * dx + dy * dy).sqrt()).clamp(0.0, 1.0);
+            if coverage > 0.0 {
+                let index = (y * width + x) as usize;
+                if let Some(pixel) = pixels.get_mut(index) {
+                    blend(pixel, source, coverage);
+                }
+            }
+        }
     }
 }
 
