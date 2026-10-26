@@ -210,6 +210,27 @@ impl AppUsageData {
         self.providers.get(&provider)
     }
 
+    /// Hide the windows the user switched off for a provider. A hidden window
+    /// reports "not available" instead of 0%, which every theme already renders
+    /// as "no figure", so themes stay unaware of the setting.
+    pub fn apply_window_visibility(
+        &mut self,
+        settings: &BTreeMap<String, crate::app_settings::ProviderSettings>,
+    ) {
+        let providers: Vec<ProviderId> = self.providers.keys().copied().collect();
+        for provider in providers {
+            let Some(preferences) = settings.get(provider.descriptor().key) else {
+                continue;
+            };
+            if preferences.windows.is_none() {
+                continue;
+            }
+            if let Some(usage) = self.providers.get_mut(&provider) {
+                hide_unselected_windows(usage, preferences);
+            }
+        }
+    }
+
     pub fn antigravity_external(&self) -> Option<&UsageData> {
         self.get(ProviderId::Antigravity)
             .and_then(|u| u.external_pool.as_deref())
@@ -641,5 +662,23 @@ mod tests {
         );
         let decoded: UsageSection = serde_json::from_value(json).unwrap();
         assert_eq!(decoded, section);
+    }
+}
+
+fn hide_unselected_windows(
+    usage: &mut UsageData,
+    preferences: &crate::app_settings::ProviderSettings,
+) {
+    if !preferences.shows("session") {
+        usage.session = UsageSection::default();
+    }
+    if !preferences.shows("weekly") {
+        usage.weekly = UsageSection::default();
+    }
+    if !preferences.shows("monthly") {
+        usage.monthly = None;
+    }
+    if let Some(pool) = usage.external_pool.as_deref_mut() {
+        hide_unselected_windows(pool, preferences);
     }
 }

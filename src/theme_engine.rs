@@ -1356,6 +1356,9 @@ pub struct ThemeRuntime {
     pub floating_card_opacity: u8,
     pub antigravity_gemini_enabled: bool,
     pub antigravity_external_enabled: bool,
+    /// Providers whose consumption is on course to exhaust a window soon; the
+    /// widget marks them with a warning glyph.
+    pub burn_warning: ProviderSet,
     pub crossfade_opacity: f64,
     host_width: u32,
     host_height: u32,
@@ -1373,6 +1376,7 @@ impl Default for ThemeRuntime {
             floating_card_opacity: 85,
             antigravity_gemini_enabled: true,
             antigravity_external_enabled: false,
+            burn_warning: ProviderSet::empty(),
             crossfade_opacity: 1.0,
             host_width: default_canvas_width(),
             host_height: default_canvas_height(),
@@ -1407,6 +1411,7 @@ impl ThemeRuntime {
             floating_card_opacity: 85,
             antigravity_gemini_enabled: agy,
             antigravity_external_enabled: false,
+            burn_warning: ProviderSet::empty(),
             crossfade_opacity: 1.0,
             host_width: default_canvas_width(),
             host_height: default_canvas_height(),
@@ -1447,6 +1452,11 @@ impl ThemeRuntime {
     }
 
     /// Count each allowance down towards its limit instead of up from zero.
+    pub fn with_burn_warning(mut self, warnings: ProviderSet) -> Self {
+        self.burn_warning = warnings;
+        self
+    }
+
     pub fn with_countdown(mut self, countdown: bool) -> Self {
         self.countdown = countdown;
         self
@@ -1546,6 +1556,11 @@ impl DataContext {
             context.insert(
                 &format!("providers.{}.enabled", descriptor.key),
                 runtime.provider_enabled(descriptor.id) as u8 as f64,
+            );
+            // Burn-rate marker: 1 when this provider is about to run out.
+            context.insert(
+                &format!("{}.burn.warning", descriptor.key),
+                runtime.burn_warning.contains(descriptor.id) as u8 as f64,
             );
         }
         context.insert("display.countdown", runtime.countdown as u8 as f64);

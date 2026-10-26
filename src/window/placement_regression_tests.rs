@@ -48,6 +48,7 @@ pub(super) fn state_for(theme: ThemeDocument, placement: PlacementOverride) -> A
         usage_countdown: false,
         alert_sound: false,
         alert_threshold_percent: crate::alerts::DEFAULT_THRESHOLD,
+        burn_warning: crate::providers::ProviderSet::empty(),
         active_theme_path: None,
         active_theme: Some(theme),
         theme_clock_interval: None,

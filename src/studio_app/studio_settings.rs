@@ -189,6 +189,91 @@ impl StudioApp {
                     },
                 );
             });
+            section(ui, language.text("Per provider"), |ui| {
+                // Read a snapshot first: the rows only need values, and edits
+                // are applied afterwards so the settings map is not borrowed
+                // while the widgets run.
+                let global_threshold = self.settings.alert_threshold_percent;
+                let snapshot: Vec<(String, &'static str, f64, [bool; 3])> = PROVIDER_DESCRIPTORS
+                    .iter()
+                    .filter(|descriptor| self.settings.provider_enabled(descriptor.id))
+                    .map(|descriptor| {
+                        let prefs = self.settings.provider_settings.get(descriptor.key);
+                        let threshold = prefs
+                            .map(|prefs| prefs.threshold(global_threshold))
+                            .unwrap_or(global_threshold);
+                        let shown = [
+                            prefs.map(|prefs| prefs.shows("session")).unwrap_or(true),
+                            prefs.map(|prefs| prefs.shows("weekly")).unwrap_or(true),
+                            prefs.map(|prefs| prefs.shows("monthly")).unwrap_or(true),
+                        ];
+                        (
+                            descriptor.key.to_string(),
+                            descriptor.display_name,
+                            threshold,
+                            shown,
+                        )
+                    })
+                    .collect();
+                let mut threshold_edits: Vec<(String, f64)> = Vec::new();
+                let mut window_edits: Vec<(String, [bool; 3])> = Vec::new();
+                for (key, display_name, threshold, shown) in snapshot {
+                    let mut chosen = threshold;
+                    let mut windows = shown;
+                    ui.push_id(&key, |ui| {
+                        setting_row(
+                            ui,
+                            language.text(display_name),
+                            language.text("Alert threshold and the windows shown"),
+                            |ui| {
+                                Dropdown::from_id_salt("provider_threshold")
+                                    .width(96.0)
+                                    .selected_text(format!("{chosen:.0}%"))
+                                    .show_ui(ui, |ui| {
+                                        for value in [80.0_f64, 90.0, 95.0, 98.0, 100.0] {
+                                            let label = format!("{value:.0}%");
+                                            if dropdown_selectable_label(
+                                                ui,
+                                                (chosen - value).abs() < 0.5,
+                                                &label,
+                                            )
+                                            .clicked()
+                                            {
+                                                chosen = value;
+                                            }
+                                        }
+                                    });
+                                for (index, caption) in ["5h", "7d", "30d"].into_iter().enumerate()
+                                {
+                                    if Toggle::new(&mut windows[index])
+                                        .labels(caption, caption)
+                                        .show(ui)
+                                        .changed()
+                                    {
+                                        // handled below
+                                    }
+                                }
+                            },
+                        );
+                    });
+                    if (chosen - threshold).abs() >= 0.5 {
+                        threshold_edits.push((key.clone(), chosen));
+                    }
+                    if windows != shown {
+                        window_edits.push((key, windows));
+                    }
+                }
+                for (key, threshold) in threshold_edits {
+                    let prefs = self.settings.provider_settings.entry(key).or_default();
+                    prefs.alert_threshold_percent = Some(threshold);
+                    changed = true;
+                }
+                for (key, windows) in window_edits {
+                    let prefs = self.settings.provider_settings.entry(key).or_default();
+                    apply_window_choice(prefs, windows);
+                    changed = true;
+                }
+            });
             section(ui, language.text("Appearance"), |ui| {
                 setting_row(
                     ui,
@@ -377,4 +462,20 @@ mod account_status_tests {
                 .contains("Service Unavailable")
         );
     }
+}
+
+/// Turn the three window toggles into the stored window list. Showing every
+/// window is the default, so it collapses back to `None`.
+fn apply_window_choice(prefs: &mut crate::app_settings::ProviderSettings, shown: [bool; 3]) {
+    let mut windows: Vec<String> = Vec::new();
+    for (index, window) in crate::app_settings::SHOWABLE_WINDOWS.iter().enumerate() {
+        if shown[index] {
+            windows.push((*window).to_string());
+        }
+    }
+    prefs.windows = if windows.len() == crate::app_settings::SHOWABLE_WINDOWS.len() {
+        None
+    } else {
+        Some(windows)
+    };
 }

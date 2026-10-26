@@ -1,5 +1,6 @@
 //! Shared, atomically persisted state used by the widget and studio processes.
 
+use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -79,6 +80,9 @@ pub struct SettingsFile {
     /// Usage percentage a window must reach before its reset is announced.
     #[serde(default = "default_alert_threshold")]
     pub alert_threshold_percent: f64,
+    /// Per-provider overrides for alerts and which windows the widget shows.
+    #[serde(default)]
+    pub provider_settings: BTreeMap<String, ProviderSettings>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub active_theme_path: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -148,6 +152,7 @@ impl Default for SettingsFile {
             usage_countdown: false,
             alert_sound: false,
             alert_threshold_percent: default_alert_threshold(),
+            provider_settings: BTreeMap::new(),
             active_theme_path: None,
             dashboard_width: None,
             dashboard_height: None,
@@ -157,6 +162,55 @@ impl Default for SettingsFile {
         }
     }
 }
+
+/// Per-provider preferences. Every field defaults to the global behaviour so a
+/// missing entry costs nothing and older settings files keep working.
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+pub struct ProviderSettings {
+    /// Threshold override; `None` uses the global alert threshold.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub alert_threshold_percent: Option<f64>,
+    /// Windows the widget should show; `None` shows every window the provider
+    /// reports, which is the default.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub windows: Option<Vec<String>>,
+}
+
+impl ProviderSettings {
+    pub fn normalize(&mut self) {
+        if let Some(threshold) = self.alert_threshold_percent {
+            self.alert_threshold_percent = (1.0..=100.0).contains(&threshold).then_some(threshold);
+        }
+        if let Some(windows) = self.windows.as_mut() {
+            windows.retain(|window| SHOWABLE_WINDOWS.contains(&window.as_str()));
+            windows.dedup();
+            if windows.is_empty() {
+                self.windows = None;
+            }
+        }
+    }
+
+    pub fn is_default(&self) -> bool {
+        self.alert_threshold_percent.is_none() && self.windows.is_none()
+    }
+
+    /// Threshold to use for this provider, falling back to the global one.
+    pub fn threshold(&self, global: f64) -> f64 {
+        self.alert_threshold_percent.unwrap_or(global)
+    }
+
+    /// Whether a window should be shown and alerted on.
+    pub fn shows(&self, window: &str) -> bool {
+        match self.windows.as_ref() {
+            Some(windows) => windows.iter().any(|shown| shown == window),
+            None => true,
+        }
+    }
+}
+
+/// Windows a provider can expose. Kept as strings so themes and settings files
+/// stay readable.
+pub const SHOWABLE_WINDOWS: [&str; 3] = ["session", "weekly", "monthly"];
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct LegacyPlacement {
@@ -184,6 +238,10 @@ impl SettingsFile {
         if self.enabled_providers().is_empty() {
             self.set_enabled_providers(ProviderSet::default());
         }
+        self.provider_settings.retain(|key, settings| {
+            settings.normalize();
+            !key.is_empty() && !settings.is_default()
+        });
         if !(1.0..=100.0).contains(&self.alert_threshold_percent) {
             self.alert_threshold_percent = default_alert_threshold();
         }

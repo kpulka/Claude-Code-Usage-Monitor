@@ -142,6 +142,8 @@ struct AppState {
     alert_sound: bool,
     /// Usage percentage that arms a window for the reset sound.
     alert_threshold_percent: f64,
+    /// Providers currently flagged by the burn-rate estimate.
+    burn_warning: crate::providers::ProviderSet,
     active_theme_path: Option<PathBuf>,
     active_theme: Option<ThemeDocument>,
     theme_clock_interval: Option<Duration>,
@@ -781,6 +783,7 @@ fn theme_runtime_from_state(state: &AppState) -> ThemeRuntime {
         state.auth_error_paused_polling,
         state.data.as_ref(),
     );
+    let burn_warning = state.burn_warning;
     let nest = if state.auto_ejected {
         SurfaceNest::Floating
     } else if let Some(ref ov) = state.placement_override {
@@ -804,6 +807,7 @@ fn theme_runtime_from_state(state: &AppState) -> ThemeRuntime {
             state.show_antigravity_external,
             state.crossfade_opacity,
         )
+        .with_burn_warning(burn_warning)
 }
 
 /// A transient outage can keep presenting the last real reading while its
@@ -2346,6 +2350,9 @@ fn total_widget_width() -> i32 {
         .unwrap_or(1)
 }
 
+/// Acrylic tint for the floating card: dark, slightly cool, AABBGGRR.
+const GLASS_TINT: u32 = 0xB4_14_12_18;
+
 pub fn run() {
     let run_args: Vec<String> = std::env::args().collect();
     let open_dashboard_on_start = run_args.iter().any(|argument| argument == "--dashboard");
@@ -2613,6 +2620,7 @@ pub fn run() {
                 usage_countdown: settings.usage_countdown,
                 alert_sound: settings.alert_sound,
                 alert_threshold_percent: settings.alert_threshold_percent,
+                burn_warning: crate::providers::ProviderSet::empty(),
                 active_theme_path,
                 active_theme,
                 theme_clock_interval,
@@ -2643,6 +2651,10 @@ pub fn run() {
 
         // Theme surfaces decide whether their windows render.
         position_at_taskbar();
+        // Frost the desktop behind the card. Harmless when the compositor or
+        // the theme declines; the translucent background still renders.
+        let frosted = crate::backdrop::apply_glass(hwnd, GLASS_TINT);
+        diagnose::log_lazy(|| format!("backdrop glass applied: {frosted}"));
         diagnose::log("window shown");
 
         // Initial render using the presenter selected by the surface nest.
@@ -3055,6 +3067,11 @@ fn do_poll_once(hwnd: HWND) {
                 None => data,
             };
             data.select_accounts(&accounts);
+            // Alerts always see every window; display honours the per-provider
+            // choice of which windows are worth showing.
+            let alert_data = data.clone();
+            let preferences = app_settings::load_settings();
+            data.apply_window_visibility(&preferences.provider_settings);
             let notifications: Vec<_> = data
                 .new_auth_failures(previous.as_ref(), force)
                 .into_iter()
@@ -3120,23 +3137,49 @@ fn do_poll_once(hwnd: HWND) {
                 // A sound only makes sense for windows the user actually spent:
                 // the module arms on the threshold and fires on the provider's
                 // own reset, so windows counted differently still behave alike.
-                let (alert_enabled, threshold) = lock_state()
+                let alert_enabled = lock_state()
                     .as_ref()
-                    .map(|state| (state.alert_sound, state.alert_threshold_percent))
-                    .unwrap_or((false, crate::alerts::DEFAULT_THRESHOLD));
-                if alert_enabled {
+                    .map(|state| state.alert_sound)
+                    .unwrap_or(false);
+                {
+                    let global_threshold = preferences.alert_threshold_percent;
+                    let thresholds = |provider: crate::providers::ProviderId| {
+                        preferences
+                            .provider_settings
+                            .get(provider.descriptor().key)
+                            .map(|prefs| prefs.threshold(global_threshold))
+                            .unwrap_or(global_threshold)
+                    };
                     let mut alert_state = app_settings::load_alert_state().unwrap_or_default();
                     let evaluation = crate::alerts::evaluate(
                         &mut alert_state,
-                        &cache_data,
+                        &alert_data,
                         enabled_providers,
-                        threshold,
+                        &thresholds,
                         SystemTime::now(),
                     );
                     if let Err(error) = app_settings::save_alert_state(&alert_state) {
                         diagnose::log_error("unable to save alert state", error);
                     }
-                    if evaluation.play {
+                    // The warning glyph follows the projection, not the sound.
+                    if let Some(state) = lock_state().as_mut() {
+                        state.burn_warning = evaluation.warnings;
+                    }
+                    if !evaluation.reached.is_empty() {
+                        let summary = evaluation
+                            .reached
+                            .iter()
+                            .map(|event| format!("{} {:.0}%", event.window, event.peak))
+                            .collect::<Vec<_>>()
+                            .join(", ");
+                        diagnose::log_lazy(|| format!("limit reached: {summary}"));
+                        tray_icon::notify_balloon(
+                            hwnd,
+                            &language.text("Allowance used up"),
+                            &summary,
+                        );
+                    }
+                    if alert_enabled && evaluation.play {
                         diagnose::log_lazy(|| {
                             format!(
                                 "alert sound: {} window(s) reset ({})",

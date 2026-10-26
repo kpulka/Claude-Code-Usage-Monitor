@@ -22,17 +22,36 @@
       },
       "width": "340",
       "height": "12 + providers.count * 76",
-      "corner_radius": "10",
+      "corner_radius": "14",
       "background": {
-        "type": "colour",
-        "colour": {
-          "color": "#1B1B1FF2"
-        }
+        "type": "gradient",
+        "start": {
+          "color": "#1A1A20F0"
+        },
+        "end": {
+          "color": "#0E0E13E8"
+        },
+        "angle": "90"
       },
       "mouse_events": {
         "right_click": "show_context_menu(\"classic-v1\")"
       },
       "children": [
+        {
+          "id": "glass-highlight",
+          "name": "Top specular highlight",
+          "x": "16",
+          "y": "0",
+          "width": "max(1, canvas.width - 32)",
+          "height": "1",
+          "corner_radius": "1",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#FFFFFF3A"
+            }
+          }
+        },
         {
           "id": "grid",
           "name": "Provider grid",
@@ -47,6 +66,29 @@
           "render": "providers.claude.enabled",
           "width": "canvas.width",
           "height": "76"
+        },
+        {
+          "id": "claude-burn-warning",
+          "name": "claude burn warning",
+          "parent": "claude-provider",
+          "render": "claude.burn.warning",
+          "x": "196",
+          "y": "6",
+          "width": "14",
+          "height": "18",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "15",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#F59E0BFF"
+            }
+          }
         },
         {
           "id": "claude-badge",
@@ -485,6 +527,29 @@
           "height": "76"
         },
         {
+          "id": "codex-burn-warning",
+          "name": "codex burn warning",
+          "parent": "codex-provider",
+          "render": "codex.burn.warning",
+          "x": "196",
+          "y": "6",
+          "width": "14",
+          "height": "18",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "15",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#F59E0BFF"
+            }
+          }
+        },
+        {
           "id": "codex-badge",
           "name": "codex-badge",
           "parent": "codex-provider",
@@ -919,6 +984,29 @@
           "render": "providers.antigravity.enabled",
           "width": "canvas.width",
           "height": "76"
+        },
+        {
+          "id": "antigravity-burn-warning",
+          "name": "antigravity burn warning",
+          "parent": "antigravity-provider",
+          "render": "antigravity.burn.warning",
+          "x": "196",
+          "y": "6",
+          "width": "14",
+          "height": "18",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "15",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#F59E0BFF"
+            }
+          }
         },
         {
           "id": "antigravity-badge",
@@ -1357,6 +1445,29 @@
           "height": "76"
         },
         {
+          "id": "opencode-burn-warning",
+          "name": "opencode burn warning",
+          "parent": "opencode-provider",
+          "render": "opencode.burn.warning",
+          "x": "196",
+          "y": "6",
+          "width": "14",
+          "height": "18",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "15",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#F59E0BFF"
+            }
+          }
+        },
+        {
           "id": "opencode-badge",
           "name": "opencode-badge",
           "parent": "opencode-provider",
@@ -1791,6 +1902,29 @@
           "render": "providers.cursor.enabled",
           "width": "canvas.width",
           "height": "76"
+        },
+        {
+          "id": "cursor-burn-warning",
+          "name": "cursor burn warning",
+          "parent": "cursor-provider",
+          "render": "cursor.burn.warning",
+          "x": "196",
+          "y": "6",
+          "width": "14",
+          "height": "18",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "15",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#F59E0BFF"
+            }
+          }
         },
         {
           "id": "cursor-badge",
@@ -2229,6 +2363,29 @@
           "height": "76"
         },
         {
+          "id": "grok-burn-warning",
+          "name": "grok burn warning",
+          "parent": "grok-provider",
+          "render": "grok.burn.warning",
+          "x": "196",
+          "y": "6",
+          "width": "14",
+          "height": "18",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "15",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#F59E0BFF"
+            }
+          }
+        },
+        {
           "id": "grok-badge",
           "name": "grok-badge",
           "parent": "grok-provider",
@@ -2665,6 +2822,29 @@
           "height": "76"
         },
         {
+          "id": "copilot-burn-warning",
+          "name": "copilot burn warning",
+          "parent": "copilot-provider",
+          "render": "copilot.burn.warning",
+          "x": "196",
+          "y": "6",
+          "width": "14",
+          "height": "18",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "15",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#F59E0BFF"
+            }
+          }
+        },
+        {
           "id": "copilot-badge",
           "name": "copilot-badge",
           "parent": "copilot-provider",
@@ -3092,7 +3272,13 @@
             "corner_radius": "3"
           }
         }
-      ]
+      ],
+      "border": {
+        "color": {
+          "color": "#FFFFFF30"
+        },
+        "width": "1"
+      }
     }
   ]
 }

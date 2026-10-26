@@ -3,6 +3,7 @@
 mod accounts;
 mod alerts;
 mod app_settings;
+mod backdrop;
 mod context_menu;
 mod dashboard;
 mod desktop_compositor;
