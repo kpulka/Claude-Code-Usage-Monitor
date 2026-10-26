@@ -72,6 +72,13 @@ pub struct SettingsFile {
     /// the widget counts down towards a limit rather than up from zero.
     #[serde(default)]
     pub usage_countdown: bool,
+    /// Play a sound when a window that was driven past the alert threshold
+    /// resets, so the allowance is noticed as available again.
+    #[serde(default)]
+    pub alert_sound: bool,
+    /// Usage percentage a window must reach before its reset is announced.
+    #[serde(default = "default_alert_threshold")]
+    pub alert_threshold_percent: f64,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub active_theme_path: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -139,6 +146,8 @@ impl Default for SettingsFile {
             show_copilot: false,
             custom_theme_enabled: true,
             usage_countdown: false,
+            alert_sound: false,
+            alert_threshold_percent: default_alert_threshold(),
             active_theme_path: None,
             dashboard_width: None,
             dashboard_height: None,
@@ -174,6 +183,9 @@ impl SettingsFile {
             || self.show_antigravity_external.unwrap_or(false);
         if self.enabled_providers().is_empty() {
             self.set_enabled_providers(ProviderSet::default());
+        }
+        if !(1.0..=100.0).contains(&self.alert_threshold_percent) {
+            self.alert_threshold_percent = default_alert_threshold();
         }
         if let Some(opacity) = self.floating_card_opacity {
             self.floating_card_opacity = Some(opacity.min(100));
@@ -426,6 +438,18 @@ pub fn save_codex_credits(state: &CodexCreditsState) -> Result<(), String> {
     write_json_atomic(&codex_credits_path(), state)
 }
 
+pub fn alert_state_path() -> PathBuf {
+    app_data_directory().join("alerts.json")
+}
+
+pub fn load_alert_state() -> Option<crate::alerts::AlertState> {
+    read_json(&alert_state_path())
+}
+
+pub fn save_alert_state(state: &crate::alerts::AlertState) -> Result<(), String> {
+    write_json_atomic(&alert_state_path(), state)
+}
+
 pub fn load_usage_cache() -> Option<UsageCache> {
     let mut cache: UsageCache = read_json(&usage_cache_path())?;
     cache.data.invalidate_changed_credentials();
@@ -482,6 +506,10 @@ pub fn write_json_atomic<T: Serialize>(path: &Path, value: &T) -> Result<(), Str
 fn wide_path(path: &Path) -> Vec<u16> {
     use std::os::windows::ffi::OsStrExt;
     path.as_os_str().encode_wide().chain(Some(0)).collect()
+}
+
+fn default_alert_threshold() -> f64 {
+    crate::alerts::DEFAULT_THRESHOLD
 }
 
 fn default_poll_interval() -> u32 {

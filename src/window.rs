@@ -138,6 +138,10 @@ struct AppState {
 
     custom_theme_enabled: bool,
     usage_countdown: bool,
+    /// Play a sound when a nearly exhausted window resets.
+    alert_sound: bool,
+    /// Usage percentage that arms a window for the reset sound.
+    alert_threshold_percent: f64,
     active_theme_path: Option<PathBuf>,
     active_theme: Option<ThemeDocument>,
     theme_clock_interval: Option<Duration>,
@@ -2607,6 +2611,8 @@ pub fn run() {
                 window_state_timer_active: false,
                 custom_theme_enabled,
                 usage_countdown: settings.usage_countdown,
+                alert_sound: settings.alert_sound,
+                alert_threshold_percent: settings.alert_threshold_percent,
                 active_theme_path,
                 active_theme,
                 theme_clock_interval,
@@ -3110,6 +3116,44 @@ fn do_poll_once(hwnd: HWND) {
                 }),
                 Err(error) => diagnose::log_error("unable to save usage cache", error),
             }
+            {
+                // A sound only makes sense for windows the user actually spent:
+                // the module arms on the threshold and fires on the provider's
+                // own reset, so windows counted differently still behave alike.
+                let (alert_enabled, threshold) = lock_state()
+                    .as_ref()
+                    .map(|state| (state.alert_sound, state.alert_threshold_percent))
+                    .unwrap_or((false, crate::alerts::DEFAULT_THRESHOLD));
+                if alert_enabled {
+                    let mut alert_state = app_settings::load_alert_state().unwrap_or_default();
+                    let evaluation = crate::alerts::evaluate(
+                        &mut alert_state,
+                        &cache_data,
+                        enabled_providers,
+                        threshold,
+                        SystemTime::now(),
+                    );
+                    if let Err(error) = app_settings::save_alert_state(&alert_state) {
+                        diagnose::log_error("unable to save alert state", error);
+                    }
+                    if evaluation.play {
+                        diagnose::log_lazy(|| {
+                            format!(
+                                "alert sound: {} window(s) reset ({})",
+                                evaluation.events.len(),
+                                evaluation
+                                    .events
+                                    .iter()
+                                    .map(|event| event.window.as_str())
+                                    .collect::<Vec<_>>()
+                                    .join(", ")
+                            )
+                        });
+                        let mode = crate::sound::play_alert();
+                        diagnose::log_lazy(|| format!("alert sound played: {mode}"));
+                    }
+                }
+            }
             if !notifications.is_empty() {
                 let body = notifications
                     .iter()
@@ -3426,6 +3470,8 @@ fn reload_external_settings(hwnd: HWND) {
         state.poll_interval_ms = settings.poll_interval_ms;
         state.providers = settings.enabled_providers();
         state.usage_countdown = settings.usage_countdown;
+        state.alert_sound = settings.alert_sound;
+        state.alert_threshold_percent = settings.alert_threshold_percent;
         dual_mode = state.show_antigravity_gemini
             && state.show_antigravity_external
             && state.providers.contains(ProviderId::Antigravity);

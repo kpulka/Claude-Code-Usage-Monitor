@@ -8,6 +8,10 @@ changes grouped into Added, Changed, Fixed, and Removed where applicable.
 
 ### Added
 
+- Sound the chime when a quota window that reached the alert threshold (95% by default) resets, so the refilled allowance is noticed without watching the widget. Arming and firing are derived from each provider's own `resets_at`, so Claude's five-hour window, OpenCode Go's rolling/weekly/monthly caps and Antigravity's separate Gemini and external pools all behave alike. Windows without a reset time, failing providers and windows that never approached the threshold stay silent; a burst of resets plays one sound.
+
+- "Grid panel" built-in theme: a 340px desktop card with one block per provider, a name row with the headline figure, and one aligned row per window (label, progress bar, percentage, reset countdown) so figures and times are no longer crammed onto one line.
+
 - Read OpenCode Go usage from the API key the OpenCode CLI already stores in `auth.json`, polling `https://opencode.ai/zen/go/v1/usage` for the rolling five-hour, weekly and monthly windows. The console cookie route stays as a fallback, so existing setups keep working and accounts with only a CLI login need no extra configuration.
 
 - Accept an `apiKey` in the OpenCode Go config file and `OPENCODE_GO_API_KEY` in the environment, plus `OPENCODE_AUTH_FILE` to point at a different OpenCode `auth.json`.

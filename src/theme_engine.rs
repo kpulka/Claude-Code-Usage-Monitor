@@ -22,6 +22,7 @@ pub const THEME_SCHEMA_VERSION: u32 = 1;
 pub const CLASSIC_THEME_ID: &str = "classic-usage-widget";
 pub const COMPACT_FLUENT_QUAD_THEME_ID: &str = "compact-fluent-quad";
 pub const CLASSIC_VERTICAL_THEME_ID: &str = "classic-vertical";
+pub const GRID_PANEL_THEME_ID: &str = "grid-panel";
 pub const MINECRAFT_THEME_ID: &str = "theme-minecraft";
 
 const BUILTIN_THEME_SOURCES: &[(&str, &str)] = &[
@@ -36,6 +37,10 @@ const BUILTIN_THEME_SOURCES: &[(&str, &str)] = &[
     (
         CLASSIC_VERTICAL_THEME_ID,
         include_str!(concat!(env!("OUT_DIR"), "/classic-vertical.json")),
+    ),
+    (
+        GRID_PANEL_THEME_ID,
+        include_str!(concat!(env!("OUT_DIR"), "/grid-panel.json")),
     ),
 ];
 

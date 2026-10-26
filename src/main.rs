@@ -1,6 +1,7 @@
 #![windows_subsystem = "windows"]
 
 mod accounts;
+mod alerts;
 mod app_settings;
 mod context_menu;
 mod dashboard;
@@ -15,6 +16,7 @@ mod models;
 mod native_interop;
 mod poller;
 mod providers;
+mod sound;
 mod studio_app;
 mod theme;
 mod theme_engine;
@@ -43,6 +45,14 @@ fn main() {
                 let _ = error;
             }
         }
+    }
+
+    if args.iter().any(|arg| arg == "--test-alert-sound") {
+        // Lets a user (or an agent) prove the alert path without waiting for a
+        // quota window to reset.
+        let mode = sound::play_alert();
+        diagnose::log(format!("alert sound verification: {mode}"));
+        return;
     }
 
     if studio_app::handle_cli_mode(&args) {

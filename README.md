@@ -93,6 +93,10 @@ Grok Build usage comes from the session the CLI stores in `%USERPROFILE%\.grok\a
 
 GitHub Copilot usage comes from `api.github.com/copilot_internal/user`, the endpoint Copilot's own editors and CLI read. The monitor uses the first GitHub login that endpoint accepts, in this order: the `COPILOT_GITHUB_TOKEN`, `GH_TOKEN`, or `GITHUB_TOKEN` environment variable, the Copilot CLI login, then the GitHub CLI login, both read from Windows Credential Manager. Copilot spends one premium-request pool per calendar month, so the monitor shows it on the long-window row and leaves the short-window row empty. Metered chat and completion allowances, as on Copilot Free, are available to themes through `copilot.limits.chat` and `copilot.limits.completions`.
 
+## Reset alerts
+
+**Settings > Sound > Reset alert** plays the Windows notification chime when a quota window that had reached the alert threshold resets, so you know the allowance is available again without watching the widget. Windows only arm once they pass the threshold (95% by default, **Alert threshold** changes it), and the reset is read from the provider's own reset time rather than from a fixed schedule — Claude's five-hour window, OpenCode Go's rolling/weekly/monthly caps and Antigravity's Gemini and external pools each reset on their own clock and are tracked independently. A window that never came close stays silent, and several windows resetting together play a single sound. State lives in `%APPDATA%\ClaudeCodeUsageMonitor\alerts.json`; `--test-alert-sound` plays the chime once and exits so the path can be verified without waiting for a reset.
+
 ## Data and privacy
 
 The monitor reads local sign-in credentials for enabled providers and sends usage requests directly to their official services. It has no backend service, collects no telemetry, and does not upload credentials or project files.

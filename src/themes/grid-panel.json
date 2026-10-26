@@ -1,0 +1,3098 @@
+{
+  "schema_version": 1,
+  "id": "grid-panel",
+  "name": "Grid panel",
+  "surfaces": [
+    {
+      "id": "main",
+      "name": "Grid panel",
+      "tooltip": "usage_summary",
+      "placement": {
+        "reference": {
+          "region": "system_tray",
+          "display": 0
+        },
+        "nest": "taskbar",
+        "horizontal": "right",
+        "vertical": "bottom",
+        "surface_horizontal": "right",
+        "surface_vertical": "bottom",
+        "offset_x": 0,
+        "offset_y": 0
+      },
+      "width": "340",
+      "height": "12 + providers.count * 76",
+      "corner_radius": "10",
+      "background": {
+        "type": "colour",
+        "colour": {
+          "color": "#1B1B1FF2"
+        }
+      },
+      "mouse_events": {
+        "right_click": "show_context_menu(\"classic-v1\")"
+      },
+      "children": [
+        {
+          "id": "grid",
+          "name": "Provider grid",
+          "width": "canvas.width",
+          "height": "canvas.height",
+          "layout": "column"
+        },
+        {
+          "id": "claude-provider",
+          "name": "Claude",
+          "parent": "grid",
+          "render": "providers.claude.enabled",
+          "width": "canvas.width",
+          "height": "76"
+        },
+        {
+          "id": "claude-badge",
+          "name": "claude-badge",
+          "parent": "claude-provider",
+          "x": "14",
+          "y": "15",
+          "width": "10",
+          "height": "10",
+          "corner_radius": "5",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#D97757"
+            }
+          }
+        },
+        {
+          "id": "claude-name-dark",
+          "name": "claude-name-dark",
+          "parent": "claude-provider",
+          "render": "system.dark",
+          "x": "30",
+          "y": "9",
+          "width": "200",
+          "height": "16",
+          "content": {
+            "type": "text",
+            "template": "Claude",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "semibold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#ECECECFF"
+            }
+          }
+        },
+        {
+          "id": "claude-headline-dark",
+          "name": "claude-headline-dark",
+          "parent": "claude-provider",
+          "render": "system.dark",
+          "x": "212",
+          "y": "7",
+          "width": "110",
+          "height": "20",
+          "content": {
+            "type": "text",
+            "template": "{claude.headline.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "15",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#D97757"
+            }
+          }
+        },
+        {
+          "id": "claude-session-label-dark",
+          "name": "claude-session-label-dark",
+          "parent": "claude-provider",
+          "render": "system.dark",
+          "x": "30",
+          "y": "31",
+          "width": "30",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{claude.session.label}",
+            "font_family": "Segoe UI",
+            "font_size": "10",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "claude-session-value-dark",
+          "name": "claude-session-value-dark",
+          "parent": "claude-provider",
+          "render": "system.dark",
+          "x": "212",
+          "y": "29",
+          "width": "60",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{claude.session.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#ECECECFF"
+            }
+          }
+        },
+        {
+          "id": "claude-session-reset-dark",
+          "name": "claude-session-reset-dark",
+          "parent": "claude-provider",
+          "render": "system.dark",
+          "x": "276",
+          "y": "31",
+          "width": "50",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{claude.session.reset.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "regular",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "claude-weekly-label-dark",
+          "name": "claude-weekly-label-dark",
+          "parent": "claude-provider",
+          "render": "system.dark",
+          "x": "30",
+          "y": "51",
+          "width": "30",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{claude.weekly.label}",
+            "font_family": "Segoe UI",
+            "font_size": "10",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "claude-weekly-value-dark",
+          "name": "claude-weekly-value-dark",
+          "parent": "claude-provider",
+          "render": "system.dark",
+          "x": "212",
+          "y": "49",
+          "width": "60",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{claude.weekly.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#ECECECFF"
+            }
+          }
+        },
+        {
+          "id": "claude-weekly-reset-dark",
+          "name": "claude-weekly-reset-dark",
+          "parent": "claude-provider",
+          "render": "system.dark",
+          "x": "276",
+          "y": "51",
+          "width": "50",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{claude.weekly.reset.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "regular",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "claude-name-light",
+          "name": "claude-name-light",
+          "parent": "claude-provider",
+          "render": "1 - system.dark",
+          "x": "30",
+          "y": "9",
+          "width": "200",
+          "height": "16",
+          "content": {
+            "type": "text",
+            "template": "Claude",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "semibold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#1A1A1AFF"
+            }
+          }
+        },
+        {
+          "id": "claude-headline-light",
+          "name": "claude-headline-light",
+          "parent": "claude-provider",
+          "render": "1 - system.dark",
+          "x": "212",
+          "y": "7",
+          "width": "110",
+          "height": "20",
+          "content": {
+            "type": "text",
+            "template": "{claude.headline.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "15",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#D97757"
+            }
+          }
+        },
+        {
+          "id": "claude-session-label-light",
+          "name": "claude-session-label-light",
+          "parent": "claude-provider",
+          "render": "1 - system.dark",
+          "x": "30",
+          "y": "31",
+          "width": "30",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{claude.session.label}",
+            "font_family": "Segoe UI",
+            "font_size": "10",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#5F6368FF"
+            }
+          }
+        },
+        {
+          "id": "claude-session-value-light",
+          "name": "claude-session-value-light",
+          "parent": "claude-provider",
+          "render": "1 - system.dark",
+          "x": "212",
+          "y": "29",
+          "width": "60",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{claude.session.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#1A1A1AFF"
+            }
+          }
+        },
+        {
+          "id": "claude-session-reset-light",
+          "name": "claude-session-reset-light",
+          "parent": "claude-provider",
+          "render": "1 - system.dark",
+          "x": "276",
+          "y": "31",
+          "width": "50",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{claude.session.reset.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "regular",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#5F6368FF"
+            }
+          }
+        },
+        {
+          "id": "claude-weekly-label-light",
+          "name": "claude-weekly-label-light",
+          "parent": "claude-provider",
+          "render": "1 - system.dark",
+          "x": "30",
+          "y": "51",
+          "width": "30",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{claude.weekly.label}",
+            "font_family": "Segoe UI",
+            "font_size": "10",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#5F6368FF"
+            }
+          }
+        },
+        {
+          "id": "claude-weekly-value-light",
+          "name": "claude-weekly-value-light",
+          "parent": "claude-provider",
+          "render": "1 - system.dark",
+          "x": "212",
+          "y": "49",
+          "width": "60",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{claude.weekly.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#1A1A1AFF"
+            }
+          }
+        },
+        {
+          "id": "claude-weekly-reset-light",
+          "name": "claude-weekly-reset-light",
+          "parent": "claude-provider",
+          "render": "1 - system.dark",
+          "x": "276",
+          "y": "51",
+          "width": "50",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{claude.weekly.reset.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "regular",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#5F6368FF"
+            }
+          }
+        },
+        {
+          "id": "claude-session-bar",
+          "name": "claude-session-bar",
+          "parent": "claude-provider",
+          "render": "claude.session.available",
+          "x": "62",
+          "y": "34",
+          "width": "146",
+          "height": "6",
+          "content": {
+            "type": "progress",
+            "value": "claude.session.display",
+            "direction": "left_to_right",
+            "fill": {
+              "color": "#D97757"
+            },
+            "track": {
+              "color": "#FFFFFF1A"
+            },
+            "corner_radius": "3"
+          }
+        },
+        {
+          "id": "claude-weekly-bar",
+          "name": "claude-weekly-bar",
+          "parent": "claude-provider",
+          "render": "claude.weekly.available",
+          "x": "62",
+          "y": "54",
+          "width": "146",
+          "height": "6",
+          "content": {
+            "type": "progress",
+            "value": "claude.weekly.display",
+            "direction": "left_to_right",
+            "fill": {
+              "color": "#D97757"
+            },
+            "track": {
+              "color": "#FFFFFF1A"
+            },
+            "corner_radius": "3"
+          }
+        },
+        {
+          "id": "codex-provider",
+          "name": "Codex",
+          "parent": "grid",
+          "render": "providers.codex.enabled",
+          "width": "canvas.width",
+          "height": "76"
+        },
+        {
+          "id": "codex-badge",
+          "name": "codex-badge",
+          "parent": "codex-provider",
+          "x": "14",
+          "y": "15",
+          "width": "10",
+          "height": "10",
+          "corner_radius": "5",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#10A37F"
+            }
+          }
+        },
+        {
+          "id": "codex-name-dark",
+          "name": "codex-name-dark",
+          "parent": "codex-provider",
+          "render": "system.dark",
+          "x": "30",
+          "y": "9",
+          "width": "200",
+          "height": "16",
+          "content": {
+            "type": "text",
+            "template": "Codex",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "semibold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#ECECECFF"
+            }
+          }
+        },
+        {
+          "id": "codex-headline-dark",
+          "name": "codex-headline-dark",
+          "parent": "codex-provider",
+          "render": "system.dark",
+          "x": "212",
+          "y": "7",
+          "width": "110",
+          "height": "20",
+          "content": {
+            "type": "text",
+            "template": "{codex.headline.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "15",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#10A37F"
+            }
+          }
+        },
+        {
+          "id": "codex-session-label-dark",
+          "name": "codex-session-label-dark",
+          "parent": "codex-provider",
+          "render": "system.dark",
+          "x": "30",
+          "y": "31",
+          "width": "30",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{codex.session.label}",
+            "font_family": "Segoe UI",
+            "font_size": "10",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "codex-session-value-dark",
+          "name": "codex-session-value-dark",
+          "parent": "codex-provider",
+          "render": "system.dark",
+          "x": "212",
+          "y": "29",
+          "width": "60",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{codex.session.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#ECECECFF"
+            }
+          }
+        },
+        {
+          "id": "codex-session-reset-dark",
+          "name": "codex-session-reset-dark",
+          "parent": "codex-provider",
+          "render": "system.dark",
+          "x": "276",
+          "y": "31",
+          "width": "50",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{codex.session.reset.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "regular",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "codex-weekly-label-dark",
+          "name": "codex-weekly-label-dark",
+          "parent": "codex-provider",
+          "render": "system.dark",
+          "x": "30",
+          "y": "51",
+          "width": "30",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{codex.weekly.label}",
+            "font_family": "Segoe UI",
+            "font_size": "10",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "codex-weekly-value-dark",
+          "name": "codex-weekly-value-dark",
+          "parent": "codex-provider",
+          "render": "system.dark",
+          "x": "212",
+          "y": "49",
+          "width": "60",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{codex.weekly.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#ECECECFF"
+            }
+          }
+        },
+        {
+          "id": "codex-weekly-reset-dark",
+          "name": "codex-weekly-reset-dark",
+          "parent": "codex-provider",
+          "render": "system.dark",
+          "x": "276",
+          "y": "51",
+          "width": "50",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{codex.weekly.reset.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "regular",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "codex-name-light",
+          "name": "codex-name-light",
+          "parent": "codex-provider",
+          "render": "1 - system.dark",
+          "x": "30",
+          "y": "9",
+          "width": "200",
+          "height": "16",
+          "content": {
+            "type": "text",
+            "template": "Codex",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "semibold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#1A1A1AFF"
+            }
+          }
+        },
+        {
+          "id": "codex-headline-light",
+          "name": "codex-headline-light",
+          "parent": "codex-provider",
+          "render": "1 - system.dark",
+          "x": "212",
+          "y": "7",
+          "width": "110",
+          "height": "20",
+          "content": {
+            "type": "text",
+            "template": "{codex.headline.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "15",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#10A37F"
+            }
+          }
+        },
+        {
+          "id": "codex-session-label-light",
+          "name": "codex-session-label-light",
+          "parent": "codex-provider",
+          "render": "1 - system.dark",
+          "x": "30",
+          "y": "31",
+          "width": "30",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{codex.session.label}",
+            "font_family": "Segoe UI",
+            "font_size": "10",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#5F6368FF"
+            }
+          }
+        },
+        {
+          "id": "codex-session-value-light",
+          "name": "codex-session-value-light",
+          "parent": "codex-provider",
+          "render": "1 - system.dark",
+          "x": "212",
+          "y": "29",
+          "width": "60",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{codex.session.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#1A1A1AFF"
+            }
+          }
+        },
+        {
+          "id": "codex-session-reset-light",
+          "name": "codex-session-reset-light",
+          "parent": "codex-provider",
+          "render": "1 - system.dark",
+          "x": "276",
+          "y": "31",
+          "width": "50",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{codex.session.reset.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "regular",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#5F6368FF"
+            }
+          }
+        },
+        {
+          "id": "codex-weekly-label-light",
+          "name": "codex-weekly-label-light",
+          "parent": "codex-provider",
+          "render": "1 - system.dark",
+          "x": "30",
+          "y": "51",
+          "width": "30",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{codex.weekly.label}",
+            "font_family": "Segoe UI",
+            "font_size": "10",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#5F6368FF"
+            }
+          }
+        },
+        {
+          "id": "codex-weekly-value-light",
+          "name": "codex-weekly-value-light",
+          "parent": "codex-provider",
+          "render": "1 - system.dark",
+          "x": "212",
+          "y": "49",
+          "width": "60",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{codex.weekly.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#1A1A1AFF"
+            }
+          }
+        },
+        {
+          "id": "codex-weekly-reset-light",
+          "name": "codex-weekly-reset-light",
+          "parent": "codex-provider",
+          "render": "1 - system.dark",
+          "x": "276",
+          "y": "51",
+          "width": "50",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{codex.weekly.reset.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "regular",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#5F6368FF"
+            }
+          }
+        },
+        {
+          "id": "codex-session-bar",
+          "name": "codex-session-bar",
+          "parent": "codex-provider",
+          "render": "codex.session.available",
+          "x": "62",
+          "y": "34",
+          "width": "146",
+          "height": "6",
+          "content": {
+            "type": "progress",
+            "value": "codex.session.display",
+            "direction": "left_to_right",
+            "fill": {
+              "color": "#10A37F"
+            },
+            "track": {
+              "color": "#FFFFFF1A"
+            },
+            "corner_radius": "3"
+          }
+        },
+        {
+          "id": "codex-weekly-bar",
+          "name": "codex-weekly-bar",
+          "parent": "codex-provider",
+          "render": "codex.weekly.available",
+          "x": "62",
+          "y": "54",
+          "width": "146",
+          "height": "6",
+          "content": {
+            "type": "progress",
+            "value": "codex.weekly.display",
+            "direction": "left_to_right",
+            "fill": {
+              "color": "#10A37F"
+            },
+            "track": {
+              "color": "#FFFFFF1A"
+            },
+            "corner_radius": "3"
+          }
+        },
+        {
+          "id": "antigravity-provider",
+          "name": "Antigravity",
+          "parent": "grid",
+          "render": "providers.antigravity.enabled",
+          "width": "canvas.width",
+          "height": "76"
+        },
+        {
+          "id": "antigravity-badge",
+          "name": "antigravity-badge",
+          "parent": "antigravity-provider",
+          "x": "14",
+          "y": "15",
+          "width": "10",
+          "height": "10",
+          "corner_radius": "5",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#4285F4"
+            }
+          }
+        },
+        {
+          "id": "antigravity-name-dark",
+          "name": "antigravity-name-dark",
+          "parent": "antigravity-provider",
+          "render": "system.dark",
+          "x": "30",
+          "y": "9",
+          "width": "200",
+          "height": "16",
+          "content": {
+            "type": "text",
+            "template": "Antigravity",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "semibold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#ECECECFF"
+            }
+          }
+        },
+        {
+          "id": "antigravity-headline-dark",
+          "name": "antigravity-headline-dark",
+          "parent": "antigravity-provider",
+          "render": "system.dark",
+          "x": "212",
+          "y": "7",
+          "width": "110",
+          "height": "20",
+          "content": {
+            "type": "text",
+            "template": "{antigravity.headline.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "15",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#4285F4"
+            }
+          }
+        },
+        {
+          "id": "antigravity-session-label-dark",
+          "name": "antigravity-session-label-dark",
+          "parent": "antigravity-provider",
+          "render": "system.dark",
+          "x": "30",
+          "y": "31",
+          "width": "30",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{antigravity.session.label}",
+            "font_family": "Segoe UI",
+            "font_size": "10",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "antigravity-session-value-dark",
+          "name": "antigravity-session-value-dark",
+          "parent": "antigravity-provider",
+          "render": "system.dark",
+          "x": "212",
+          "y": "29",
+          "width": "60",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{antigravity.session.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#ECECECFF"
+            }
+          }
+        },
+        {
+          "id": "antigravity-session-reset-dark",
+          "name": "antigravity-session-reset-dark",
+          "parent": "antigravity-provider",
+          "render": "system.dark",
+          "x": "276",
+          "y": "31",
+          "width": "50",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{antigravity.session.reset.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "regular",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "antigravity-weekly-label-dark",
+          "name": "antigravity-weekly-label-dark",
+          "parent": "antigravity-provider",
+          "render": "system.dark",
+          "x": "30",
+          "y": "51",
+          "width": "30",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{antigravity.weekly.label}",
+            "font_family": "Segoe UI",
+            "font_size": "10",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "antigravity-weekly-value-dark",
+          "name": "antigravity-weekly-value-dark",
+          "parent": "antigravity-provider",
+          "render": "system.dark",
+          "x": "212",
+          "y": "49",
+          "width": "60",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{antigravity.weekly.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#ECECECFF"
+            }
+          }
+        },
+        {
+          "id": "antigravity-weekly-reset-dark",
+          "name": "antigravity-weekly-reset-dark",
+          "parent": "antigravity-provider",
+          "render": "system.dark",
+          "x": "276",
+          "y": "51",
+          "width": "50",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{antigravity.weekly.reset.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "regular",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "antigravity-name-light",
+          "name": "antigravity-name-light",
+          "parent": "antigravity-provider",
+          "render": "1 - system.dark",
+          "x": "30",
+          "y": "9",
+          "width": "200",
+          "height": "16",
+          "content": {
+            "type": "text",
+            "template": "Antigravity",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "semibold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#1A1A1AFF"
+            }
+          }
+        },
+        {
+          "id": "antigravity-headline-light",
+          "name": "antigravity-headline-light",
+          "parent": "antigravity-provider",
+          "render": "1 - system.dark",
+          "x": "212",
+          "y": "7",
+          "width": "110",
+          "height": "20",
+          "content": {
+            "type": "text",
+            "template": "{antigravity.headline.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "15",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#4285F4"
+            }
+          }
+        },
+        {
+          "id": "antigravity-session-label-light",
+          "name": "antigravity-session-label-light",
+          "parent": "antigravity-provider",
+          "render": "1 - system.dark",
+          "x": "30",
+          "y": "31",
+          "width": "30",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{antigravity.session.label}",
+            "font_family": "Segoe UI",
+            "font_size": "10",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#5F6368FF"
+            }
+          }
+        },
+        {
+          "id": "antigravity-session-value-light",
+          "name": "antigravity-session-value-light",
+          "parent": "antigravity-provider",
+          "render": "1 - system.dark",
+          "x": "212",
+          "y": "29",
+          "width": "60",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{antigravity.session.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#1A1A1AFF"
+            }
+          }
+        },
+        {
+          "id": "antigravity-session-reset-light",
+          "name": "antigravity-session-reset-light",
+          "parent": "antigravity-provider",
+          "render": "1 - system.dark",
+          "x": "276",
+          "y": "31",
+          "width": "50",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{antigravity.session.reset.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "regular",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#5F6368FF"
+            }
+          }
+        },
+        {
+          "id": "antigravity-weekly-label-light",
+          "name": "antigravity-weekly-label-light",
+          "parent": "antigravity-provider",
+          "render": "1 - system.dark",
+          "x": "30",
+          "y": "51",
+          "width": "30",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{antigravity.weekly.label}",
+            "font_family": "Segoe UI",
+            "font_size": "10",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#5F6368FF"
+            }
+          }
+        },
+        {
+          "id": "antigravity-weekly-value-light",
+          "name": "antigravity-weekly-value-light",
+          "parent": "antigravity-provider",
+          "render": "1 - system.dark",
+          "x": "212",
+          "y": "49",
+          "width": "60",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{antigravity.weekly.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#1A1A1AFF"
+            }
+          }
+        },
+        {
+          "id": "antigravity-weekly-reset-light",
+          "name": "antigravity-weekly-reset-light",
+          "parent": "antigravity-provider",
+          "render": "1 - system.dark",
+          "x": "276",
+          "y": "51",
+          "width": "50",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{antigravity.weekly.reset.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "regular",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#5F6368FF"
+            }
+          }
+        },
+        {
+          "id": "antigravity-session-bar",
+          "name": "antigravity-session-bar",
+          "parent": "antigravity-provider",
+          "render": "antigravity.session.available",
+          "x": "62",
+          "y": "34",
+          "width": "146",
+          "height": "6",
+          "content": {
+            "type": "progress",
+            "value": "antigravity.session.display",
+            "direction": "left_to_right",
+            "fill": {
+              "color": "#4285F4"
+            },
+            "track": {
+              "color": "#FFFFFF1A"
+            },
+            "corner_radius": "3"
+          }
+        },
+        {
+          "id": "antigravity-weekly-bar",
+          "name": "antigravity-weekly-bar",
+          "parent": "antigravity-provider",
+          "render": "antigravity.weekly.available",
+          "x": "62",
+          "y": "54",
+          "width": "146",
+          "height": "6",
+          "content": {
+            "type": "progress",
+            "value": "antigravity.weekly.display",
+            "direction": "left_to_right",
+            "fill": {
+              "color": "#4285F4"
+            },
+            "track": {
+              "color": "#FFFFFF1A"
+            },
+            "corner_radius": "3"
+          }
+        },
+        {
+          "id": "opencode-provider",
+          "name": "OpenCode Go",
+          "parent": "grid",
+          "render": "providers.opencode.enabled",
+          "width": "canvas.width",
+          "height": "76"
+        },
+        {
+          "id": "opencode-badge",
+          "name": "opencode-badge",
+          "parent": "opencode-provider",
+          "x": "14",
+          "y": "15",
+          "width": "10",
+          "height": "10",
+          "corner_radius": "5",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#8B5CF6"
+            }
+          }
+        },
+        {
+          "id": "opencode-name-dark",
+          "name": "opencode-name-dark",
+          "parent": "opencode-provider",
+          "render": "system.dark",
+          "x": "30",
+          "y": "9",
+          "width": "200",
+          "height": "16",
+          "content": {
+            "type": "text",
+            "template": "OpenCode Go",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "semibold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#ECECECFF"
+            }
+          }
+        },
+        {
+          "id": "opencode-headline-dark",
+          "name": "opencode-headline-dark",
+          "parent": "opencode-provider",
+          "render": "system.dark",
+          "x": "212",
+          "y": "7",
+          "width": "110",
+          "height": "20",
+          "content": {
+            "type": "text",
+            "template": "{opencode.headline.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "15",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#8B5CF6"
+            }
+          }
+        },
+        {
+          "id": "opencode-session-label-dark",
+          "name": "opencode-session-label-dark",
+          "parent": "opencode-provider",
+          "render": "system.dark",
+          "x": "30",
+          "y": "31",
+          "width": "30",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{opencode.session.label}",
+            "font_family": "Segoe UI",
+            "font_size": "10",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "opencode-session-value-dark",
+          "name": "opencode-session-value-dark",
+          "parent": "opencode-provider",
+          "render": "system.dark",
+          "x": "212",
+          "y": "29",
+          "width": "60",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{opencode.session.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#ECECECFF"
+            }
+          }
+        },
+        {
+          "id": "opencode-session-reset-dark",
+          "name": "opencode-session-reset-dark",
+          "parent": "opencode-provider",
+          "render": "system.dark",
+          "x": "276",
+          "y": "31",
+          "width": "50",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{opencode.session.reset.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "regular",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "opencode-weekly-label-dark",
+          "name": "opencode-weekly-label-dark",
+          "parent": "opencode-provider",
+          "render": "system.dark",
+          "x": "30",
+          "y": "51",
+          "width": "30",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{opencode.weekly.label}",
+            "font_family": "Segoe UI",
+            "font_size": "10",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "opencode-weekly-value-dark",
+          "name": "opencode-weekly-value-dark",
+          "parent": "opencode-provider",
+          "render": "system.dark",
+          "x": "212",
+          "y": "49",
+          "width": "60",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{opencode.weekly.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#ECECECFF"
+            }
+          }
+        },
+        {
+          "id": "opencode-weekly-reset-dark",
+          "name": "opencode-weekly-reset-dark",
+          "parent": "opencode-provider",
+          "render": "system.dark",
+          "x": "276",
+          "y": "51",
+          "width": "50",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{opencode.weekly.reset.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "regular",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "opencode-name-light",
+          "name": "opencode-name-light",
+          "parent": "opencode-provider",
+          "render": "1 - system.dark",
+          "x": "30",
+          "y": "9",
+          "width": "200",
+          "height": "16",
+          "content": {
+            "type": "text",
+            "template": "OpenCode Go",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "semibold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#1A1A1AFF"
+            }
+          }
+        },
+        {
+          "id": "opencode-headline-light",
+          "name": "opencode-headline-light",
+          "parent": "opencode-provider",
+          "render": "1 - system.dark",
+          "x": "212",
+          "y": "7",
+          "width": "110",
+          "height": "20",
+          "content": {
+            "type": "text",
+            "template": "{opencode.headline.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "15",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#8B5CF6"
+            }
+          }
+        },
+        {
+          "id": "opencode-session-label-light",
+          "name": "opencode-session-label-light",
+          "parent": "opencode-provider",
+          "render": "1 - system.dark",
+          "x": "30",
+          "y": "31",
+          "width": "30",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{opencode.session.label}",
+            "font_family": "Segoe UI",
+            "font_size": "10",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#5F6368FF"
+            }
+          }
+        },
+        {
+          "id": "opencode-session-value-light",
+          "name": "opencode-session-value-light",
+          "parent": "opencode-provider",
+          "render": "1 - system.dark",
+          "x": "212",
+          "y": "29",
+          "width": "60",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{opencode.session.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#1A1A1AFF"
+            }
+          }
+        },
+        {
+          "id": "opencode-session-reset-light",
+          "name": "opencode-session-reset-light",
+          "parent": "opencode-provider",
+          "render": "1 - system.dark",
+          "x": "276",
+          "y": "31",
+          "width": "50",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{opencode.session.reset.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "regular",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#5F6368FF"
+            }
+          }
+        },
+        {
+          "id": "opencode-weekly-label-light",
+          "name": "opencode-weekly-label-light",
+          "parent": "opencode-provider",
+          "render": "1 - system.dark",
+          "x": "30",
+          "y": "51",
+          "width": "30",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{opencode.weekly.label}",
+            "font_family": "Segoe UI",
+            "font_size": "10",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#5F6368FF"
+            }
+          }
+        },
+        {
+          "id": "opencode-weekly-value-light",
+          "name": "opencode-weekly-value-light",
+          "parent": "opencode-provider",
+          "render": "1 - system.dark",
+          "x": "212",
+          "y": "49",
+          "width": "60",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{opencode.weekly.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#1A1A1AFF"
+            }
+          }
+        },
+        {
+          "id": "opencode-weekly-reset-light",
+          "name": "opencode-weekly-reset-light",
+          "parent": "opencode-provider",
+          "render": "1 - system.dark",
+          "x": "276",
+          "y": "51",
+          "width": "50",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{opencode.weekly.reset.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "regular",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#5F6368FF"
+            }
+          }
+        },
+        {
+          "id": "opencode-session-bar",
+          "name": "opencode-session-bar",
+          "parent": "opencode-provider",
+          "render": "opencode.session.available",
+          "x": "62",
+          "y": "34",
+          "width": "146",
+          "height": "6",
+          "content": {
+            "type": "progress",
+            "value": "opencode.session.display",
+            "direction": "left_to_right",
+            "fill": {
+              "color": "#8B5CF6"
+            },
+            "track": {
+              "color": "#FFFFFF1A"
+            },
+            "corner_radius": "3"
+          }
+        },
+        {
+          "id": "opencode-weekly-bar",
+          "name": "opencode-weekly-bar",
+          "parent": "opencode-provider",
+          "render": "opencode.weekly.available",
+          "x": "62",
+          "y": "54",
+          "width": "146",
+          "height": "6",
+          "content": {
+            "type": "progress",
+            "value": "opencode.weekly.display",
+            "direction": "left_to_right",
+            "fill": {
+              "color": "#8B5CF6"
+            },
+            "track": {
+              "color": "#FFFFFF1A"
+            },
+            "corner_radius": "3"
+          }
+        },
+        {
+          "id": "cursor-provider",
+          "name": "Cursor",
+          "parent": "grid",
+          "render": "providers.cursor.enabled",
+          "width": "canvas.width",
+          "height": "76"
+        },
+        {
+          "id": "cursor-badge",
+          "name": "cursor-badge",
+          "parent": "cursor-provider",
+          "x": "14",
+          "y": "15",
+          "width": "10",
+          "height": "10",
+          "corner_radius": "5",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#9CA3AF"
+            }
+          }
+        },
+        {
+          "id": "cursor-name-dark",
+          "name": "cursor-name-dark",
+          "parent": "cursor-provider",
+          "render": "system.dark",
+          "x": "30",
+          "y": "9",
+          "width": "200",
+          "height": "16",
+          "content": {
+            "type": "text",
+            "template": "Cursor",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "semibold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#ECECECFF"
+            }
+          }
+        },
+        {
+          "id": "cursor-headline-dark",
+          "name": "cursor-headline-dark",
+          "parent": "cursor-provider",
+          "render": "system.dark",
+          "x": "212",
+          "y": "7",
+          "width": "110",
+          "height": "20",
+          "content": {
+            "type": "text",
+            "template": "{cursor.headline.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "15",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#ECECECFF"
+            }
+          }
+        },
+        {
+          "id": "cursor-session-label-dark",
+          "name": "cursor-session-label-dark",
+          "parent": "cursor-provider",
+          "render": "system.dark",
+          "x": "30",
+          "y": "31",
+          "width": "30",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{cursor.session.label}",
+            "font_family": "Segoe UI",
+            "font_size": "10",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "cursor-session-value-dark",
+          "name": "cursor-session-value-dark",
+          "parent": "cursor-provider",
+          "render": "system.dark",
+          "x": "212",
+          "y": "29",
+          "width": "60",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{cursor.session.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#ECECECFF"
+            }
+          }
+        },
+        {
+          "id": "cursor-session-reset-dark",
+          "name": "cursor-session-reset-dark",
+          "parent": "cursor-provider",
+          "render": "system.dark",
+          "x": "276",
+          "y": "31",
+          "width": "50",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{cursor.session.reset.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "regular",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "cursor-weekly-label-dark",
+          "name": "cursor-weekly-label-dark",
+          "parent": "cursor-provider",
+          "render": "system.dark",
+          "x": "30",
+          "y": "51",
+          "width": "30",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{cursor.weekly.label}",
+            "font_family": "Segoe UI",
+            "font_size": "10",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "cursor-weekly-value-dark",
+          "name": "cursor-weekly-value-dark",
+          "parent": "cursor-provider",
+          "render": "system.dark",
+          "x": "212",
+          "y": "49",
+          "width": "60",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{cursor.weekly.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#ECECECFF"
+            }
+          }
+        },
+        {
+          "id": "cursor-weekly-reset-dark",
+          "name": "cursor-weekly-reset-dark",
+          "parent": "cursor-provider",
+          "render": "system.dark",
+          "x": "276",
+          "y": "51",
+          "width": "50",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{cursor.weekly.reset.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "regular",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "cursor-name-light",
+          "name": "cursor-name-light",
+          "parent": "cursor-provider",
+          "render": "1 - system.dark",
+          "x": "30",
+          "y": "9",
+          "width": "200",
+          "height": "16",
+          "content": {
+            "type": "text",
+            "template": "Cursor",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "semibold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#1A1A1AFF"
+            }
+          }
+        },
+        {
+          "id": "cursor-headline-light",
+          "name": "cursor-headline-light",
+          "parent": "cursor-provider",
+          "render": "1 - system.dark",
+          "x": "212",
+          "y": "7",
+          "width": "110",
+          "height": "20",
+          "content": {
+            "type": "text",
+            "template": "{cursor.headline.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "15",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#1A1A1AFF"
+            }
+          }
+        },
+        {
+          "id": "cursor-session-label-light",
+          "name": "cursor-session-label-light",
+          "parent": "cursor-provider",
+          "render": "1 - system.dark",
+          "x": "30",
+          "y": "31",
+          "width": "30",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{cursor.session.label}",
+            "font_family": "Segoe UI",
+            "font_size": "10",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#5F6368FF"
+            }
+          }
+        },
+        {
+          "id": "cursor-session-value-light",
+          "name": "cursor-session-value-light",
+          "parent": "cursor-provider",
+          "render": "1 - system.dark",
+          "x": "212",
+          "y": "29",
+          "width": "60",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{cursor.session.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#1A1A1AFF"
+            }
+          }
+        },
+        {
+          "id": "cursor-session-reset-light",
+          "name": "cursor-session-reset-light",
+          "parent": "cursor-provider",
+          "render": "1 - system.dark",
+          "x": "276",
+          "y": "31",
+          "width": "50",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{cursor.session.reset.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "regular",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#5F6368FF"
+            }
+          }
+        },
+        {
+          "id": "cursor-weekly-label-light",
+          "name": "cursor-weekly-label-light",
+          "parent": "cursor-provider",
+          "render": "1 - system.dark",
+          "x": "30",
+          "y": "51",
+          "width": "30",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{cursor.weekly.label}",
+            "font_family": "Segoe UI",
+            "font_size": "10",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#5F6368FF"
+            }
+          }
+        },
+        {
+          "id": "cursor-weekly-value-light",
+          "name": "cursor-weekly-value-light",
+          "parent": "cursor-provider",
+          "render": "1 - system.dark",
+          "x": "212",
+          "y": "49",
+          "width": "60",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{cursor.weekly.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#1A1A1AFF"
+            }
+          }
+        },
+        {
+          "id": "cursor-weekly-reset-light",
+          "name": "cursor-weekly-reset-light",
+          "parent": "cursor-provider",
+          "render": "1 - system.dark",
+          "x": "276",
+          "y": "51",
+          "width": "50",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{cursor.weekly.reset.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "regular",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#5F6368FF"
+            }
+          }
+        },
+        {
+          "id": "cursor-session-bar",
+          "name": "cursor-session-bar",
+          "parent": "cursor-provider",
+          "render": "cursor.session.available",
+          "x": "62",
+          "y": "34",
+          "width": "146",
+          "height": "6",
+          "content": {
+            "type": "progress",
+            "value": "cursor.session.display",
+            "direction": "left_to_right",
+            "fill": {
+              "color": "#9CA3AF"
+            },
+            "track": {
+              "color": "#FFFFFF1A"
+            },
+            "corner_radius": "3"
+          }
+        },
+        {
+          "id": "cursor-weekly-bar",
+          "name": "cursor-weekly-bar",
+          "parent": "cursor-provider",
+          "render": "cursor.weekly.available",
+          "x": "62",
+          "y": "54",
+          "width": "146",
+          "height": "6",
+          "content": {
+            "type": "progress",
+            "value": "cursor.weekly.display",
+            "direction": "left_to_right",
+            "fill": {
+              "color": "#9CA3AF"
+            },
+            "track": {
+              "color": "#FFFFFF1A"
+            },
+            "corner_radius": "3"
+          }
+        },
+        {
+          "id": "grok-provider",
+          "name": "Grok",
+          "parent": "grid",
+          "render": "providers.grok.enabled",
+          "width": "canvas.width",
+          "height": "76"
+        },
+        {
+          "id": "grok-badge",
+          "name": "grok-badge",
+          "parent": "grok-provider",
+          "x": "14",
+          "y": "15",
+          "width": "10",
+          "height": "10",
+          "corner_radius": "5",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#E5E7EB"
+            }
+          }
+        },
+        {
+          "id": "grok-name-dark",
+          "name": "grok-name-dark",
+          "parent": "grok-provider",
+          "render": "system.dark",
+          "x": "30",
+          "y": "9",
+          "width": "200",
+          "height": "16",
+          "content": {
+            "type": "text",
+            "template": "Grok",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "semibold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#ECECECFF"
+            }
+          }
+        },
+        {
+          "id": "grok-headline-dark",
+          "name": "grok-headline-dark",
+          "parent": "grok-provider",
+          "render": "system.dark",
+          "x": "212",
+          "y": "7",
+          "width": "110",
+          "height": "20",
+          "content": {
+            "type": "text",
+            "template": "{grok.headline.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "15",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#E5E7EB"
+            }
+          }
+        },
+        {
+          "id": "grok-session-label-dark",
+          "name": "grok-session-label-dark",
+          "parent": "grok-provider",
+          "render": "system.dark",
+          "x": "30",
+          "y": "31",
+          "width": "30",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{grok.session.label}",
+            "font_family": "Segoe UI",
+            "font_size": "10",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "grok-session-value-dark",
+          "name": "grok-session-value-dark",
+          "parent": "grok-provider",
+          "render": "system.dark",
+          "x": "212",
+          "y": "29",
+          "width": "60",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{grok.session.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#ECECECFF"
+            }
+          }
+        },
+        {
+          "id": "grok-session-reset-dark",
+          "name": "grok-session-reset-dark",
+          "parent": "grok-provider",
+          "render": "system.dark",
+          "x": "276",
+          "y": "31",
+          "width": "50",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{grok.session.reset.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "regular",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "grok-weekly-label-dark",
+          "name": "grok-weekly-label-dark",
+          "parent": "grok-provider",
+          "render": "system.dark",
+          "x": "30",
+          "y": "51",
+          "width": "30",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{grok.weekly.label}",
+            "font_family": "Segoe UI",
+            "font_size": "10",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "grok-weekly-value-dark",
+          "name": "grok-weekly-value-dark",
+          "parent": "grok-provider",
+          "render": "system.dark",
+          "x": "212",
+          "y": "49",
+          "width": "60",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{grok.weekly.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#ECECECFF"
+            }
+          }
+        },
+        {
+          "id": "grok-weekly-reset-dark",
+          "name": "grok-weekly-reset-dark",
+          "parent": "grok-provider",
+          "render": "system.dark",
+          "x": "276",
+          "y": "51",
+          "width": "50",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{grok.weekly.reset.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "regular",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "grok-name-light",
+          "name": "grok-name-light",
+          "parent": "grok-provider",
+          "render": "1 - system.dark",
+          "x": "30",
+          "y": "9",
+          "width": "200",
+          "height": "16",
+          "content": {
+            "type": "text",
+            "template": "Grok",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "semibold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#1A1A1AFF"
+            }
+          }
+        },
+        {
+          "id": "grok-headline-light",
+          "name": "grok-headline-light",
+          "parent": "grok-provider",
+          "render": "1 - system.dark",
+          "x": "212",
+          "y": "7",
+          "width": "110",
+          "height": "20",
+          "content": {
+            "type": "text",
+            "template": "{grok.headline.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "15",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#E5E7EB"
+            }
+          }
+        },
+        {
+          "id": "grok-session-label-light",
+          "name": "grok-session-label-light",
+          "parent": "grok-provider",
+          "render": "1 - system.dark",
+          "x": "30",
+          "y": "31",
+          "width": "30",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{grok.session.label}",
+            "font_family": "Segoe UI",
+            "font_size": "10",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#5F6368FF"
+            }
+          }
+        },
+        {
+          "id": "grok-session-value-light",
+          "name": "grok-session-value-light",
+          "parent": "grok-provider",
+          "render": "1 - system.dark",
+          "x": "212",
+          "y": "29",
+          "width": "60",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{grok.session.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#1A1A1AFF"
+            }
+          }
+        },
+        {
+          "id": "grok-session-reset-light",
+          "name": "grok-session-reset-light",
+          "parent": "grok-provider",
+          "render": "1 - system.dark",
+          "x": "276",
+          "y": "31",
+          "width": "50",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{grok.session.reset.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "regular",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#5F6368FF"
+            }
+          }
+        },
+        {
+          "id": "grok-weekly-label-light",
+          "name": "grok-weekly-label-light",
+          "parent": "grok-provider",
+          "render": "1 - system.dark",
+          "x": "30",
+          "y": "51",
+          "width": "30",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{grok.weekly.label}",
+            "font_family": "Segoe UI",
+            "font_size": "10",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#5F6368FF"
+            }
+          }
+        },
+        {
+          "id": "grok-weekly-value-light",
+          "name": "grok-weekly-value-light",
+          "parent": "grok-provider",
+          "render": "1 - system.dark",
+          "x": "212",
+          "y": "49",
+          "width": "60",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{grok.weekly.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#1A1A1AFF"
+            }
+          }
+        },
+        {
+          "id": "grok-weekly-reset-light",
+          "name": "grok-weekly-reset-light",
+          "parent": "grok-provider",
+          "render": "1 - system.dark",
+          "x": "276",
+          "y": "51",
+          "width": "50",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{grok.weekly.reset.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "regular",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#5F6368FF"
+            }
+          }
+        },
+        {
+          "id": "grok-session-bar",
+          "name": "grok-session-bar",
+          "parent": "grok-provider",
+          "render": "grok.session.available",
+          "x": "62",
+          "y": "34",
+          "width": "146",
+          "height": "6",
+          "content": {
+            "type": "progress",
+            "value": "grok.session.display",
+            "direction": "left_to_right",
+            "fill": {
+              "color": "#E5E7EB"
+            },
+            "track": {
+              "color": "#FFFFFF1A"
+            },
+            "corner_radius": "3"
+          }
+        },
+        {
+          "id": "grok-weekly-bar",
+          "name": "grok-weekly-bar",
+          "parent": "grok-provider",
+          "render": "grok.weekly.available",
+          "x": "62",
+          "y": "54",
+          "width": "146",
+          "height": "6",
+          "content": {
+            "type": "progress",
+            "value": "grok.weekly.display",
+            "direction": "left_to_right",
+            "fill": {
+              "color": "#E5E7EB"
+            },
+            "track": {
+              "color": "#FFFFFF1A"
+            },
+            "corner_radius": "3"
+          }
+        },
+        {
+          "id": "copilot-provider",
+          "name": "Copilot",
+          "parent": "grid",
+          "render": "providers.copilot.enabled",
+          "width": "canvas.width",
+          "height": "76"
+        },
+        {
+          "id": "copilot-badge",
+          "name": "copilot-badge",
+          "parent": "copilot-provider",
+          "x": "14",
+          "y": "15",
+          "width": "10",
+          "height": "10",
+          "corner_radius": "5",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#6E7681"
+            }
+          }
+        },
+        {
+          "id": "copilot-name-dark",
+          "name": "copilot-name-dark",
+          "parent": "copilot-provider",
+          "render": "system.dark",
+          "x": "30",
+          "y": "9",
+          "width": "200",
+          "height": "16",
+          "content": {
+            "type": "text",
+            "template": "Copilot",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "semibold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#ECECECFF"
+            }
+          }
+        },
+        {
+          "id": "copilot-headline-dark",
+          "name": "copilot-headline-dark",
+          "parent": "copilot-provider",
+          "render": "system.dark",
+          "x": "212",
+          "y": "7",
+          "width": "110",
+          "height": "20",
+          "content": {
+            "type": "text",
+            "template": "{copilot.headline.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "15",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#6E7681"
+            }
+          }
+        },
+        {
+          "id": "copilot-session-label-dark",
+          "name": "copilot-session-label-dark",
+          "parent": "copilot-provider",
+          "render": "system.dark",
+          "x": "30",
+          "y": "31",
+          "width": "30",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{copilot.session.label}",
+            "font_family": "Segoe UI",
+            "font_size": "10",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "copilot-session-value-dark",
+          "name": "copilot-session-value-dark",
+          "parent": "copilot-provider",
+          "render": "system.dark",
+          "x": "212",
+          "y": "29",
+          "width": "60",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{copilot.session.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#ECECECFF"
+            }
+          }
+        },
+        {
+          "id": "copilot-session-reset-dark",
+          "name": "copilot-session-reset-dark",
+          "parent": "copilot-provider",
+          "render": "system.dark",
+          "x": "276",
+          "y": "31",
+          "width": "50",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{copilot.session.reset.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "regular",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "copilot-weekly-label-dark",
+          "name": "copilot-weekly-label-dark",
+          "parent": "copilot-provider",
+          "render": "system.dark",
+          "x": "30",
+          "y": "51",
+          "width": "30",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{copilot.weekly.label}",
+            "font_family": "Segoe UI",
+            "font_size": "10",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "copilot-weekly-value-dark",
+          "name": "copilot-weekly-value-dark",
+          "parent": "copilot-provider",
+          "render": "system.dark",
+          "x": "212",
+          "y": "49",
+          "width": "60",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{copilot.weekly.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#ECECECFF"
+            }
+          }
+        },
+        {
+          "id": "copilot-weekly-reset-dark",
+          "name": "copilot-weekly-reset-dark",
+          "parent": "copilot-provider",
+          "render": "system.dark",
+          "x": "276",
+          "y": "51",
+          "width": "50",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{copilot.weekly.reset.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "regular",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "copilot-name-light",
+          "name": "copilot-name-light",
+          "parent": "copilot-provider",
+          "render": "1 - system.dark",
+          "x": "30",
+          "y": "9",
+          "width": "200",
+          "height": "16",
+          "content": {
+            "type": "text",
+            "template": "Copilot",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "semibold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#1A1A1AFF"
+            }
+          }
+        },
+        {
+          "id": "copilot-headline-light",
+          "name": "copilot-headline-light",
+          "parent": "copilot-provider",
+          "render": "1 - system.dark",
+          "x": "212",
+          "y": "7",
+          "width": "110",
+          "height": "20",
+          "content": {
+            "type": "text",
+            "template": "{copilot.headline.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "15",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#6E7681"
+            }
+          }
+        },
+        {
+          "id": "copilot-session-label-light",
+          "name": "copilot-session-label-light",
+          "parent": "copilot-provider",
+          "render": "1 - system.dark",
+          "x": "30",
+          "y": "31",
+          "width": "30",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{copilot.session.label}",
+            "font_family": "Segoe UI",
+            "font_size": "10",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#5F6368FF"
+            }
+          }
+        },
+        {
+          "id": "copilot-session-value-light",
+          "name": "copilot-session-value-light",
+          "parent": "copilot-provider",
+          "render": "1 - system.dark",
+          "x": "212",
+          "y": "29",
+          "width": "60",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{copilot.session.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#1A1A1AFF"
+            }
+          }
+        },
+        {
+          "id": "copilot-session-reset-light",
+          "name": "copilot-session-reset-light",
+          "parent": "copilot-provider",
+          "render": "1 - system.dark",
+          "x": "276",
+          "y": "31",
+          "width": "50",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{copilot.session.reset.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "regular",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#5F6368FF"
+            }
+          }
+        },
+        {
+          "id": "copilot-weekly-label-light",
+          "name": "copilot-weekly-label-light",
+          "parent": "copilot-provider",
+          "render": "1 - system.dark",
+          "x": "30",
+          "y": "51",
+          "width": "30",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{copilot.weekly.label}",
+            "font_family": "Segoe UI",
+            "font_size": "10",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#5F6368FF"
+            }
+          }
+        },
+        {
+          "id": "copilot-weekly-value-light",
+          "name": "copilot-weekly-value-light",
+          "parent": "copilot-provider",
+          "render": "1 - system.dark",
+          "x": "212",
+          "y": "49",
+          "width": "60",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{copilot.weekly.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#1A1A1AFF"
+            }
+          }
+        },
+        {
+          "id": "copilot-weekly-reset-light",
+          "name": "copilot-weekly-reset-light",
+          "parent": "copilot-provider",
+          "render": "1 - system.dark",
+          "x": "276",
+          "y": "51",
+          "width": "50",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{copilot.weekly.reset.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "regular",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#5F6368FF"
+            }
+          }
+        },
+        {
+          "id": "copilot-session-bar",
+          "name": "copilot-session-bar",
+          "parent": "copilot-provider",
+          "render": "copilot.session.available",
+          "x": "62",
+          "y": "34",
+          "width": "146",
+          "height": "6",
+          "content": {
+            "type": "progress",
+            "value": "copilot.session.display",
+            "direction": "left_to_right",
+            "fill": {
+              "color": "#6E7681"
+            },
+            "track": {
+              "color": "#FFFFFF1A"
+            },
+            "corner_radius": "3"
+          }
+        },
+        {
+          "id": "copilot-weekly-bar",
+          "name": "copilot-weekly-bar",
+          "parent": "copilot-provider",
+          "render": "copilot.weekly.available",
+          "x": "62",
+          "y": "54",
+          "width": "146",
+          "height": "6",
+          "content": {
+            "type": "progress",
+            "value": "copilot.weekly.display",
+            "direction": "left_to_right",
+            "fill": {
+              "color": "#6E7681"
+            },
+            "track": {
+              "color": "#FFFFFF1A"
+            },
+            "corner_radius": "3"
+          }
+        }
+      ]
+    }
+  ]
+}

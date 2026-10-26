@@ -150,6 +150,45 @@ impl StudioApp {
                     },
                 );
             });
+            section(ui, language.text("Sound"), |ui| {
+                setting_row(
+                    ui,
+                    language.text("Reset alert"),
+                    language.text("Play a sound when a limit you nearly reached resets"),
+                    |ui| {
+                        changed |= Toggle::new(&mut self.settings.alert_sound)
+                            .labels(language.text("On"), language.text("Off"))
+                            .show(ui)
+                            .changed();
+                    },
+                );
+                setting_separator(ui);
+                setting_row(
+                    ui,
+                    language.text("Alert threshold"),
+                    language.text("Only alert for windows that reached this much usage"),
+                    |ui| {
+                        Dropdown::from_id_salt("alert_threshold")
+                            .width(120.0)
+                            .selected_text(format!("{:.0}%", self.settings.alert_threshold_percent))
+                            .show_ui(ui, |ui| {
+                                for value in [80.0_f64, 90.0, 95.0, 98.0, 100.0] {
+                                    let label = format!("{value:.0}%");
+                                    if dropdown_selectable_label(
+                                        ui,
+                                        (self.settings.alert_threshold_percent - value).abs() < 0.5,
+                                        &label,
+                                    )
+                                    .clicked()
+                                    {
+                                        self.settings.alert_threshold_percent = value;
+                                        changed = true;
+                                    }
+                                }
+                            });
+                    },
+                );
+            });
             section(ui, language.text("Appearance"), |ui| {
                 setting_row(
                     ui,
