@@ -95,7 +95,11 @@ GitHub Copilot usage comes from `api.github.com/copilot_internal/user`, the endp
 
 ## Reset alerts
 
-**Settings > Sound > Reset alert** plays the Windows notification chime when a quota window that had reached the alert threshold resets, so you know the allowance is available again without watching the widget. Windows only arm once they pass the threshold (95% by default, **Alert threshold** changes it), and the reset is read from the provider's own reset time rather than from a fixed schedule — Claude's five-hour window, OpenCode Go's rolling/weekly/monthly caps and Antigravity's Gemini and external pools each reset on their own clock and are tracked independently. A window that never came close stays silent, and several windows resetting together play a single sound. State lives in `%APPDATA%\ClaudeCodeUsageMonitor\alerts.json`; `--test-alert-sound` plays the chime once and exits so the path can be verified without waiting for a reset.
+**Settings > Sound > Reset alert** plays the Windows notification chime when a quota window that had reached the alert threshold resets, so you know the allowance is available again without watching the widget. Windows only arm once they pass the threshold (95% by default, **Alert threshold** changes it), and the reset is read from the provider's own reset time rather than from a fixed schedule — Claude's five-hour window, OpenCode Go's rolling/weekly/monthly caps and Antigravity's Gemini and external pools each reset on their own clock and are tracked independently. A window that never came close stays silent, and several windows resetting together play a single sound. State lives in `%APPDATA%\ClaudeCodeUsageMonitor\alerts.json`; `--test-alert-sound` plays the chime once and exits so the path can be verified without waiting for a reset. Two switches control the tray balloons: "Notify when a limit is reached" and "Notify when a limit resets".
+
+## Usage history
+
+Every poll also folds the figures into a seven-day history of hourly buckets per window, stored in `%APPDATA%\ClaudeCodeUsageMonitor\history.json`. Themes read it as `<provider>.<window>.history` - a comma-separated series with gaps for hours without a sample - and the grid card renders it as a sparkline next to each provider, so a slow climb towards a limit is visible before the percentage looks alarming.
 
 ## Data and privacy
 

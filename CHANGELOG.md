@@ -8,6 +8,23 @@ changes grouped into Added, Changed, Fixed, and Removed where applicable.
 
 ### Added
 
+- Seven days of hourly usage per window, kept in `history.json` and exposed to themes as
+  `<provider>.<window>.history`; the grid card draws it as a sparkline next to each provider.
+- The burn-rate warning now carries the projection: `!` plus `~40m` from `{provider}.burn.eta.seconds`.
+- Tray notifications are switchable: "Notify when a limit is reached" and "Notify when a limit resets",
+  with a toast when a spent window refills instead of only a sound.
+- Polish translations for every string this fork introduced (the catalogue now carries 114 extra keys
+  across all 14 locales, so no locale falls back to English for them).
+
+### Changed
+
+- Self-update follows this fork: the package repository is `kpulka/Claude-Code-Usage-Monitor`, and a
+  release is refused unless its asset URL belongs to that repository. The WinGet path is derived from
+  the package id and stays disabled here, because `CodeZeno.ClaudeCodeUsageMonitor` belongs to another
+  publisher - pressing "Check for updates" can no longer replace this build with upstream.
+
+### Added
+
 - Sound the chime when a quota window that reached the alert threshold (95% by default) resets, so the refilled allowance is noticed without watching the widget. Arming and firing are derived from each provider's own `resets_at`, so Claude's five-hour window, OpenCode Go's rolling/weekly/monthly caps and Antigravity's separate Gemini and external pools all behave alike. Windows without a reset time, failing providers and windows that never approached the threshold stay silent; a burst of resets plays one sound.
 
 - "Grid panel" built-in theme: a 340px desktop card with one block per provider, a name row with the headline figure, and one aligned row per window (label, progress bar, percentage, reset countdown) so figures and times are no longer crammed onto one line.
