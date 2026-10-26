@@ -26,10 +26,10 @@
       "background": {
         "type": "gradient",
         "start": {
-          "color": "#1A1A20F0"
+          "color": "#1A1A20A0"
         },
         "end": {
-          "color": "#0E0E13E8"
+          "color": "#0E0E1392"
         },
         "angle": "90"
       },
