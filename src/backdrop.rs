@@ -9,6 +9,58 @@
 use std::ffi::c_void;
 use std::mem::size_of;
 
+use std::sync::atomic::{AtomicI32, Ordering};
+
+use windows::Win32::Graphics::Gdi::{CreateRoundRectRgn, DeleteObject, SetWindowRgn};
+use windows::Win32::UI::HiDpi::GetDpiForWindow;
+
+/// Corner radius of the card in logical pixels, published by the theme loader.
+static CARD_RADIUS: AtomicI32 = AtomicI32::new(0);
+
+/// Remember the radius the active theme asked for. Zero disables rounding.
+pub(crate) fn set_card_radius(radius: i32) {
+    CARD_RADIUS.store(radius.max(0), Ordering::Relaxed);
+    crate::diagnose::log_lazy(|| format!("card corner radius: {radius} logical px"));
+}
+
+/// Clip the window to the card's rounded outline.
+///
+/// The widget renders its own rounded background, but the window itself is a
+/// rectangle: the acrylic frost behind it, and anything the compositor paints
+/// outside the card, would square off the corners. A window region trims the
+/// whole window — frost included — to the same curve the theme draws.
+pub(crate) fn refresh_region(hwnd: HWND, width: i32, height: i32) {
+    let logical = CARD_RADIUS.load(Ordering::Relaxed);
+    let scale = unsafe { GetDpiForWindow(hwnd) }.max(96) as f64 / 96.0;
+    let radius = (logical as f64 * scale).round() as i32;
+    if radius <= 0 || width <= 0 || height <= 0 {
+        // A theme without rounding gets its square window back.
+        unsafe {
+            let _ = SetWindowRgn(hwnd, None, true);
+        }
+        return;
+    }
+    static LAST: AtomicI32 = AtomicI32::new(-1);
+    let signature = (logical << 16) ^ (width << 4) ^ height;
+    if LAST.swap(signature, Ordering::Relaxed) != signature {
+        crate::diagnose::log_lazy(|| {
+            format!("card window region: {width}x{height} radius {radius}px")
+        });
+    }
+    unsafe {
+        // CreateRoundRectRgn takes an exclusive bottom-right corner.
+        let region = CreateRoundRectRgn(0, 0, width + 1, height + 1, radius * 2, radius * 2);
+        if region.is_invalid() {
+            return;
+        }
+        if SetWindowRgn(hwnd, Some(region), true) == 0 {
+            // The window keeps ownership only when the call succeeds.
+            let _ = DeleteObject(region.into());
+        }
+    }
+}
+
+
 use windows::core::{s, w, PCWSTR};
 use windows::Win32::Foundation::HWND;
 use windows::Win32::System::LibraryLoader::{GetModuleHandleW, GetProcAddress};

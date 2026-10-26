@@ -1924,6 +1924,8 @@ fn replace_active_theme(state: &mut AppState, loaded: ThemeDocument, path: Optio
     if changed {
         clear_auto_ejection(state);
     }
+    // Keep the window region in step with the theme that is about to be used.
+    crate::backdrop::set_card_radius(card_corner_radius(&loaded));
     state.active_theme = Some(loaded);
     if path.is_some() {
         state.active_theme_path = path;
@@ -2000,6 +2002,19 @@ fn apply_custom_theme(
     schedule_countdown_timer();
     schedule_clock_timer();
     Ok(())
+}
+
+/// Corner radius the theme asks for, in logical pixels. Themes express it as a
+/// plain number; anything else falls back to no rounding at the window level.
+fn card_corner_radius(theme: &ThemeDocument) -> i32 {
+    theme
+        .surfaces
+        .iter()
+        .find(|surface| surface.id == "main")
+        .or_else(|| theme.surfaces.first())
+        .and_then(|surface| surface.corner_radius.0.trim().parse::<f64>().ok())
+        .map(|radius| radius.round() as i32)
+        .unwrap_or(0)
 }
 
 fn sync_surface_windows() {
@@ -2500,6 +2515,11 @@ pub fn run() {
                     .or_else(|| Some(ThemeDocument::starter()));
                 (path, theme)
             });
+        // Startup bypasses replace_active_theme, so publish the theme's corner
+        // radius here as well: the window region depends on it.
+        if let Some(theme) = active_theme.as_ref() {
+            crate::backdrop::set_card_radius(card_corner_radius(theme));
+        }
         let custom_theme_enabled = true;
         let theme_clock_interval = active_theme
             .as_ref()

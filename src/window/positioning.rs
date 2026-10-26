@@ -366,6 +366,9 @@ pub(super) fn position_custom_theme_internal(
                     height,
                     SWP_NOACTIVATE,
                 );
+                // Trim the window (not just its pixels) to the card's curve so
+                // the frosted backdrop cannot show square corners.
+                crate::backdrop::refresh_region(hwnd, width, height);
             }
         }
     }
