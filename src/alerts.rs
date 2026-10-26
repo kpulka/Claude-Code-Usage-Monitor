@@ -88,6 +88,8 @@ pub(crate) struct Evaluation {
     pub play: bool,
     /// Providers whose consumption is on course to exhaust a window soon.
     pub warnings: ProviderSet,
+    /// Seconds until the flagged window runs out, per provider, when known.
+    pub warning_eta: BTreeMap<ProviderId, u64>,
 }
 
 /// Fold one poll into the persisted state and report what just reset.
@@ -106,6 +108,7 @@ pub(crate) fn evaluate(
     let mut events = Vec::new();
     let mut reached = Vec::new();
     let mut warnings = ProviderSet::empty();
+    let mut warning_eta: BTreeMap<ProviderId, u64> = BTreeMap::new();
     for provider in providers.iter() {
         let threshold = thresholds(provider).clamp(1.0, 100.0);
         let Some(usage) = data.get(provider) else {
@@ -135,8 +138,12 @@ pub(crate) fn evaluate(
                     peak: section.percentage,
                 });
             }
-            if outcome.burning {
+            if let Some(eta) = outcome.eta_seconds {
                 warnings.set(provider, true);
+                // Keep the tightest window per provider: that is the one the
+                // user is about to lose.
+                let entry = warning_eta.entry(provider).or_insert(eta);
+                *entry = (*entry).min(eta);
             }
         }
     }
@@ -153,6 +160,7 @@ pub(crate) fn evaluate(
         reached,
         play,
         warnings,
+        warning_eta,
     }
 }
 
@@ -162,6 +170,8 @@ struct WindowOutcome {
     reached: bool,
     /// Consumption is on course to exhaust the window within `BURN_WARN_SECS`.
     burning: bool,
+    /// Seconds until exhaustion, when the projection says it is close.
+    eta_seconds: Option<u64>,
 }
 
 fn push_windows<'a>(
@@ -235,7 +245,7 @@ fn observe(
         let excess = samples.len() - MAX_SAMPLES;
         samples.drain(..excess);
     }
-    let burning = burn_rate(&samples, section.percentage, now_unix).is_some();
+    let eta_seconds = burn_rate(&samples, section.percentage, now_unix);
 
     state.windows.insert(
         key.to_string(),
@@ -246,7 +256,11 @@ fn observe(
             samples,
         },
     );
-    WindowOutcome { reached, burning }
+    WindowOutcome {
+        reached,
+        burning: eta_seconds.is_some(),
+        eta_seconds,
+    }
 }
 
 /// Usage per second across the recorded samples, expressed as a will-run-out

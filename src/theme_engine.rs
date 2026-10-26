@@ -1359,6 +1359,8 @@ pub struct ThemeRuntime {
     /// Providers whose consumption is on course to exhaust a window soon; the
     /// widget marks them with a warning glyph.
     pub burn_warning: ProviderSet,
+    /// Seconds until the flagged window runs out, indexed like `ProviderId::ALL`.
+    pub burn_eta_seconds: [u32; ProviderId::ALL.len()],
     pub crossfade_opacity: f64,
     host_width: u32,
     host_height: u32,
@@ -1377,6 +1379,7 @@ impl Default for ThemeRuntime {
             antigravity_gemini_enabled: true,
             antigravity_external_enabled: false,
             burn_warning: ProviderSet::empty(),
+            burn_eta_seconds: [0; ProviderId::ALL.len()],
             crossfade_opacity: 1.0,
             host_width: default_canvas_width(),
             host_height: default_canvas_height(),
@@ -1412,6 +1415,7 @@ impl ThemeRuntime {
             antigravity_gemini_enabled: agy,
             antigravity_external_enabled: false,
             burn_warning: ProviderSet::empty(),
+            burn_eta_seconds: [0; ProviderId::ALL.len()],
             crossfade_opacity: 1.0,
             host_width: default_canvas_width(),
             host_height: default_canvas_height(),
@@ -1454,6 +1458,11 @@ impl ThemeRuntime {
     /// Count each allowance down towards its limit instead of up from zero.
     pub fn with_burn_warning(mut self, warnings: ProviderSet) -> Self {
         self.burn_warning = warnings;
+        self
+    }
+
+    pub fn with_burn_eta(mut self, eta_seconds: [u32; ProviderId::ALL.len()]) -> Self {
+        self.burn_eta_seconds = eta_seconds;
         self
     }
 
@@ -1557,10 +1566,20 @@ impl DataContext {
                 &format!("providers.{}.enabled", descriptor.key),
                 runtime.provider_enabled(descriptor.id) as u8 as f64,
             );
-            // Burn-rate marker: 1 when this provider is about to run out.
+            // Burn-rate marker: 1 when this provider is about to run out, and
+            // the projected seconds until the window is gone.
             context.insert(
                 &format!("{}.burn.warning", descriptor.key),
                 runtime.burn_warning.contains(descriptor.id) as u8 as f64,
+            );
+            let eta = ProviderId::ALL
+                .iter()
+                .position(|provider| *provider == descriptor.id)
+                .map(|index| runtime.burn_eta_seconds[index])
+                .unwrap_or(0);
+            context.insert(
+                &format!("{}.burn.eta.seconds", descriptor.key),
+                f64::from(eta),
             );
         }
         context.insert("display.countdown", runtime.countdown as u8 as f64);

@@ -165,6 +165,30 @@ impl StudioApp {
                 setting_separator(ui);
                 setting_row(
                     ui,
+                    language.text("Notify when a limit is reached"),
+                    language.text("Tray notification when a window is fully spent"),
+                    |ui| {
+                        changed |= Toggle::new(&mut self.settings.notify_limit_reached)
+                            .labels(language.text("On"), language.text("Off"))
+                            .show(ui)
+                            .changed();
+                    },
+                );
+                setting_separator(ui);
+                setting_row(
+                    ui,
+                    language.text("Notify when a limit resets"),
+                    language.text("Tray notification when a spent window refills"),
+                    |ui| {
+                        changed |= Toggle::new(&mut self.settings.notify_limit_reset)
+                            .labels(language.text("On"), language.text("Off"))
+                            .show(ui)
+                            .changed();
+                    },
+                );
+                setting_separator(ui);
+                setting_row(
+                    ui,
                     language.text("Alert threshold"),
                     language.text("Only alert for windows that reached this much usage"),
                     |ui| {

@@ -80,6 +80,12 @@ pub struct SettingsFile {
     /// Usage percentage a window must reach before its reset is announced.
     #[serde(default = "default_alert_threshold")]
     pub alert_threshold_percent: f64,
+    /// Show a tray notification when a window is fully spent.
+    #[serde(default = "default_true")]
+    pub notify_limit_reached: bool,
+    /// Show a tray notification when a spent window refills.
+    #[serde(default = "default_true")]
+    pub notify_limit_reset: bool,
     /// Per-provider overrides for alerts and which windows the widget shows.
     #[serde(default)]
     pub provider_settings: BTreeMap<String, ProviderSettings>,
@@ -152,6 +158,8 @@ impl Default for SettingsFile {
             usage_countdown: false,
             alert_sound: false,
             alert_threshold_percent: default_alert_threshold(),
+            notify_limit_reached: true,
+            notify_limit_reset: true,
             provider_settings: BTreeMap::new(),
             active_theme_path: None,
             dashboard_width: None,

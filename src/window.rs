@@ -144,6 +144,12 @@ struct AppState {
     alert_threshold_percent: f64,
     /// Providers currently flagged by the burn-rate estimate.
     burn_warning: crate::providers::ProviderSet,
+    /// Seconds until the flagged window runs out, indexed like `ProviderId::ALL`.
+    burn_eta_seconds: [u32; crate::providers::ProviderId::ALL.len()],
+    /// Tray notifications for a fully spent window.
+    notify_limit_reached: bool,
+    /// Tray notifications for a refilled window.
+    notify_limit_reset: bool,
     active_theme_path: Option<PathBuf>,
     active_theme: Option<ThemeDocument>,
     theme_clock_interval: Option<Duration>,
@@ -784,6 +790,7 @@ fn theme_runtime_from_state(state: &AppState) -> ThemeRuntime {
         state.data.as_ref(),
     );
     let burn_warning = state.burn_warning;
+    let burn_eta_seconds = state.burn_eta_seconds;
     let nest = if state.auto_ejected {
         SurfaceNest::Floating
     } else if let Some(ref ov) = state.placement_override {
@@ -808,6 +815,7 @@ fn theme_runtime_from_state(state: &AppState) -> ThemeRuntime {
             state.crossfade_opacity,
         )
         .with_burn_warning(burn_warning)
+        .with_burn_eta(burn_eta_seconds)
 }
 
 /// A transient outage can keep presenting the last real reading while its
@@ -2638,6 +2646,9 @@ pub fn run() {
                 alert_sound: settings.alert_sound,
                 alert_threshold_percent: settings.alert_threshold_percent,
                 burn_warning: crate::providers::ProviderSet::empty(),
+                burn_eta_seconds: [0; crate::providers::ProviderId::ALL.len()],
+                notify_limit_reached: settings.notify_limit_reached,
+                notify_limit_reset: settings.notify_limit_reset,
                 active_theme_path,
                 active_theme,
                 theme_clock_interval,
@@ -3204,8 +3215,18 @@ fn do_poll_once(hwnd: HWND) {
                     // The warning glyph follows the projection, not the sound.
                     if let Some(state) = lock_state().as_mut() {
                         state.burn_warning = evaluation.warnings;
+                        let mut eta = [0u32; crate::providers::ProviderId::ALL.len()];
+                        for (provider, seconds) in &evaluation.warning_eta {
+                            if let Some(index) = crate::providers::ProviderId::ALL
+                                .iter()
+                                .position(|candidate| candidate == provider)
+                            {
+                                eta[index] = (*seconds).min(u32::MAX as u64) as u32;
+                            }
+                        }
+                        state.burn_eta_seconds = eta;
                     }
-                    if !evaluation.reached.is_empty() {
+                    if preferences.notify_limit_reached && !evaluation.reached.is_empty() {
                         let summary = evaluation
                             .reached
                             .iter()
@@ -3216,6 +3237,19 @@ fn do_poll_once(hwnd: HWND) {
                         tray_icon::notify_balloon(
                             hwnd,
                             &language.text("Allowance used up"),
+                            &summary,
+                        );
+                    }
+                    if preferences.notify_limit_reset && !evaluation.events.is_empty() {
+                        let summary = evaluation
+                            .events
+                            .iter()
+                            .map(|event| format!("{} {:.0}%", event.window, event.peak))
+                            .collect::<Vec<_>>()
+                            .join(", ");
+                        tray_icon::notify_balloon(
+                            hwnd,
+                            &language.text("Allowance refreshed"),
                             &summary,
                         );
                     }
@@ -3555,6 +3589,8 @@ fn reload_external_settings(hwnd: HWND) {
         state.usage_countdown = settings.usage_countdown;
         state.alert_sound = settings.alert_sound;
         state.alert_threshold_percent = settings.alert_threshold_percent;
+        state.notify_limit_reached = settings.notify_limit_reached;
+        state.notify_limit_reset = settings.notify_limit_reset;
         dual_mode = state.show_antigravity_gemini
             && state.show_antigravity_external
             && state.providers.contains(ProviderId::Antigravity);

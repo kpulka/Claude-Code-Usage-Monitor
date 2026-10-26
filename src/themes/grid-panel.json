@@ -68,6 +68,29 @@
           "height": "76"
         },
         {
+          "id": "claude-burn-eta",
+          "name": "claude burn eta",
+          "parent": "claude-provider",
+          "render": "claude.burn.warning",
+          "x": "150",
+          "y": "8",
+          "width": "42",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{claude.burn.eta.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#F59E0BFF"
+            }
+          }
+        },
+        {
           "id": "claude-burn-warning",
           "name": "claude burn warning",
           "parent": "claude-provider",
@@ -525,6 +548,29 @@
           "render": "providers.codex.enabled",
           "width": "canvas.width",
           "height": "76"
+        },
+        {
+          "id": "codex-burn-eta",
+          "name": "codex burn eta",
+          "parent": "codex-provider",
+          "render": "codex.burn.warning",
+          "x": "150",
+          "y": "8",
+          "width": "42",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{codex.burn.eta.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#F59E0BFF"
+            }
+          }
         },
         {
           "id": "codex-burn-warning",
@@ -986,6 +1032,29 @@
           "height": "76"
         },
         {
+          "id": "antigravity-burn-eta",
+          "name": "antigravity burn eta",
+          "parent": "antigravity-provider",
+          "render": "antigravity.burn.warning",
+          "x": "150",
+          "y": "8",
+          "width": "42",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{antigravity.burn.eta.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#F59E0BFF"
+            }
+          }
+        },
+        {
           "id": "antigravity-burn-warning",
           "name": "antigravity burn warning",
           "parent": "antigravity-provider",
@@ -1443,6 +1512,29 @@
           "render": "providers.opencode.enabled",
           "width": "canvas.width",
           "height": "76"
+        },
+        {
+          "id": "opencode-burn-eta",
+          "name": "opencode burn eta",
+          "parent": "opencode-provider",
+          "render": "opencode.burn.warning",
+          "x": "150",
+          "y": "8",
+          "width": "42",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{opencode.burn.eta.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#F59E0BFF"
+            }
+          }
         },
         {
           "id": "opencode-burn-warning",
@@ -1904,6 +1996,29 @@
           "height": "76"
         },
         {
+          "id": "cursor-burn-eta",
+          "name": "cursor burn eta",
+          "parent": "cursor-provider",
+          "render": "cursor.burn.warning",
+          "x": "150",
+          "y": "8",
+          "width": "42",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{cursor.burn.eta.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#F59E0BFF"
+            }
+          }
+        },
+        {
           "id": "cursor-burn-warning",
           "name": "cursor burn warning",
           "parent": "cursor-provider",
@@ -2363,6 +2478,29 @@
           "height": "76"
         },
         {
+          "id": "grok-burn-eta",
+          "name": "grok burn eta",
+          "parent": "grok-provider",
+          "render": "grok.burn.warning",
+          "x": "150",
+          "y": "8",
+          "width": "42",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{grok.burn.eta.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#F59E0BFF"
+            }
+          }
+        },
+        {
           "id": "grok-burn-warning",
           "name": "grok burn warning",
           "parent": "grok-provider",
@@ -2820,6 +2958,29 @@
           "render": "providers.copilot.enabled",
           "width": "canvas.width",
           "height": "76"
+        },
+        {
+          "id": "copilot-burn-eta",
+          "name": "copilot burn eta",
+          "parent": "copilot-provider",
+          "render": "copilot.burn.warning",
+          "x": "150",
+          "y": "8",
+          "width": "42",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{copilot.burn.eta.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#F59E0BFF"
+            }
+          }
         },
         {
           "id": "copilot-burn-warning",
