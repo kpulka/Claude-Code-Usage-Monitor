@@ -21,7 +21,7 @@
         "offset_y": 0
       },
       "width": "340",
-      "height": "12 + providers.count * 76",
+      "height": "30 + providers.count * 76",
       "corner_radius": "14",
       "background": {
         "type": "gradient",
@@ -60,6 +60,27 @@
           "layout": "column"
         },
         {
+          "id": "recommendation",
+          "name": "Recommended plan",
+          "parent": "grid",
+          "render": "summary.recommendation != ''",
+          "width": "canvas.width",
+          "height": "18",
+          "content": {
+            "type": "text",
+            "template": "\u2192 {summary.recommendation}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "semibold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#8BE9A6FF"
+            }
+          }
+        },
+        {
           "id": "claude-provider",
           "name": "Claude",
           "parent": "grid",
@@ -87,6 +108,23 @@
             "align": "right",
             "color": {
               "color": "#F59E0BFF"
+            }
+          }
+        },
+        {
+          "id": "claude-forecast-dot",
+          "name": "claude forecast warning",
+          "parent": "claude-provider",
+          "render": "claude.forecast.exhausted",
+          "x": "198",
+          "y": "18",
+          "width": "7",
+          "height": "7",
+          "corner_radius": "3",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#F87171FF"
             }
           }
         },
@@ -593,6 +631,23 @@
           }
         },
         {
+          "id": "codex-forecast-dot",
+          "name": "codex forecast warning",
+          "parent": "codex-provider",
+          "render": "codex.forecast.exhausted",
+          "x": "198",
+          "y": "18",
+          "width": "7",
+          "height": "7",
+          "corner_radius": "3",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#F87171FF"
+            }
+          }
+        },
+        {
           "id": "codex-burn-warning",
           "name": "codex burn warning",
           "parent": "codex-provider",
@@ -1091,6 +1146,23 @@
             "align": "right",
             "color": {
               "color": "#F59E0BFF"
+            }
+          }
+        },
+        {
+          "id": "antigravity-forecast-dot",
+          "name": "antigravity forecast warning",
+          "parent": "antigravity-provider",
+          "render": "antigravity.forecast.exhausted",
+          "x": "198",
+          "y": "18",
+          "width": "7",
+          "height": "7",
+          "corner_radius": "3",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#F87171FF"
             }
           }
         },
@@ -1597,6 +1669,23 @@
           }
         },
         {
+          "id": "opencode-forecast-dot",
+          "name": "opencode forecast warning",
+          "parent": "opencode-provider",
+          "render": "opencode.forecast.exhausted",
+          "x": "198",
+          "y": "18",
+          "width": "7",
+          "height": "7",
+          "corner_radius": "3",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#F87171FF"
+            }
+          }
+        },
+        {
           "id": "opencode-burn-warning",
           "name": "opencode burn warning",
           "parent": "opencode-provider",
@@ -2095,6 +2184,23 @@
             "align": "right",
             "color": {
               "color": "#F59E0BFF"
+            }
+          }
+        },
+        {
+          "id": "cursor-forecast-dot",
+          "name": "cursor forecast warning",
+          "parent": "cursor-provider",
+          "render": "cursor.forecast.exhausted",
+          "x": "198",
+          "y": "18",
+          "width": "7",
+          "height": "7",
+          "corner_radius": "3",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#F87171FF"
             }
           }
         },
@@ -2601,6 +2707,23 @@
           }
         },
         {
+          "id": "grok-forecast-dot",
+          "name": "grok forecast warning",
+          "parent": "grok-provider",
+          "render": "grok.forecast.exhausted",
+          "x": "198",
+          "y": "18",
+          "width": "7",
+          "height": "7",
+          "corner_radius": "3",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#F87171FF"
+            }
+          }
+        },
+        {
           "id": "grok-burn-warning",
           "name": "grok burn warning",
           "parent": "grok-provider",
@@ -3099,6 +3222,23 @@
             "align": "right",
             "color": {
               "color": "#F59E0BFF"
+            }
+          }
+        },
+        {
+          "id": "copilot-forecast-dot",
+          "name": "copilot forecast warning",
+          "parent": "copilot-provider",
+          "render": "copilot.forecast.exhausted",
+          "x": "198",
+          "y": "18",
+          "width": "7",
+          "height": "7",
+          "corner_radius": "3",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#F87171FF"
             }
           }
         },

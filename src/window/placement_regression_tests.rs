@@ -52,6 +52,7 @@ pub(super) fn state_for(theme: ThemeDocument, placement: PlacementOverride) -> A
         burn_eta_seconds: [0; crate::providers::ProviderId::ALL.len()],
         notify_limit_reached: true,
         notify_limit_reset: true,
+        forecast_exhausted: crate::providers::ProviderSet::empty(),
         active_theme_path: None,
         active_theme: Some(theme),
         theme_clock_interval: None,

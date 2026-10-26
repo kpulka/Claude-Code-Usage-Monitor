@@ -3707,3 +3707,45 @@ fn sparkline_draws_a_line_for_a_series_and_nothing_for_empty_data() {
     let single = sparkline_pixels("42");
     assert!(single.iter().any(|pixel| *pixel != 0));
 }
+
+#[test]
+fn recommendation_names_the_plan_with_the_most_room() {
+    use crate::models::{AppUsageData, UsageData, UsageSection};
+
+    let window = |percentage: f64| UsageSection {
+        available: true,
+        percentage,
+        resets_at: None,
+    };
+    let mut claude = UsageData::default();
+    claude.session = window(96.0);
+    claude.weekly = window(40.0);
+    let mut opencode = UsageData::default();
+    opencode.session = window(12.0);
+    opencode.weekly = window(88.0);
+    let data = AppUsageData::from_iter([
+        (ProviderId::Claude, claude),
+        (ProviderId::OpenCode, opencode),
+    ]);
+
+    let mut runtime = ThemeRuntime::default();
+    runtime.providers = ProviderSet::from_enabled([ProviderId::Claude, ProviderId::OpenCode]);
+    let context = DataContext::from_usage_with_runtime(Some(&data), &Canvas::default(), runtime);
+    // Claude's tightest window has 4% left, OpenCode's has 12%.
+    assert_eq!(
+        context.get_string("summary.recommendation"),
+        Some("OpenCode 12%")
+    );
+    assert_eq!(context.get("opencode.recommended"), Some(1.0));
+    assert_eq!(context.get("claude.recommended"), Some(0.0));
+}
+
+#[test]
+fn recommendation_stays_empty_without_figures() {
+    use crate::models::AppUsageData;
+
+    let data = AppUsageData::from_iter([(ProviderId::Claude, Default::default())]);
+    let context = DataContext::from_usage(Some(&data), &Canvas::default());
+    assert_eq!(context.get_string("summary.recommendation"), Some(""));
+    assert_eq!(context.get("claude.recommended"), Some(0.0));
+}

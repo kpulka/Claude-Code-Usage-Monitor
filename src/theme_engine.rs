@@ -1376,6 +1376,8 @@ pub struct ThemeRuntime {
     pub burn_warning: ProviderSet,
     /// Seconds until the flagged window runs out, indexed like `ProviderId::ALL`.
     pub burn_eta_seconds: [u32; ProviderId::ALL.len()],
+    /// Providers whose current pace exhausts a window before it resets.
+    pub forecast_exhausted: ProviderSet,
     pub crossfade_opacity: f64,
     host_width: u32,
     host_height: u32,
@@ -1395,6 +1397,7 @@ impl Default for ThemeRuntime {
             antigravity_external_enabled: false,
             burn_warning: ProviderSet::empty(),
             burn_eta_seconds: [0; ProviderId::ALL.len()],
+            forecast_exhausted: ProviderSet::empty(),
             crossfade_opacity: 1.0,
             host_width: default_canvas_width(),
             host_height: default_canvas_height(),
@@ -1431,6 +1434,7 @@ impl ThemeRuntime {
             antigravity_external_enabled: false,
             burn_warning: ProviderSet::empty(),
             burn_eta_seconds: [0; ProviderId::ALL.len()],
+            forecast_exhausted: ProviderSet::empty(),
             crossfade_opacity: 1.0,
             host_width: default_canvas_width(),
             host_height: default_canvas_height(),
@@ -1478,6 +1482,11 @@ impl ThemeRuntime {
 
     pub fn with_burn_eta(mut self, eta_seconds: [u32; ProviderId::ALL.len()]) -> Self {
         self.burn_eta_seconds = eta_seconds;
+        self
+    }
+
+    pub fn with_forecast_exhausted(mut self, exhausted: ProviderSet) -> Self {
+        self.forecast_exhausted = exhausted;
         self
     }
 
@@ -1596,6 +1605,10 @@ impl DataContext {
                 &format!("{}.burn.eta.seconds", descriptor.key),
                 f64::from(eta),
             );
+            context.insert(
+                &format!("{}.forecast.exhausted", descriptor.key),
+                runtime.forecast_exhausted.contains(descriptor.id) as u8 as f64,
+            );
         }
         // Hourly peaks of the last day, one comma-separated binding per window,
         // so themes can draw a sparkline without asking the poller for more.
@@ -1629,6 +1642,27 @@ impl DataContext {
             "antigravity.crossfade_opacity",
             runtime.crossfade_opacity.clamp(0.0, 1.0),
         );
+        // Which plan has the most room right now. Derived from the same figures
+        // the rows show, so the hint can never disagree with them.
+        let recommendation = recommended_provider(data, runtime.providers);
+        context.insert_string(
+            "summary.recommendation",
+            &recommendation
+                .map(|(provider, headroom)| {
+                    format!(
+                        "{} {:.0}%",
+                        runtime.language.text(provider.descriptor().display_name),
+                        headroom
+                    )
+                })
+                .unwrap_or_default(),
+        );
+        for descriptor in PROVIDER_DESCRIPTORS {
+            context.insert(
+                &format!("{}.recommended", descriptor.key),
+                recommendation.is_some_and(|(provider, _)| provider == descriptor.id) as u8 as f64,
+            );
+        }
         if let Some(data) = data {
             for account in &data.accounts {
                 let key = format!(
@@ -2924,6 +2958,48 @@ pub fn validate_template(template: &str, context: &DataContext) -> Vec<String> {
         remaining = &remaining[end + 1..];
     }
     errors
+}
+
+/// Provider with the most headroom on its tightest window, and that headroom in
+/// percentage points. `None` when no enabled provider reported anything.
+fn recommended_provider(
+    data: Option<&AppUsageData>,
+    providers: ProviderSet,
+) -> Option<(ProviderId, f64)> {
+    let data = data?;
+    providers
+        .iter()
+        .filter_map(|provider| {
+            let usage = data.get(provider)?;
+            // Only the three windows the card draws: a scoped limit the theme
+            // cannot show must never move the advice.
+            // The card draws the external pool too, so a plan whose Claude
+            // quota is spent must not win just because Gemini has room.
+            let external = usage
+                .external_pool
+                .as_ref()
+                .map(|pool| pool.sections())
+                .into_iter()
+                .flatten();
+            let tightest = [Some(&usage.session), Some(&usage.weekly)]
+                .into_iter()
+                .flatten()
+                .chain(usage.monthly.iter())
+                .chain(external)
+                .filter(|section| section.available)
+                .map(|section| section.percentage)
+                .fold(None::<f64>, |worst, percentage| {
+                    Some(worst.map_or(percentage, |current| current.max(percentage)))
+                })?;
+            Some((provider, (100.0 - tightest).max(0.0)))
+        })
+        .max_by(|left, right| {
+            left.1
+                .partial_cmp(&right.1)
+                .unwrap_or(std::cmp::Ordering::Equal)
+                // A stable order keeps the hint from flickering between equals.
+                .then_with(|| right.0.descriptor().key.cmp(left.0.descriptor().key))
+        })
 }
 
 impl Default for Canvas {

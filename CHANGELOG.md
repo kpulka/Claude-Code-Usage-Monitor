@@ -25,6 +25,12 @@ changes grouped into Added, Changed, Fixed, and Removed where applicable.
 
 ### Added
 
+- A headline row above the providers naming the plan with the most room right now
+  (`summary.recommendation`, and `<provider>.recommended` for themes that want to highlight the row), derived
+  from the same windows the card draws - including an external pool, so a plan whose Claude quota is spent
+  cannot win on Gemini's remaining budget alone.
+- `<provider>.forecast.exhausted` marks a provider whose current pace runs out before its window would have
+  reset, with a red dot on the row, so a week that will not survive to Monday is visible at 40% used.
 - Sound the chime when a quota window that reached the alert threshold (95% by default) resets, so the refilled allowance is noticed without watching the widget. Arming and firing are derived from each provider's own `resets_at`, so Claude's five-hour window, OpenCode Go's rolling/weekly/monthly caps and Antigravity's separate Gemini and external pools all behave alike. Windows without a reset time, failing providers and windows that never approached the threshold stay silent; a burst of resets plays one sound.
 
 - "Grid panel" built-in theme: a 340px desktop card with one block per provider, a name row with the headline figure, and one aligned row per window (label, progress bar, percentage, reset countdown) so figures and times are no longer crammed onto one line.

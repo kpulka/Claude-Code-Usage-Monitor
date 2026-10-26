@@ -90,6 +90,8 @@ pub(crate) struct Evaluation {
     pub warnings: ProviderSet,
     /// Seconds until the flagged window runs out, per provider, when known.
     pub warning_eta: BTreeMap<ProviderId, u64>,
+    /// Providers whose current pace exhausts a window before it resets.
+    pub forecast_exhausted: ProviderSet,
 }
 
 /// Fold one poll into the persisted state and report what just reset.
@@ -109,6 +111,7 @@ pub(crate) fn evaluate(
     let mut reached = Vec::new();
     let mut warnings = ProviderSet::empty();
     let mut warning_eta: BTreeMap<ProviderId, u64> = BTreeMap::new();
+    let mut forecast_exhausted = ProviderSet::empty();
     for provider in providers.iter() {
         let threshold = thresholds(provider).clamp(1.0, 100.0);
         let Some(usage) = data.get(provider) else {
@@ -138,7 +141,10 @@ pub(crate) fn evaluate(
                     peak: section.percentage,
                 });
             }
-            if let Some(eta) = outcome.eta_seconds {
+            if outcome.exhausted_before_reset {
+                forecast_exhausted.set(provider, true);
+            }
+            if let Some(eta) = outcome.eta_seconds.filter(|eta| *eta <= BURN_WARN_SECS) {
                 warnings.set(provider, true);
                 // Keep the tightest window per provider: that is the one the
                 // user is about to lose.
@@ -161,6 +167,7 @@ pub(crate) fn evaluate(
         play,
         warnings,
         warning_eta,
+        forecast_exhausted,
     }
 }
 
@@ -170,8 +177,10 @@ struct WindowOutcome {
     reached: bool,
     /// Consumption is on course to exhaust the window within `BURN_WARN_SECS`.
     burning: bool,
-    /// Seconds until exhaustion, when the projection says it is close.
+    /// Seconds until exhaustion at the current pace.
     eta_seconds: Option<u64>,
+    /// The projection runs out before the window would have reset.
+    exhausted_before_reset: bool,
 }
 
 fn push_windows<'a>(
@@ -256,17 +265,27 @@ fn observe(
             samples,
         },
     );
+    let exhausted_before_reset = match (eta_seconds, resets_at_unix) {
+        (Some(eta), Some(reset)) => {
+            let seconds_to_reset = reset.saturating_sub(now_unix);
+            eta > 0 && eta < seconds_to_reset
+        }
+        _ => false,
+    };
     WindowOutcome {
         reached,
-        burning: eta_seconds.is_some(),
+        burning: eta_seconds.is_some_and(|eta| eta <= BURN_WARN_SECS),
         eta_seconds,
+        exhausted_before_reset,
     }
 }
 
 /// Usage per second across the recorded samples, expressed as a will-run-out
 /// estimate. `None` when usage is flat or falling, or when the history is too
 /// short to say anything.
-fn burn_rate(samples: &[Sample], percentage: f64, now_unix: u64) -> Option<u64> {
+/// Seconds until the window is exhausted at the current rate, whatever the
+/// horizon. `None` when usage is flat or falling, or the history is too short.
+fn burn_rate(samples: &[Sample], percentage: f64, _now_unix: u64) -> Option<u64> {
     let first = samples.first()?;
     let last = samples.last()?;
     let span = last.unix.saturating_sub(first.unix);
@@ -282,10 +301,7 @@ fn burn_rate(samples: &[Sample], percentage: f64, now_unix: u64) -> Option<u64> 
         return None;
     }
     let remaining = (100.0 - percentage).max(0.0);
-    let eta = (remaining / rate) as u64;
-    // Guard against a single spike claiming the window ends instantly.
-    let _ = now_unix;
-    (eta <= BURN_WARN_SECS).then_some(eta)
+    Some((remaining / rate) as u64)
 }
 
 #[cfg(test)]
@@ -537,5 +553,31 @@ mod tests {
             at(500),
         );
         assert!(state.windows["claude:session"].armed);
+    }
+
+    #[test]
+    fn a_pace_that_outruns_the_reset_is_flagged_as_a_forecast() {
+        let mut state = AlertState::default();
+        let providers = claude_only();
+
+        // 80% at t=1000, then 90% an hour later: ten points an hour against ten
+        // points left is an hour, while the window is four hours from its reset.
+        let early = data_with(
+            section(80.0, Some(at(1000 + 5 * 3600))),
+            section(30.0, None),
+        );
+        evaluate(&mut state, &early, providers, &|_| 95.0, at(1000));
+        let later = data_with(
+            section(90.0, Some(at(1000 + 5 * 3600))),
+            section(31.0, None),
+        );
+        let evaluation = evaluate(&mut state, &later, providers, &|_| 95.0, at(1000 + 3600));
+
+        assert!(evaluation.forecast_exhausted.contains(ProviderId::Claude));
+        assert!(
+            !evaluation.warnings.contains(ProviderId::Claude),
+            "an hour left is not the forty-five minute warning"
+        );
+        assert!(evaluation.events.is_empty(), "nothing has run out yet");
     }
 }

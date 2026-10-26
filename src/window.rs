@@ -150,6 +150,8 @@ struct AppState {
     notify_limit_reached: bool,
     /// Tray notifications for a refilled window.
     notify_limit_reset: bool,
+    /// Providers whose pace exhausts a window before its reset.
+    forecast_exhausted: crate::providers::ProviderSet,
     active_theme_path: Option<PathBuf>,
     active_theme: Option<ThemeDocument>,
     theme_clock_interval: Option<Duration>,
@@ -791,6 +793,7 @@ fn theme_runtime_from_state(state: &AppState) -> ThemeRuntime {
     );
     let burn_warning = state.burn_warning;
     let burn_eta_seconds = state.burn_eta_seconds;
+    let forecast_exhausted = state.forecast_exhausted;
     let nest = if state.auto_ejected {
         SurfaceNest::Floating
     } else if let Some(ref ov) = state.placement_override {
@@ -816,6 +819,7 @@ fn theme_runtime_from_state(state: &AppState) -> ThemeRuntime {
         )
         .with_burn_warning(burn_warning)
         .with_burn_eta(burn_eta_seconds)
+        .with_forecast_exhausted(forecast_exhausted)
 }
 
 /// A transient outage can keep presenting the last real reading while its
@@ -2649,6 +2653,7 @@ pub fn run() {
                 burn_eta_seconds: [0; crate::providers::ProviderId::ALL.len()],
                 notify_limit_reached: settings.notify_limit_reached,
                 notify_limit_reset: settings.notify_limit_reset,
+                forecast_exhausted: crate::providers::ProviderSet::empty(),
                 active_theme_path,
                 active_theme,
                 theme_clock_interval,
@@ -3219,6 +3224,7 @@ fn do_poll_once(hwnd: HWND) {
                     // The warning glyph follows the projection, not the sound.
                     if let Some(state) = lock_state().as_mut() {
                         state.burn_warning = evaluation.warnings;
+                        state.forecast_exhausted = evaluation.forecast_exhausted;
                         let mut eta = [0u32; crate::providers::ProviderId::ALL.len()];
                         for (provider, seconds) in &evaluation.warning_eta {
                             if let Some(index) = crate::providers::ProviderId::ALL
