@@ -98,6 +98,19 @@ fn rejects_unexpected_download_locations() {
 }
 
 #[test]
+fn rejects_releases_published_by_another_repository() {
+    // The upstream project this fork is based on must never be offered.
+    for (owner, repo) in [("CodeZeno", "Claude-Code-Usage-Monitor"), ("other", "repo")] {
+        let mut value = fixture("v2.14.0");
+        value["assets"][0]["browser_download_url"] = json!(format!(
+            "https://github.com/{owner}/{repo}/releases/download/v2.14.0/{RELEASE_ASSET_NAME}"
+        ));
+        let error = descriptor(value, "2.13.44").unwrap_err();
+        assert!(error.contains("does not belong"), "{owner}/{repo}: {error}");
+    }
+}
+
+#[test]
 fn semver_prerelease_precedence_is_preserved() {
     let versions = [
         "2.14.0-alpha",

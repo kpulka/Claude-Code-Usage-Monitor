@@ -57,6 +57,14 @@ pub(super) fn release_descriptor(
     }
 
     let (owner, repo) = github_repo()?;
+    // A release from a foreign owner or repository must never be offered, even
+    // if its asset is named like ours. Forks would otherwise silently replace
+    // themselves with upstream binaries.
+    if !super::github_url_belongs_to_repository(&asset.browser_download_url, owner, repo) {
+        return Err(format!(
+            "The update asset URL does not belong to https://github.com/{owner}/{repo}."
+        ));
+    }
     let expected_url = format!(
         "https://github.com/{owner}/{repo}/releases/download/{}/{RELEASE_ASSET_NAME}",
         release.tag_name
@@ -71,6 +79,19 @@ pub(super) fn release_descriptor(
         asset_url: expected_url,
         integrity,
     }))
+}
+
+/// Refuses to install a release that was not published by this build's own
+/// GitHub repository. Checked again right before the download starts.
+pub(super) fn ensure_release_belongs_to_build(release: &ReleaseDescriptor) -> Result<(), String> {
+    let (owner, repo) = github_repo()?;
+    if super::github_url_belongs_to_repository(&release.asset_url, owner, repo) {
+        return Ok(());
+    }
+
+    Err(format!(
+        "Refusing to install a release that does not belong to https://github.com/{owner}/{repo}."
+    ))
 }
 
 pub(super) fn parse_version(version: &str) -> Result<Version, String> {

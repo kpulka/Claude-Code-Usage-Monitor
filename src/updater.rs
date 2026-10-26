@@ -38,7 +38,7 @@ mod release;
 
 use download::{download_release_asset, open_verified_source, AssetIntegrity};
 pub use release::ReleaseDescriptor;
-use release::{parse_version, release_descriptor, GitHubRelease};
+use release::{ensure_release_belongs_to_build, parse_version, release_descriptor, GitHubRelease};
 use semver::Version;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -116,13 +116,23 @@ fn parse_apply_update_args(
 }
 
 pub fn current_install_channel() -> InstallChannel {
+    // A WinGet-managed path only means something when the WinGet package is
+    // actually ours, so a fork never routes its updates through upstream.
     match std::env::current_exe() {
-        Ok(path) if is_winget_install_path(&path) => InstallChannel::Winget,
+        Ok(path) if is_winget_install_path(&path) && winget_update_available() => {
+            InstallChannel::Winget
+        }
         _ => InstallChannel::Portable,
     }
 }
 
 pub fn check_for_updates(channel: InstallChannel) -> Result<UpdateCheckResult, String> {
+    // Never query WinGet about a package that is not ours: upgrading through
+    // it would install another publisher's build over this one.
+    if channel == InstallChannel::Winget {
+        ensure_winget_upgrade_allowed()?;
+    }
+
     check_channel_updates(channel, fetch_latest_release, winget_listed_versions)
 }
 
@@ -161,6 +171,7 @@ fn winget_update_result(current: &Version, listed: &[Version]) -> UpdateCheckRes
 }
 
 pub fn begin_winget_update() -> Result<(), String> {
+    ensure_winget_upgrade_allowed()?;
     let current_exe =
         std::env::current_exe().map_err(|e| format!("Unable to locate current executable: {e}"))?;
     let current_dir = current_exe
@@ -184,6 +195,8 @@ pub fn begin_winget_update() -> Result<(), String> {
 }
 
 pub fn begin_self_update(release: &ReleaseDescriptor) -> Result<(), String> {
+    // Verify ownership before touching the filesystem or the network.
+    ensure_release_belongs_to_build(release)?;
     let current_exe =
         std::env::current_exe().map_err(|e| format!("Unable to locate current executable: {e}"))?;
     ensure_target_location_writable(&current_exe)?;
@@ -515,6 +528,22 @@ fn ensure_target_location_writable(target: &Path) -> Result<(), String> {
     }
 }
 
+/// True when `url` addresses `owner/repo` on GitHub itself.
+///
+/// GitHub owners and repository names are case-insensitive, so this comparison
+/// is too. Anything else - another host, another owner, another repository, or
+/// a repository whose name merely starts with ours - is foreign.
+fn github_url_belongs_to_repository(url: &str, owner: &str, repo: &str) -> bool {
+    if owner.is_empty() || repo.is_empty() {
+        return false;
+    }
+    let prefix = format!("https://github.com/{owner}/{repo}/");
+    let Some(head) = url.get(..prefix.len()) else {
+        return false;
+    };
+    head.eq_ignore_ascii_case(&prefix)
+}
+
 fn github_repo() -> Result<(&'static str, &'static str), String> {
     let repository = env!("CARGO_PKG_REPOSITORY").trim_end_matches('/');
     let parts: Vec<&str> = repository.split('/').collect();
@@ -529,6 +558,42 @@ fn github_repo() -> Result<(&'static str, &'static str), String> {
     }
 
     Ok((owner, repo))
+}
+
+/// WinGet package identifiers are `Publisher.Package`.
+fn winget_package_publisher(package_id: &str) -> Option<&str> {
+    let (publisher, package) = package_id.split_once('.')?;
+    (!publisher.is_empty() && !package.is_empty()).then_some(publisher)
+}
+
+/// A build may only upgrade through a WinGet package published under its own
+/// repository owner. Forks inherit the upstream package id, and running
+/// `winget upgrade` on it would replace the fork with upstream binaries.
+fn winget_upgrade_allowed(package_id: &str, owner: &str) -> Result<(), String> {
+    let publisher = winget_package_publisher(package_id).ok_or_else(|| {
+        format!("WinGet package id {package_id} is malformed, so WinGet updates are disabled.")
+    })?;
+    if publisher.eq_ignore_ascii_case(owner) {
+        return Ok(());
+    }
+
+    Err(format!(
+        concat!(
+            "WinGet updates are unavailable for this build: package id {} belongs to {}, ",
+            "but this build comes from {}. Update from this build's GitHub releases instead."
+        ),
+        package_id, publisher, owner
+    ))
+}
+
+fn ensure_winget_upgrade_allowed() -> Result<(), String> {
+    let (owner, _) = github_repo()?;
+    winget_upgrade_allowed(WINGET_PACKAGE_ID, owner)
+}
+
+/// Whether this build may upgrade through the WinGet source at all.
+pub fn winget_update_available() -> bool {
+    ensure_winget_upgrade_allowed().is_ok()
 }
 
 fn user_agent() -> &'static str {

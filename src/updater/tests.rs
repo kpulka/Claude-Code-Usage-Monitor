@@ -358,3 +358,76 @@ fn winget_lists_published_versions_from_the_live_source() {
     let versions = winget_listed_versions().unwrap();
     assert!(versions.contains(&v("2.15.0")), "{versions:?}");
 }
+
+fn release_descriptor_at(asset_url: &str) -> ReleaseDescriptor {
+    ReleaseDescriptor {
+        latest_version: "99.0.0".into(),
+        asset_url: asset_url.into(),
+        integrity: AssetIntegrity::new(3, Some(ABC_DIGEST)).unwrap(),
+    }
+}
+
+#[test]
+fn releases_from_another_owner_or_repository_are_rejected() {
+    let (owner, repo) = github_repo().unwrap();
+    let asset = "claude-code-usage-monitor.exe";
+    let ours = |owner: &str, repo: &str| {
+        format!("https://github.com/{owner}/{repo}/releases/download/v99.0.0/{asset}")
+    };
+
+    for url in [
+        // The upstream repository this fork is based on.
+        ours("CodeZeno", "Claude-Code-Usage-Monitor"),
+        ours("someoneelse", repo),
+        ours(owner, "some-other-repo"),
+        // A repository whose name merely starts with ours.
+        ours(owner, &format!("{repo}-fork")),
+        "https://example.com/releases/download/v99.0.0/claude-code-usage-monitor.exe".into(),
+    ] {
+        let release = release_descriptor_at(&url);
+        let error = ensure_release_belongs_to_build(&release).unwrap_err();
+        assert!(error.contains("does not belong"), "url: {url}: {error}");
+        // Applying must refuse the same release before touching the install.
+        let error = begin_self_update(&release).unwrap_err();
+        assert!(error.contains("does not belong"), "url: {url}: {error}");
+    }
+
+    let release = release_descriptor_at(&ours(owner, repo));
+    assert!(ensure_release_belongs_to_build(&release).is_ok());
+    // GitHub owner names are case-insensitive.
+    let release = release_descriptor_at(&ours(&owner.to_ascii_uppercase(), repo));
+    assert!(ensure_release_belongs_to_build(&release).is_ok());
+}
+
+#[test]
+fn winget_publisher_is_read_from_the_package_id() {
+    assert_eq!(
+        winget_package_publisher("CodeZeno.ClaudeCodeUsageMonitor"),
+        Some("CodeZeno")
+    );
+    assert_eq!(winget_package_publisher("Kpulka.App"), Some("Kpulka"));
+    for malformed in ["CodeZenoClaudeCodeUsageMonitor", ".App", "Publisher.", ""] {
+        assert_eq!(winget_package_publisher(malformed), None, "{malformed:?}");
+    }
+}
+
+#[test]
+fn winget_upgrade_is_unavailable_when_the_package_belongs_to_another_owner() {
+    assert!(winget_upgrade_allowed("Kpulka.ClaudeCodeUsageMonitor", "kpulka").is_ok());
+    let error = winget_upgrade_allowed(WINGET_PACKAGE_ID, "kpulka").unwrap_err();
+    assert!(error.contains(WINGET_PACKAGE_ID), "{error}");
+    assert!(error.contains("unavailable"), "{error}");
+    assert!(winget_upgrade_allowed("CodeZeno.App", "").is_err());
+}
+
+#[test]
+fn this_fork_never_updates_through_the_upstream_winget_package() {
+    let (owner, _) = github_repo().unwrap();
+    // This build inherits the upstream package id, so it must not upgrade through it.
+    assert_eq!(WINGET_PACKAGE_ID, "CodeZeno.ClaudeCodeUsageMonitor");
+    assert!(!owner.eq_ignore_ascii_case("CodeZeno"), "owner: {owner}");
+    assert!(!winget_update_available());
+    // The WinGet source must not even be queried for a foreign package.
+    let error = check_for_updates(InstallChannel::Winget).unwrap_err();
+    assert!(error.contains(WINGET_PACKAGE_ID), "{error}");
+}
