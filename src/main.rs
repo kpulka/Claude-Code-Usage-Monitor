@@ -48,6 +48,10 @@ fn main() {
         }
     }
 
+    if args.iter().any(|arg| arg == "--no-glass") {
+        backdrop::disable_glass();
+    }
+
     if args.iter().any(|arg| arg == "--test-alert-sound") {
         // Lets a user (or an agent) prove the alert path without waiting for a
         // quota window to reset.
