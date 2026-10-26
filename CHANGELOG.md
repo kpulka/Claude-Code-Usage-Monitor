@@ -4,6 +4,14 @@ Notable changes to Claude Code Usage Monitor are documented here, newest first.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), with
 changes grouped into Added, Changed, Fixed, and Removed where applicable.
 
+## [Unreleased]
+
+### Added
+
+- Read OpenCode Go usage from the API key the OpenCode CLI already stores in `auth.json`, polling `https://opencode.ai/zen/go/v1/usage` for the rolling five-hour, weekly and monthly windows. The console cookie route stays as a fallback, so existing setups keep working and accounts with only a CLI login need no extra configuration.
+
+- Accept an `apiKey` in the OpenCode Go config file and `OPENCODE_GO_API_KEY` in the environment, plus `OPENCODE_AUTH_FILE` to point at a different OpenCode `auth.json`.
+
 ## [2.22.4] - 2026-10-25
 
 ### Fixed

@@ -68,21 +68,24 @@ In the default theme, left-click a provider tray icon to show or hide the widget
 | Claude Code | Sign in with the Claude Code CLI or desktop app. Windows and WSL credentials are detected automatically. |
 | Codex | Install and sign in to the Codex CLI, then enable Codex in **Providers**. |
 | Google Antigravity | Sign in to Antigravity, then enable it in **Providers**. |
-| OpenCode Go | Connect an OpenCode Go account, configure the credentials described below, then enable OpenCode in **Providers**. |
+| OpenCode Go | Sign in to the OpenCode CLI (`opencode auth login`) or set an API key, then enable OpenCode in **Providers**. The key is detected automatically. |
 | Cursor | Sign in to Cursor, then enable it in **Providers**. The local session is detected automatically. |
 | Grok Build | Run `grok login` in the Grok Build CLI, then enable Grok in **Providers**. The signed-in session is detected automatically. |
 | GitHub Copilot | Sign in with the Copilot CLI (`copilot`, then `/login`) or the GitHub CLI (`gh auth login`), then enable Copilot in **Providers**. The stored login is detected automatically. |
 
-For OpenCode Go, set `OPENCODE_GO_WORKSPACE_ID` and `OPENCODE_GO_AUTH_COOKIE`, or create `%APPDATA%\opencode-go\config.json`:
+The OpenCode Go API key is read automatically: the monitor uses `OPENCODE_GO_API_KEY` when set, otherwise the `opencode-go` entry in the OpenCode CLI's `auth.json` (`%USERPROFILE%\.local\share\opencode\auth.json`). It then polls `https://opencode.ai/zen/go/v1/usage`, the endpoint behind the OpenCode Go allowance meters, which reports the rolling five-hour, weekly and monthly windows as percentages with their reset times. No browser session is involved, so nothing expires. 
+
+Accounts without a CLI login can still use the console route: set `OPENCODE_GO_WORKSPACE_ID` and `OPENCODE_GO_AUTH_COOKIE`, or create `%APPDATA%\opencode-go\config.json`:
 
 ```json
 {
+  "apiKey": "sk-...",
   "workspaceId": "wrk_01...",
   "authCookie": "__Host-console_session=your-session-cookie-value"
 }
 ```
 
-The workspace ID is part of the OpenCode Go console URL: `https://opencode.ai/console/<workspaceId>/go`. Copy the `__Host-console_session` cookie from an authenticated `opencode.ai` browser session, including its name as shown above. A full Cookie header containing `__Host-console_session` or the legacy `auth` cookie is also accepted unchanged; no empty `auth=;` prefix is needed. Bare legacy `auth` cookie values remain supported. These formats work for both `authCookie` and `OPENCODE_GO_AUTH_COOKIE`. Set `OPENCODE_GO_CONFIG_FILE` to use a different config path. The monitor reads usage from the console JSON API using this workspace ID and cookie.
+The workspace ID is part of the OpenCode Go console URL: `https://opencode.ai/console/<workspaceId>/go`. Copy the `__Host-console_session` cookie from an authenticated `opencode.ai` browser session, including its name as shown above. A full Cookie header containing `__Host-console_session` or the legacy `auth` cookie is also accepted unchanged; no empty `auth=;` prefix is needed. Bare legacy `auth` cookie values remain supported. These formats work for both `authCookie` and `OPENCODE_GO_AUTH_COOKIE`. Set `OPENCODE_GO_CONFIG_FILE` to use a different config path and `OPENCODE_AUTH_FILE` to point at a different OpenCode `auth.json`. The monitor prefers the API key and falls back to the console JSON API when the key is missing or rejected.
 
 For Cursor, `CURSOR_SESSION_TOKEN` can override the automatically detected local session.
 
