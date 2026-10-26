@@ -2351,7 +2351,7 @@ fn total_widget_width() -> i32 {
 }
 
 /// Acrylic tint for the floating card: dark, slightly cool, AABBGGRR.
-const GLASS_TINT: u32 = 0xC8_16_14_1A;
+const GLASS_TINT: u32 = 0x78_12_11_16;
 
 pub fn run() {
     let run_args: Vec<String> = std::env::args().collect();
