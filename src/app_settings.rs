@@ -508,6 +508,18 @@ pub fn save_alert_state(state: &crate::alerts::AlertState) -> Result<(), String>
     write_json_atomic(&alert_state_path(), state)
 }
 
+pub fn history_path() -> PathBuf {
+    app_data_directory().join("history.json")
+}
+
+pub fn load_history() -> Option<crate::history::History> {
+    read_json(&history_path())
+}
+
+pub fn save_history(history: &crate::history::History) -> Result<(), String> {
+    write_json_atomic(&history_path(), history)
+}
+
 pub fn load_usage_cache() -> Option<UsageCache> {
     let mut cache: UsageCache = read_json(&usage_cache_path())?;
     cache.data.invalidate_changed_credentials();

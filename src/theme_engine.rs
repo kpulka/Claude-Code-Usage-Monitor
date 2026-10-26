@@ -25,6 +25,9 @@ pub const CLASSIC_VERTICAL_THEME_ID: &str = "classic-vertical";
 pub const GRID_PANEL_THEME_ID: &str = "grid-panel";
 pub const MINECRAFT_THEME_ID: &str = "theme-minecraft";
 
+/// Windows that get a history binding (`<provider>.<window>.history`).
+pub const HISTORY_WINDOWS: [&str; 3] = ["session", "weekly", "monthly"];
+
 const BUILTIN_THEME_SOURCES: &[(&str, &str)] = &[
     (
         CLASSIC_THEME_ID,
@@ -318,6 +321,18 @@ pub enum SceneContent {
         segments_expression: Option<Expression>,
         #[serde(default = "default_segment_gap")]
         segment_gap: Expression,
+    },
+    /// A tiny polyline over a series of percentages, 0 to 100.
+    Sparkline {
+        /// Either the name of a binding that yields comma-separated values
+        /// (e.g. `claude.session.history`) or an inline template that does.
+        #[serde(default)]
+        source: String,
+        #[serde(default = "default_accent_paint")]
+        color: Paint,
+        /// Optional soft area under the line; a transparent fill draws none.
+        #[serde(default)]
+        fill: Paint,
     },
 }
 
@@ -1563,6 +1578,22 @@ impl DataContext {
                 runtime.burn_warning.contains(descriptor.id) as u8 as f64,
             );
         }
+        // Hourly peaks of the last day, one comma-separated binding per window,
+        // so themes can draw a sparkline without asking the poller for more.
+        for descriptor in PROVIDER_DESCRIPTORS {
+            for window in HISTORY_WINDOWS {
+                context.insert_string(
+                    &format!("{}.{window}.history", descriptor.key),
+                    crate::history::binding(descriptor.key, window).unwrap_or_default(),
+                );
+            }
+        }
+        for window in HISTORY_WINDOWS {
+            context.insert_string(
+                &format!("antigravity_external.{window}.history"),
+                crate::history::binding("antigravity#external", window).unwrap_or_default(),
+            );
+        }
         context.insert("display.countdown", runtime.countdown as u8 as f64);
         context.insert(
             "antigravity.gemini.enabled",
@@ -2761,6 +2792,20 @@ fn validate_scene_object(errors: &mut Vec<String>, context: &DataContext, object
             for error in validate_template(template, &object_context) {
                 errors.push(format!("{}.template: {error}", object.name));
             }
+        }
+        SceneContent::Sparkline { color, fill, .. } => {
+            validate_paint(
+                errors,
+                &object_context,
+                &format!("{}.color", object.name),
+                color,
+            );
+            validate_paint(
+                errors,
+                &object_context,
+                &format!("{}.fill", object.name),
+                fill,
+            );
         }
         SceneContent::Progress {
             value,

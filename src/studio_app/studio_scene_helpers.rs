@@ -292,6 +292,7 @@ pub(super) fn scene_object_icon(object: &SceneObject) -> LucideIcon {
     match &object.content {
         SceneContent::Text { .. } => LucideIcon::Type,
         SceneContent::Progress { .. } => LucideIcon::Gauge,
+        SceneContent::Sparkline { .. } => LucideIcon::Activity,
         SceneContent::None => {
             if matches!(&object.background, LayerBackground::Image { .. }) {
                 LucideIcon::Image
@@ -312,6 +313,7 @@ pub(super) fn scene_object_icon_color(
 ) -> egui::Color32 {
     match &object.content {
         SceneContent::Text { color, .. } => scene_paint_color(color),
+        SceneContent::Sparkline { color, .. } => scene_paint_color(color),
         SceneContent::None | SceneContent::Progress { .. } => scene_icon_contrast_color(background),
     }
 }

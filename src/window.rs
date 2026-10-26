@@ -3173,6 +3173,10 @@ fn do_poll_once(hwnd: HWND) {
                 }),
                 Err(error) => diagnose::log_error("unable to save usage cache", error),
             }
+            // History is a record, not a notification: it folds in on every
+            // successful poll whatever the alert settings say. Every window is
+            // recorded, including the ones the display currently hides.
+            crate::history::record_poll(&alert_data, SystemTime::now());
             {
                 // A sound only makes sense for windows the user actually spent:
                 // the module arms on the threshold and fires on the provider's

@@ -337,6 +337,26 @@
           }
         },
         {
+          "id": "claude-history",
+          "name": "claude usage history",
+          "parent": "claude-provider",
+          "render": "providers.claude.enabled",
+          "x": "232",
+          "y": "26",
+          "width": "84",
+          "height": "10",
+          "content": {
+            "type": "sparkline",
+            "source": "claude.session.history",
+            "color": {
+              "color": "#D97757"
+            },
+            "fill": {
+              "color": "#D9775726"
+            }
+          }
+        },
+        {
           "id": "claude-session-label-light",
           "name": "claude-session-label-light",
           "parent": "claude-provider",
@@ -792,6 +812,26 @@
             "align": "right",
             "color": {
               "color": "#10A37F"
+            }
+          }
+        },
+        {
+          "id": "codex-history",
+          "name": "codex usage history",
+          "parent": "codex-provider",
+          "render": "providers.codex.enabled",
+          "x": "232",
+          "y": "26",
+          "width": "84",
+          "height": "10",
+          "content": {
+            "type": "sparkline",
+            "source": "codex.session.history",
+            "color": {
+              "color": "#10A37F"
+            },
+            "fill": {
+              "color": "#10A37F26"
             }
           }
         },
@@ -1255,6 +1295,26 @@
           }
         },
         {
+          "id": "antigravity-history",
+          "name": "antigravity usage history",
+          "parent": "antigravity-provider",
+          "render": "providers.antigravity.enabled",
+          "x": "232",
+          "y": "26",
+          "width": "84",
+          "height": "10",
+          "content": {
+            "type": "sparkline",
+            "source": "antigravity.session.history",
+            "color": {
+              "color": "#4285F4"
+            },
+            "fill": {
+              "color": "#4285F426"
+            }
+          }
+        },
+        {
           "id": "antigravity-session-label-light",
           "name": "antigravity-session-label-light",
           "parent": "antigravity-provider",
@@ -1710,6 +1770,26 @@
             "align": "right",
             "color": {
               "color": "#8B5CF6"
+            }
+          }
+        },
+        {
+          "id": "opencode-history",
+          "name": "opencode usage history",
+          "parent": "opencode-provider",
+          "render": "providers.opencode.enabled",
+          "x": "232",
+          "y": "26",
+          "width": "84",
+          "height": "10",
+          "content": {
+            "type": "sparkline",
+            "source": "opencode.session.history",
+            "color": {
+              "color": "#8B5CF6"
+            },
+            "fill": {
+              "color": "#8B5CF626"
             }
           }
         },
@@ -2173,6 +2253,26 @@
           }
         },
         {
+          "id": "cursor-history",
+          "name": "cursor usage history",
+          "parent": "cursor-provider",
+          "render": "providers.cursor.enabled",
+          "x": "232",
+          "y": "26",
+          "width": "84",
+          "height": "10",
+          "content": {
+            "type": "sparkline",
+            "source": "cursor.session.history",
+            "color": {
+              "color": "#9CA3AF"
+            },
+            "fill": {
+              "color": "#9CA3AF26"
+            }
+          }
+        },
+        {
           "id": "cursor-session-label-light",
           "name": "cursor-session-label-light",
           "parent": "cursor-provider",
@@ -2632,6 +2732,26 @@
           }
         },
         {
+          "id": "grok-history",
+          "name": "grok usage history",
+          "parent": "grok-provider",
+          "render": "providers.grok.enabled",
+          "x": "232",
+          "y": "26",
+          "width": "84",
+          "height": "10",
+          "content": {
+            "type": "sparkline",
+            "source": "grok.session.history",
+            "color": {
+              "color": "#E5E7EB"
+            },
+            "fill": {
+              "color": "#E5E7EB26"
+            }
+          }
+        },
+        {
           "id": "grok-session-label-light",
           "name": "grok-session-label-light",
           "parent": "grok-provider",
@@ -3087,6 +3207,26 @@
             "align": "right",
             "color": {
               "color": "#6E7681"
+            }
+          }
+        },
+        {
+          "id": "copilot-history",
+          "name": "copilot usage history",
+          "parent": "copilot-provider",
+          "render": "providers.copilot.enabled",
+          "x": "232",
+          "y": "26",
+          "width": "84",
+          "height": "10",
+          "content": {
+            "type": "sparkline",
+            "source": "copilot.session.history",
+            "color": {
+              "color": "#6E7681"
+            },
+            "fill": {
+              "color": "#6E768126"
             }
           }
         },
