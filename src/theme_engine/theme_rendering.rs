@@ -233,6 +233,18 @@ pub fn render_theme_surface_with_runtime_at_scale(
                 | scale(*pixel & 0xff);
         }
     }
+    // Children are composited without inheriting the surface outline, so a
+    // badge, a highlight or a label that reaches the edge would square off the
+    // card. Clip the finished surface to its own rounding: every corner stays
+    // consistent no matter what a theme puts there.
+    let surface_radius = evaluate(&surface.corner_radius.0, &context).unwrap_or(0.0) * scale;
+    clip_to_rounded_rectangle(&mut pixels, width, height, surface_radius);
+    // The outline is painted with the root layer, so a row that reaches the
+    // edge would hide it. Re-stroke it on top for a continuous light edge.
+    if surface.border.is_some() && content_offset == 0.0 {
+        render_object_border(&root_layer, &context, scale, &mut pixels, width, height);
+    }
+
     RenderedTheme {
         width,
         height,
