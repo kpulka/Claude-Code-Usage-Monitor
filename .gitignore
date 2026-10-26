@@ -35,3 +35,6 @@ test_bin/
 # Local dev builds and scratch
 /builds/
 /scratch/
+
+# Local release build dropped in the repo root for the desktop shortcut
+/claude-code-usage-monitor.exe
