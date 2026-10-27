@@ -33,8 +33,8 @@ use crate::diagnose;
 use crate::localization::{self, LanguageId, Strings};
 use crate::models::AppUsageData;
 use crate::native_interop::{
-    self, TIMER_CLOCK, TIMER_COUNTDOWN, TIMER_CROSSFADE_SCHEDULE, TIMER_MOUSE_CLICK, TIMER_POLL,
-    TIMER_RESET_POLL, TIMER_TRAY_HOVER, TIMER_TRAY_REPOSITION, TIMER_UPDATE_CHECK,
+    self, TIMER_CLOCK, TIMER_COUNTDOWN, TIMER_CROSSFADE_SCHEDULE, TIMER_FROST, TIMER_MOUSE_CLICK,
+    TIMER_POLL, TIMER_RESET_POLL, TIMER_TRAY_HOVER, TIMER_TRAY_REPOSITION, TIMER_UPDATE_CHECK,
     TIMER_WINDOW_STATE, WM_APP_DISABLE_DIAGNOSTICS, WM_APP_ENABLE_DIAGNOSTICS,
     WM_APP_OPEN_DASHBOARD, WM_APP_QUIT, WM_APP_REFRESH_NOW, WM_APP_SETTINGS_UPDATED,
     WM_APP_TASKBAR_COLLISION, WM_APP_TRAY, WM_APP_USAGE_UPDATED,
@@ -2722,6 +2722,9 @@ pub fn run() {
                 .unwrap_or(POLL_15_MIN)
         };
         set_controller_timer(Some(hwnd), TIMER_POLL, initial_poll_ms, None);
+        // The frost behind a floating card is a screenshot: without its own
+        // timer it would stay frozen at the moment the card was last painted.
+        set_controller_timer(Some(hwnd), TIMER_FROST, FROST_REFRESH_MS, None);
         sync_window_state_timer(hwnd);
 
         // Sample collision geometry off-thread and ask the stable controller to
@@ -2764,6 +2767,11 @@ pub fn run() {
 
 /// Render every theme surface, then dispatch it to the presenter selected by
 /// its nest: DirectComposition for desktop and layered windows elsewhere.
+/// How often the frost behind a floating card is re-captured. A screenshot and
+/// a blur of a few thousand pixels is well under a millisecond, so the card can
+/// follow the desktop instead of freezing at paint time.
+pub(crate) const FROST_REFRESH_MS: u32 = 2000;
+
 fn render_layered() {
     refresh_dpi();
     sync_surface_windows();
@@ -3537,15 +3545,21 @@ fn antigravity_crossfade_frame(now_ms: u64) -> (f64, u32) {
         let t = elapsed as f64 / 2_000.0;
         t * t * (3.0 - 2.0 * t)
     };
+    // A fade step costs a full theme render, so the two-second fade runs at
+    // twenty frames rather than thirty a second: still smooth, a third of the
+    // work, and the steady holds cost nothing at all.
     match phase {
         0..8_000 => (1.0, (8_000 - phase) as u32),
-        8_000..10_000 => (1.0 - smooth(phase - 8_000), 30),
+        8_000..10_000 => (1.0 - smooth(phase - 8_000), 100),
         10_000..18_000 => (0.0, (18_000 - phase) as u32),
-        _ => (smooth(phase - 18_000), 30),
+        _ => (smooth(phase - 18_000), 100),
     }
 }
 
-pub(super) fn arm_crossfade_schedule(hwnd: HWND) {
+/// Re-arms the pool crossfade and reports whether the opacity moved enough to
+/// be worth a frame. A steady fade used to repaint the card three times a
+/// second, and every repaint costs a full theme render.
+pub(super) fn arm_crossfade_schedule(hwnd: HWND) -> bool {
     let now_ms = SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .map(|duration| duration.as_millis() as u64)
@@ -3557,8 +3571,11 @@ pub(super) fn arm_crossfade_schedule(hwnd: HWND) {
             && state.show_antigravity_external
             && state.providers.contains(ProviderId::Antigravity)
     });
+    let target = if dual_mode { opacity } else { 1.0 };
+    let mut changed = false;
     if let Some(state) = state.as_mut() {
-        state.crossfade_opacity = if dual_mode { opacity } else { 1.0 };
+        changed = (state.crossfade_opacity - target).abs() >= 0.03;
+        state.crossfade_opacity = target;
     }
     unsafe {
         if dual_mode {
@@ -3567,6 +3584,7 @@ pub(super) fn arm_crossfade_schedule(hwnd: HWND) {
             let _ = kill_controller_timer(Some(hwnd), TIMER_CROSSFADE_SCHEDULE);
         }
     }
+    changed
 }
 
 fn reload_external_settings(hwnd: HWND) {
@@ -4435,12 +4453,12 @@ mod antigravity_crossfade_tests {
             for (phase, opacity, delay) in [
                 (0, 1.0, 8_000),
                 (7_000, 1.0, 1_000),
-                (8_000, 1.0, 30),
-                (9_000, 0.5, 30),
+                (8_000, 1.0, 100),
+                (9_000, 0.5, 100),
                 (10_000, 0.0, 8_000),
                 (17_000, 0.0, 1_000),
-                (18_000, 0.0, 30),
-                (19_000, 0.5, 30),
+                (18_000, 0.0, 100),
+                (19_000, 0.5, 100),
             ] {
                 assert_eq!(antigravity_crossfade_frame(cycle + phase), (opacity, delay));
             }

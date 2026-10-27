@@ -85,6 +85,12 @@ pub fn set_backdrop(width: u32, height: u32, pixels: Vec<u32>) {
     });
 }
 
+/// Whether a frost layer is installed, so the refresh timer can stop itself
+/// once a theme stops drawing floating surfaces.
+pub fn backdrop_installed() -> bool {
+    BACKDROP.with(|backdrop| backdrop.borrow().is_some())
+}
+
 pub fn clear_backdrop() {
     BACKDROP.with(|slot| *slot.borrow_mut() = None);
 }
@@ -1421,10 +1427,34 @@ pub(super) fn render_image(
 }
 
 #[allow(clippy::too_many_arguments)]
-pub(super) fn render_text_mask(
-    target: &mut [u32],
+/// Identity of a rasterised glyph run. The mask only depends on the text, the
+/// font request and the box it is fitted into - not on the colour, which is
+/// applied while blending.
+#[derive(Clone, PartialEq, Eq, Hash)]
+struct TextMaskKey {
+    text: String,
+    family: String,
+    size: u64,
+    weight: i32,
+    rendering: u8,
+    contrast: u64,
+    align: u8,
     width: u32,
     height: u32,
+}
+
+thread_local! {
+    /// Rasterising a run means creating a DIB section, a GDI font and drawing
+    /// the text: a third of a millisecond each, and a card draws over a hundred
+    /// runs per frame. Values barely change between frames, so the masks are
+    /// reused.
+    static TEXT_MASKS: std::cell::RefCell<std::collections::HashMap<TextMaskKey, std::rc::Rc<Vec<u32>>>> =
+        std::cell::RefCell::new(std::collections::HashMap::new());
+}
+
+const TEXT_MASK_CACHE_LIMIT: usize = 512;
+
+fn text_mask(
     text: &str,
     font_family: &str,
     font_size: f64,
@@ -1432,18 +1462,57 @@ pub(super) fn render_text_mask(
     rendering: FontRendering,
     contrast: f64,
     align: TextAlign,
-    color: Rgba,
-) {
-    // windows-rs represents an empty UTF-16 Vec with a non-null dangling
-    // sentinel. DrawTextW still probes the pointer when cchText is zero, so
-    // calling it for empty output causes a native access violation.
-    if text.is_empty() || width == 0 || height == 0 || target.is_empty() {
-        return;
+    width: u32,
+    height: u32,
+) -> Option<std::rc::Rc<Vec<u32>>> {
+    let key = TextMaskKey {
+        text: text.to_owned(),
+        family: font_family.to_owned(),
+        size: font_size.to_bits(),
+        weight: font_weight,
+        rendering: rendering as u8,
+        contrast: contrast.to_bits(),
+        align: align as u8,
+        width,
+        height,
+    };
+    if let Some(cached) = TEXT_MASKS.with(|cache| cache.borrow().get(&key).cloned()) {
+        return Some(cached);
     }
+    let mask = std::rc::Rc::new(rasterize_text_mask(
+        text,
+        font_family,
+        font_size,
+        font_weight,
+        rendering,
+        width,
+        height,
+        align,
+    )?);
+    TEXT_MASKS.with(|cache| {
+        let mut cache = cache.borrow_mut();
+        if cache.len() >= TEXT_MASK_CACHE_LIMIT {
+            cache.clear();
+        }
+        cache.insert(key, mask.clone());
+    });
+    Some(mask)
+}
+
+fn rasterize_text_mask(
+    text: &str,
+    font_family: &str,
+    font_size: f64,
+    font_weight: i32,
+    rendering: FontRendering,
+    width: u32,
+    height: u32,
+    align: TextAlign,
+) -> Option<Vec<u32>> {
     unsafe {
         let memory_dc = CreateCompatibleDC(None);
         if memory_dc.is_invalid() {
-            return;
+            return None;
         }
         let bitmap_info = BITMAPINFO {
             bmiHeader: BITMAPINFOHEADER {
@@ -1469,7 +1538,7 @@ pub(super) fn render_text_mask(
         .unwrap_or_default();
         if bitmap.is_invalid() || bits.is_null() {
             let _ = DeleteDC(memory_dc);
-            return;
+            return None;
         }
         let old_bitmap = SelectObject(memory_dc, bitmap.into());
         std::ptr::write_bytes(bits, 0, width as usize * height as usize * 4);
@@ -1512,17 +1581,55 @@ pub(super) fn render_text_mask(
             alignment | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS | DT_NOPREFIX,
         );
         let mask = std::slice::from_raw_parts(bits as *const u32, width as usize * height as usize);
-        for (destination, source) in target.iter_mut().zip(mask) {
-            let coverage = text_mask_coverage(*source, rendering, contrast);
-            if coverage > 0.0 {
-                blend(destination, premultiply(color), coverage);
-            }
-        }
+        let owned = mask.to_vec();
         SelectObject(memory_dc, old_font);
         let _ = DeleteObject(font.into());
         SelectObject(memory_dc, old_bitmap);
         let _ = DeleteObject(bitmap.into());
         let _ = DeleteDC(memory_dc);
+        Some(owned)
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+pub(super) fn render_text_mask(
+    target: &mut [u32],
+    width: u32,
+    height: u32,
+    text: &str,
+    font_family: &str,
+    font_size: f64,
+    font_weight: i32,
+    rendering: FontRendering,
+    contrast: f64,
+    align: TextAlign,
+    color: Rgba,
+) {
+    // windows-rs represents an empty UTF-16 Vec with a non-null dangling
+    // sentinel. DrawTextW still probes the pointer when cchText is zero, so
+    // calling it for empty output causes a native access violation.
+    if text.is_empty() || width == 0 || height == 0 || target.is_empty() {
+        return;
+    }
+    let Some(mask) = text_mask(
+        text,
+        font_family,
+        font_size,
+        font_weight,
+        rendering,
+        contrast,
+        align,
+        width,
+        height,
+    ) else {
+        return;
+    };
+    let colour = premultiply(color);
+    for (destination, source) in target.iter_mut().zip(mask.iter()) {
+        let coverage = text_mask_coverage(*source, rendering, contrast);
+        if coverage > 0.0 {
+            blend(destination, colour, coverage);
+        }
     }
 }
 

@@ -3749,3 +3749,31 @@ fn recommendation_stays_empty_without_figures() {
     assert_eq!(context.get_string("summary.recommendation"), Some(""));
     assert_eq!(context.get("claude.recommended"), Some(0.0));
 }
+
+#[test]
+#[ignore]
+fn measure_context_clone_cost() {
+    use crate::models::{AppUsageData, UsageData, UsageSection};
+    let window = |percentage: f64| UsageSection {
+        available: true,
+        percentage,
+        resets_at: None,
+    };
+    let mut usage = UsageData::default();
+    usage.session = window(40.0);
+    usage.weekly = window(60.0);
+    let data = AppUsageData::from_iter([
+        (ProviderId::Claude, usage.clone()),
+        (ProviderId::OpenCode, usage.clone()),
+        (ProviderId::Antigravity, usage),
+    ]);
+    let context = DataContext::from_usage(Some(&data), &Canvas::default());
+    let started = std::time::Instant::now();
+    let mut sum = 0.0;
+    for _ in 0..171 {
+        let mut copy = context.clone();
+        copy.insert("object.width", 12.0);
+        sum += copy.get("canvas.width").unwrap_or(0.0);
+    }
+    println!("171 clones took {:?} (sum {sum})", started.elapsed());
+}

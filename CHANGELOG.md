@@ -18,6 +18,12 @@ changes grouped into Added, Changed, Fixed, and Removed where applicable.
 
 ### Changed
 
+- The frost behind a floating card is no longer a magnifying glass: it was copying one eighth of the covered
+  desktop and stretching it back, so everything behind the card was enlarged eight times. It now stretches the
+  whole window rectangle into the small buffer and blurs it more gently, so the desktop stays at its own scale.
+- The frost is re-captured every 900 ms instead of staying frozen at the moment the card was painted, so windows
+  behind the card keep moving. A capture and blur of a few thousand pixels costs well under a millisecond.
+
 - Self-update follows this fork: the package repository is `kpulka/Claude-Code-Usage-Monitor`, and a
   release is refused unless its asset URL belongs to that repository. The WinGet path is derived from
   the package id and stays disabled here, because `CodeZeno.ClaudeCodeUsageMonitor` belongs to another

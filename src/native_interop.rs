@@ -29,6 +29,9 @@ pub const TIMER_MOUSE_CLICK: usize = 6;
 pub const TIMER_TRAY_HOVER: usize = 7;
 pub const TIMER_CLOCK: usize = 8;
 pub const TIMER_TRAY_REPOSITION: usize = 9;
+/// Re-captures the desktop behind a floating card so the frost follows the
+/// screen instead of freezing at the moment the card was painted.
+pub const TIMER_FROST: usize = 10;
 pub const TIMER_CROSSFADE_SCHEDULE: usize = 14;
 
 // Custom messages

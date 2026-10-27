@@ -219,9 +219,9 @@ pub(crate) fn apply_glass(hwnd: HWND, tint: u32) -> bool {
 /// card draws, so the cut-out is exactly the theme's outline.
 pub(crate) fn capture_behind(hwnd: HWND, width: u32, height: u32) -> Option<Vec<u32>> {
     use windows::Win32::Graphics::Gdi::{
-        BitBlt, CreateCompatibleBitmap, CreateCompatibleDC, DeleteDC, DeleteObject, GetDC,
-        GetDIBits, ReleaseDC, SelectObject, BITMAPINFO, BITMAPINFOHEADER, BI_RGB, DIB_RGB_COLORS,
-        HGDIOBJ, SRCCOPY,
+        CreateCompatibleBitmap, CreateCompatibleDC, DeleteDC, DeleteObject, GetDC, GetDIBits,
+        ReleaseDC, SelectObject, SetStretchBltMode, StretchBlt, BITMAPINFO, BITMAPINFOHEADER,
+        BI_RGB, COLORONCOLOR, DIB_RGB_COLORS, HGDIOBJ, SRCCOPY,
     };
 
     if width == 0 || height == 0 || width > 4096 || height > 4096 {
@@ -233,9 +233,11 @@ pub(crate) fn capture_behind(hwnd: HWND, width: u32, height: u32) -> Option<Vec<
     }
 
     // Blur at a fraction of the final size: cheap, and the upscale hides the
-    // sampling grid.
-    let small_w = (width / 8).max(6);
-    let small_h = (height / 8).max(6);
+    // sampling grid. Four is small enough to read as frost and large enough
+    // that the desktop behind stays recognisable instead of magnified.
+    const DOWNSCALE: u32 = 4;
+    let small_w = (width / DOWNSCALE).max(6);
+    let small_h = (height / DOWNSCALE).max(6);
 
     let mut small = vec![0u8; (small_w * small_h * 4) as usize];
     unsafe {
@@ -246,7 +248,14 @@ pub(crate) fn capture_behind(hwnd: HWND, width: u32, height: u32) -> Option<Vec<
         let memory = CreateCompatibleDC(Some(screen));
         let bitmap = CreateCompatibleBitmap(screen, small_w as i32, small_h as i32);
         let previous = SelectObject(memory, HGDIOBJ(bitmap.0));
-        let copied = BitBlt(
+        // Stretch the whole window rectangle into the small bitmap. Copying a
+        // `small_w`-sized patch instead would upscale one eighth of the covered
+        // desktop, which is what made the frost look like a magnifying glass.
+        // COLORONCOLOR drops pixels instead of averaging them, but the two box
+        // passes afterwards hide that - and it is an order of magnitude cheaper
+        // than HALFTONE, which blends every pixel in software on the screen DC.
+        SetStretchBltMode(memory, COLORONCOLOR);
+        let copied = StretchBlt(
             memory,
             0,
             0,
@@ -255,9 +264,11 @@ pub(crate) fn capture_behind(hwnd: HWND, width: u32, height: u32) -> Option<Vec<
             Some(screen),
             rect.left,
             rect.top,
+            (rect.right - rect.left).max(1),
+            (rect.bottom - rect.top).max(1),
             SRCCOPY,
         )
-        .is_ok();
+        .as_bool();
 
         let mut info = BITMAPINFO::default();
         info.bmiHeader.biSize = std::mem::size_of::<BITMAPINFOHEADER>() as u32;
@@ -289,10 +300,11 @@ pub(crate) fn capture_behind(hwnd: HWND, width: u32, height: u32) -> Option<Vec<
         }
     }
 
-    // Two box passes turn the capture into frosted glass without banding.
+    // Two box passes turn the capture into frosted glass without banding; at
+    // this scale a radius of one already reads as a light blur.
     let mut small = small;
-    box_blur(&mut small, small_w, small_h, 2);
-    box_blur(&mut small, small_w, small_h, 2);
+    box_blur(&mut small, small_w, small_h, 1);
+    box_blur(&mut small, small_w, small_h, 1);
 
     // Upscale to the card and tint it dark and slightly cool, so text keeps its
     // contrast over a bright desktop.
