@@ -369,6 +369,7 @@ pub(super) fn position_custom_theme_internal(
                 // Trim the window (not just its pixels) to the card's curve so
                 // the frosted backdrop cannot show square corners.
                 crate::backdrop::refresh_region(hwnd, width, height);
+                crate::glass_plate::follow(hwnd);
                 // Capture exclusion is only accepted once the window is a
                 // top-level popup; the first attempt at startup can come too
                 // early, which would make the frost sample its own card.

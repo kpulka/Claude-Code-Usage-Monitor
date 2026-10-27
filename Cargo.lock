@@ -263,6 +263,7 @@ dependencies = [
  "toml",
  "ureq",
  "windows",
+ "windows-numerics",
  "winit",
  "winresource",
  "zip",

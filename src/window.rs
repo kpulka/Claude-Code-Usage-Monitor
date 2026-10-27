@@ -2688,8 +2688,16 @@ pub fn run() {
         // the theme declines; the translucent background still renders.
         crate::backdrop::suppress_system_frame(hwnd);
         let excluded = crate::backdrop::exclude_from_capture(hwnd);
+        // Preferred frost: a plate window under the card that DWM blurs on the
+        // GPU. The CPU capture stays as a fallback for machines where the
+        // compositor route is unavailable.
+        let plate = crate::glass_plate::install(hwnd);
         diagnose::log_lazy(|| {
-            format!("frost mode: own blurred capture (excluded from capture: {excluded})")
+            if plate {
+                "frost mode: host backdrop plate (compositor blur)".to_string()
+            } else {
+                format!("frost mode: own blurred capture (excluded from capture: {excluded})")
+            }
         });
         diagnose::log("window shown");
 
@@ -2846,20 +2854,25 @@ fn render_layered() {
 
         let scale = theme_surface_scale(&theme, surface_index);
         if nest == SurfaceNest::Floating {
-            // Frost is painted by us: DWM's acrylic cannot follow the rounded
-            // window region, which is what left square corners.
-            let (pixel_width, pixel_height) = theme_engine::surface_render_size(
-                &theme,
-                surface_index,
-                usage_data.as_ref(),
-                surface_runtime,
-                scale,
-            );
-            match crate::backdrop::capture_behind(target_hwnd, pixel_width, pixel_height) {
-                Some(pixels) => theme_engine::set_backdrop(pixel_width, pixel_height, pixels),
-                None => {
-                    diagnose::log("backdrop capture failed; card renders translucent only");
-                    theme_engine::clear_backdrop();
+            // Frost comes from the plate window behind the card when the
+            // compositor route is available; otherwise we paint it ourselves,
+            // because DWM acrylic cannot follow the rounded region.
+            if crate::glass_plate::is_active() {
+                theme_engine::clear_backdrop();
+            } else {
+                let (pixel_width, pixel_height) = theme_engine::surface_render_size(
+                    &theme,
+                    surface_index,
+                    usage_data.as_ref(),
+                    surface_runtime,
+                    scale,
+                );
+                match crate::backdrop::capture_behind(target_hwnd, pixel_width, pixel_height) {
+                    Some(pixels) => theme_engine::set_backdrop(pixel_width, pixel_height, pixels),
+                    None => {
+                        diagnose::log("backdrop capture failed; card renders translucent only");
+                        theme_engine::clear_backdrop();
+                    }
                 }
             }
         } else {
@@ -2903,6 +2916,10 @@ fn render_layered() {
             let show = nest != SurfaceNest::Floating
                 || !foreground_is_fullscreen_on_display(positioned.placement.reference.display);
             let _ = ShowWindow(target_hwnd, if show { SW_SHOWNOACTIVATE } else { SW_HIDE });
+        }
+        if nest == SurfaceNest::Floating {
+            // The plate copies the card's final rectangle, never a predicted one.
+            crate::glass_plate::follow(target_hwnd);
         }
     }
 

@@ -544,6 +544,7 @@ pub fn move_window(hwnd: HWND, x: i32, y: i32, w: i32, h: i32) {
     }
     // The window rectangle (and the frost behind it) follow the theme's curve.
     crate::backdrop::refresh_region(hwnd, w, h);
+    crate::glass_plate::follow(hwnd);
 }
 
 /// Set up a WinEvent hook for tray location changes

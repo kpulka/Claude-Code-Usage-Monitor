@@ -9,6 +9,7 @@ mod dashboard;
 mod desktop_compositor;
 mod diagnose;
 mod font_catalog;
+mod glass_plate;
 mod history;
 #[cfg(test)]
 mod https_test;

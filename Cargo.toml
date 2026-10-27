@@ -34,6 +34,10 @@ egui-winit = { version = "0.36", default-features = false, features = ["clipboar
 winit = { version = "0.30", default-features = false, features = ["rwh_06"] }
 zip = { version = "9.0.4", default-features = false, features = ["deflate-flate2-zlib-rs"] }
 
+# `windows` hands WinRT composition vectors through this crate, so the same
+# version has to be a direct dependency to name `Vector2`.
+windows-numerics = "0.3"
+
 [dependencies.windows]
 version = "0.62"
 features = [
@@ -62,6 +66,11 @@ features = [
     "Win32_Graphics_Dxgi",
     "Win32_Graphics_Dxgi_Common",
     "Win32_Storage_FileSystem",
+    "Win32_System_WinRT",
+    "Win32_System_WinRT_Composition",
+    "UI_Composition",
+    "UI_Composition_Desktop",
+    "Foundation_Numerics",
 ]
 
 [dev-dependencies]

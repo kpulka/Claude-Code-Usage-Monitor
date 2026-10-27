@@ -27,6 +27,13 @@ fn glass_disabled() -> bool {
     GLASS_DISABLED.load(Ordering::Relaxed)
 }
 
+/// The corner radius the window is actually cut to, in physical pixels.
+pub(crate) fn card_radius_pixels(hwnd: HWND) -> i32 {
+    let logical = CARD_RADIUS.load(Ordering::Relaxed);
+    let scale = unsafe { GetDpiForWindow(hwnd) }.max(96) as f64 / 96.0;
+    (logical as f64 * scale).round().max(0.0) as i32
+}
+
 /// Remember the radius the active theme asked for. Zero disables rounding.
 pub(crate) fn set_card_radius(radius: i32) {
     CARD_RADIUS.store(radius.max(0), Ordering::Relaxed);
@@ -219,11 +226,11 @@ pub(crate) fn apply_glass(hwnd: HWND, tint: u32) -> bool {
 /// card draws, so the cut-out is exactly the theme's outline.
 pub(crate) fn capture_behind(hwnd: HWND, width: u32, height: u32) -> Option<Vec<u32>> {
     use windows::Win32::Graphics::Gdi::{
-        CreateCompatibleBitmap, CreateCompatibleDC, DeleteDC, DeleteObject, GetDC, GetDIBits,
-        ReleaseDC, SelectObject, SetStretchBltMode, StretchBlt, BITMAPINFO, BITMAPINFOHEADER,
-        BI_RGB, COLORONCOLOR, DIB_RGB_COLORS, HGDIOBJ, SRCCOPY,
+        BitBlt, CreateCompatibleDC, CreateDIBSection, DeleteDC, DeleteObject, GetDC, ReleaseDC,
+        SelectObject, BITMAPINFO, BITMAPINFOHEADER, BI_RGB, DIB_RGB_COLORS, HGDIOBJ, SRCCOPY,
     };
 
+    let started = std::time::Instant::now();
     if width == 0 || height == 0 || width > 4096 || height > 4096 {
         return None;
     }
@@ -240,62 +247,56 @@ pub(crate) fn capture_behind(hwnd: HWND, width: u32, height: u32) -> Option<Vec<
     let small_h = (height / DOWNSCALE).max(6);
 
     let mut small = vec![0u8; (small_w * small_h * 4) as usize];
+    let full_w = (rect.right - rect.left).max(1) as u32;
+    let full_h = (rect.bottom - rect.top).max(1) as u32;
     unsafe {
         let screen = GetDC(None);
         if screen.is_invalid() {
             return None;
         }
         let memory = CreateCompatibleDC(Some(screen));
-        let bitmap = CreateCompatibleBitmap(screen, small_w as i32, small_h as i32);
-        let previous = SelectObject(memory, HGDIOBJ(bitmap.0));
-        // Stretch the whole window rectangle into the small bitmap. Copying a
-        // `small_w`-sized patch instead would upscale one eighth of the covered
-        // desktop, which is what made the frost look like a magnifying glass.
-        // COLORONCOLOR drops pixels instead of averaging them, but the two box
-        // passes afterwards hide that - and it is an order of magnitude cheaper
-        // than HALFTONE, which blends every pixel in software on the screen DC.
-        SetStretchBltMode(memory, COLORONCOLOR);
-        let copied = StretchBlt(
-            memory,
-            0,
-            0,
-            small_w as i32,
-            small_h as i32,
-            Some(screen),
-            rect.left,
-            rect.top,
-            (rect.right - rect.left).max(1),
-            (rect.bottom - rect.top).max(1),
-            SRCCOPY,
-        )
-        .as_bool();
-
+        // Copy at 1:1 into a DIB section and let Rust do the averaging. GDI
+        // stretching from the screen DC costs ten milliseconds; a plain BitBlt
+        // plus an average over 4x4 blocks costs a fraction of that, and the
+        // average keeps thin lines that COLORONCOLOR would drop.
         let mut info = BITMAPINFO::default();
         info.bmiHeader.biSize = std::mem::size_of::<BITMAPINFOHEADER>() as u32;
-        info.bmiHeader.biWidth = small_w as i32;
-        info.bmiHeader.biHeight = -(small_h as i32);
+        info.bmiHeader.biWidth = full_w as i32;
+        info.bmiHeader.biHeight = -(full_h as i32);
         info.bmiHeader.biPlanes = 1;
         info.bmiHeader.biBitCount = 32;
         info.bmiHeader.biCompression = BI_RGB.0;
-        let lines = if copied {
-            GetDIBits(
-                memory,
-                bitmap,
-                0,
-                small_h,
-                Some(small.as_mut_ptr().cast::<c_void>()),
-                &mut info,
-                DIB_RGB_COLORS,
-            )
-        } else {
-            0
-        };
+        let mut bits: *mut c_void = std::ptr::null_mut();
+        let bitmap = CreateDIBSection(Some(screen), &info, DIB_RGB_COLORS, &mut bits, None, 0)
+            .unwrap_or_default();
+        if bitmap.is_invalid() || bits.is_null() {
+            let _ = DeleteDC(memory);
+            ReleaseDC(None, screen);
+            return None;
+        }
+        let previous = SelectObject(memory, bitmap.into());
+        let copied = BitBlt(
+            memory,
+            0,
+            0,
+            full_w as i32,
+            full_h as i32,
+            Some(screen),
+            rect.left,
+            rect.top,
+            SRCCOPY,
+        )
+        .is_ok();
+        if copied {
+            let source = std::slice::from_raw_parts(bits as *const u32, (full_w * full_h) as usize);
+            downscale_average(source, full_w, full_h, &mut small, small_w, small_h);
+        }
 
         let _ = SelectObject(memory, previous);
         let _ = DeleteObject(bitmap.into());
         let _ = DeleteDC(memory);
         ReleaseDC(None, screen);
-        if lines == 0 {
+        if !copied {
             return None;
         }
     }
@@ -339,7 +340,57 @@ pub(crate) fn capture_behind(hwnd: HWND, width: u32, height: u32) -> Option<Vec<
             out[(y * width + x) as usize] = (255 << 24) | (r << 16) | (g << 8) | b;
         }
     }
+    if crate::diagnose::is_enabled() {
+        crate::diagnose::log(format!(
+            "frost capture {small_w}x{small_h} took {:?}",
+            started.elapsed()
+        ));
+    }
     Some(out)
+}
+
+/// Average every block of source pixels into one target pixel (BGRA, opaque).
+/// Integer arithmetic and one pass over the source, so it can run inside a
+/// frame budget without a separate resampling library.
+fn downscale_average(
+    source: &[u32],
+    src_w: u32,
+    src_h: u32,
+    target: &mut [u8],
+    dst_w: u32,
+    dst_h: u32,
+) {
+    if src_w == 0 || src_h == 0 || dst_w == 0 || dst_h == 0 {
+        return;
+    }
+    for y in 0..dst_h {
+        let y0 = (u64::from(y) * u64::from(src_h) / u64::from(dst_h)) as u32;
+        let y1 = ((u64::from(y + 1) * u64::from(src_h) / u64::from(dst_h)) as u32)
+            .min(src_h)
+            .max(y0 + 1);
+        for x in 0..dst_w {
+            let x0 = (u64::from(x) * u64::from(src_w) / u64::from(dst_w)) as u32;
+            let x1 = ((u64::from(x + 1) * u64::from(src_w) / u64::from(dst_w)) as u32)
+                .min(src_w)
+                .max(x0 + 1);
+            let (mut blue, mut green, mut red) = (0u32, 0u32, 0u32);
+            for sy in y0..y1 {
+                let row = &source[(sy * src_w) as usize..];
+                for sx in x0..x1 {
+                    let pixel = row[sx as usize];
+                    blue += pixel & 0xFF;
+                    green += (pixel >> 8) & 0xFF;
+                    red += (pixel >> 16) & 0xFF;
+                }
+            }
+            let count = (x1 - x0) * (y1 - y0);
+            let index = ((y * dst_w + x) * 4) as usize;
+            target[index] = (blue / count) as u8;
+            target[index + 1] = (green / count) as u8;
+            target[index + 2] = (red / count) as u8;
+            target[index + 3] = 255;
+        }
+    }
 }
 
 fn box_blur(pixels: &mut [u8], width: u32, height: u32, radius: i32) {
