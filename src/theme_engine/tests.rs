@@ -997,6 +997,31 @@ fn horizontal_fable_columns_follow_claude_visibility_and_usage_direction() {
 }
 
 #[test]
+fn grid_panel_bars_are_ten_segment_gauges() {
+    // The compact grid draws continuous bars, which read as a smooth swipe and
+    // hide how much of each window is left. Ten marks put a 10% step on every
+    // bar so a glance can count them, matching the classic widget.
+    let (_, source) = BUILTIN_THEME_SOURCES
+        .iter()
+        .find(|(id, _)| *id == GRID_PANEL_THEME_ID)
+        .expect("grid-panel ships as a built-in theme");
+    let theme: ThemeDocument = serde_json::from_str(source).unwrap();
+    let bars = theme.surfaces[0]
+        .children
+        .iter()
+        .filter_map(|object| match object.content {
+            SceneContent::Progress { segments, .. } => Some(segments),
+            _ => None,
+        })
+        .collect::<Vec<_>>();
+    assert!(!bars.is_empty(), "grid-panel should draw progress bars");
+    assert!(
+        bars.iter().all(|segments| *segments == 10),
+        "every grid-panel bar is a ten-mark gauge: {bars:?}"
+    );
+}
+
+#[test]
 fn starter_theme_round_trips_and_validates() {
     let theme = ThemeDocument::starter();
     assert!(theme.validate().is_empty());

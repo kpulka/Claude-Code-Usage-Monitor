@@ -574,7 +574,9 @@
             "track": {
               "color": "#FFFFFF1A"
             },
-            "corner_radius": "3"
+            "corner_radius": "3",
+            "segments": 10,
+            "segment_gap": "1"
           }
         },
         {
@@ -596,7 +598,9 @@
             "track": {
               "color": "#FFFFFF1A"
             },
-            "corner_radius": "3"
+            "corner_radius": "3",
+            "segments": 10,
+            "segment_gap": "1"
           }
         },
         {
@@ -1093,7 +1097,9 @@
             "track": {
               "color": "#FFFFFF1A"
             },
-            "corner_radius": "3"
+            "corner_radius": "3",
+            "segments": 10,
+            "segment_gap": "1"
           }
         },
         {
@@ -1115,7 +1121,9 @@
             "track": {
               "color": "#FFFFFF1A"
             },
-            "corner_radius": "3"
+            "corner_radius": "3",
+            "segments": 10,
+            "segment_gap": "1"
           }
         },
         {
@@ -1612,7 +1620,9 @@
             "track": {
               "color": "#FFFFFF1A"
             },
-            "corner_radius": "3"
+            "corner_radius": "3",
+            "segments": 10,
+            "segment_gap": "1"
           }
         },
         {
@@ -1634,7 +1644,9 @@
             "track": {
               "color": "#FFFFFF1A"
             },
-            "corner_radius": "3"
+            "corner_radius": "3",
+            "segments": 10,
+            "segment_gap": "1"
           }
         },
         {
@@ -2131,7 +2143,9 @@
             "track": {
               "color": "#FFFFFF1A"
             },
-            "corner_radius": "3"
+            "corner_radius": "3",
+            "segments": 10,
+            "segment_gap": "1"
           }
         },
         {
@@ -2153,7 +2167,9 @@
             "track": {
               "color": "#FFFFFF1A"
             },
-            "corner_radius": "3"
+            "corner_radius": "3",
+            "segments": 10,
+            "segment_gap": "1"
           }
         },
         {
@@ -2313,7 +2329,9 @@
             "track": {
               "color": "#FFFFFF1A"
             },
-            "corner_radius": "3"
+            "corner_radius": "3",
+            "segments": 10,
+            "segment_gap": "1"
           }
         },
         {
@@ -2810,7 +2828,9 @@
             "track": {
               "color": "#FFFFFF1A"
             },
-            "corner_radius": "3"
+            "corner_radius": "3",
+            "segments": 10,
+            "segment_gap": "1"
           }
         },
         {
@@ -2832,7 +2852,9 @@
             "track": {
               "color": "#FFFFFF1A"
             },
-            "corner_radius": "3"
+            "corner_radius": "3",
+            "segments": 10,
+            "segment_gap": "1"
           }
         },
         {
@@ -3329,7 +3351,9 @@
             "track": {
               "color": "#FFFFFF1A"
             },
-            "corner_radius": "3"
+            "corner_radius": "3",
+            "segments": 10,
+            "segment_gap": "1"
           }
         },
         {
@@ -3351,7 +3375,9 @@
             "track": {
               "color": "#FFFFFF1A"
             },
-            "corner_radius": "3"
+            "corner_radius": "3",
+            "segments": 10,
+            "segment_gap": "1"
           }
         },
         {
@@ -3848,7 +3874,9 @@
             "track": {
               "color": "#FFFFFF1A"
             },
-            "corner_radius": "3"
+            "corner_radius": "3",
+            "segments": 10,
+            "segment_gap": "1"
           }
         },
         {
@@ -3870,7 +3898,9 @@
             "track": {
               "color": "#FFFFFF1A"
             },
-            "corner_radius": "3"
+            "corner_radius": "3",
+            "segments": 10,
+            "segment_gap": "1"
           }
         },
         {
@@ -4367,7 +4397,9 @@
             "track": {
               "color": "#FFFFFF1A"
             },
-            "corner_radius": "3"
+            "corner_radius": "3",
+            "segments": 10,
+            "segment_gap": "1"
           }
         },
         {
@@ -4389,7 +4421,9 @@
             "track": {
               "color": "#FFFFFF1A"
             },
-            "corner_radius": "3"
+            "corner_radius": "3",
+            "segments": 10,
+            "segment_gap": "1"
           }
         },
         {
@@ -4549,7 +4583,9 @@
             "track": {
               "color": "#FFFFFF1A"
             },
-            "corner_radius": "3"
+            "corner_radius": "3",
+            "segments": 10,
+            "segment_gap": "1"
           }
         },
         {
@@ -4799,7 +4835,9 @@
             "track": {
               "color": "#FFFFFF1A"
             },
-            "corner_radius": "3"
+            "corner_radius": "3",
+            "segments": 10,
+            "segment_gap": "1"
           }
         },
         {
