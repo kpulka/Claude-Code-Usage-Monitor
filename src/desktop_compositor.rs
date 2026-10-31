@@ -137,7 +137,7 @@ pub fn present(hwnd: HWND, rendered: &RenderedTheme) -> Result<(), String> {
             .map_err(|error| format!("DirectComposition present failed: {error}"));
         // The rounded outline belongs to the window, not the compositor: apply
         // it here so mirrors and desktop surfaces inherit it too.
-        crate::backdrop::refresh_region(hwnd, rendered.width as i32, rendered.height as i32);
+        crate::window_chrome::refresh_region(hwnd, rendered.width as i32, rendered.height as i32);
         result
     })
 }

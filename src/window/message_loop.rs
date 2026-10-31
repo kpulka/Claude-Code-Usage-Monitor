@@ -72,16 +72,6 @@ pub(super) unsafe extern "system" fn wnd_proc(
                     sync_tray_icon(hwnd);
                     schedule_countdown_timer();
                 }
-                TIMER_FROST => {
-                    if theme_engine::backdrop_installed() {
-                        render_layered();
-                        unsafe {
-                            set_controller_timer(Some(hwnd), TIMER_FROST, FROST_REFRESH_MS, None);
-                        }
-                    } else {
-                        let _ = kill_controller_timer(Some(hwnd), TIMER_FROST);
-                    }
-                }
                 TIMER_CLOCK => {
                     render_layered();
                     let refresh_tray = lock_state()

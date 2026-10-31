@@ -1,17 +1,20 @@
-//! A GPU backdrop plate that sits behind the card.
+//! The one and only frost path: a GPU backdrop plate under the card.
 //!
-//! DWM can blur whatever lies behind a window and hand the result straight to
-//! the compositor (`CreateHostBackdropBrush`). Clipped by a rounded geometry
-//! that blur follows the card's corner radius with antialiasing, and it costs
-//! the application nothing per frame - the alternative is a screenshot, which
-//! pays a full vblank (~16 ms) every time the desktop behind changes.
+//! DWM blurs whatever lies behind a window and hands the result straight to the
+//! compositor (`CreateHostBackdropBrush`). Clipped by rounded geometry, that blur
+//! follows the card's corner radius with antialiasing and costs the application
+//! nothing per frame. The plate is a separate, click-through window placed
+//! directly under the card: the card keeps presenting premultiplied pixels
+//! through `UpdateLayeredWindow` and its translucent background lets the blurred
+//! plate show through.
 //!
-//! The plate is a separate, click-through window placed directly under the
-//! card: the card keeps presenting premultiplied pixels through
-//! `UpdateLayeredWindow`, and its translucent background lets the blurred plate
-//! show through. When any step here fails the caller keeps the CPU frost.
+//! When the plate cannot be installed — old compositor, no WinRT dispatcher,
+//! `--no-glass` — the card simply renders its own translucent background. There
+//! is no second, self-captured frost implementation to fall back to: one frost
+//! path means one set of failure modes.
 
 use std::cell::RefCell;
+use std::sync::atomic::{AtomicBool, Ordering};
 
 use windows::core::{Interface, PCWSTR};
 use windows::Win32::Foundation::{HWND, LPARAM, LRESULT, WPARAM};
@@ -49,14 +52,25 @@ thread_local! {
     static PLATE: RefCell<Option<Plate>> = const { RefCell::new(None) };
 }
 
-/// Whether a plate is installed; the caller then skips its own frost capture.
+/// `--no-glass` asks for the plain translucent card, so no plate is installed.
+static DISABLED: AtomicBool = AtomicBool::new(false);
+
+pub(crate) fn disable() {
+    DISABLED.store(true, Ordering::Relaxed);
+}
+
+/// Whether a plate is installed, which is the only source of blur in the app.
 pub(crate) fn is_active() -> bool {
     PLATE.with(|plate| plate.borrow().is_some())
 }
 
-/// Install the plate under `owner`. Returns false when the compositor or the
-/// backdrop brush is unavailable, leaving the CPU frost in charge.
+/// Install the plate under `owner`. Returns false when the compositor, the
+/// backdrop brush or `--no-glass` says no; the card then keeps its translucent
+/// background and simply is not blurred.
 pub(crate) fn install(owner: HWND) -> bool {
+    if DISABLED.load(Ordering::Relaxed) {
+        return false;
+    }
     if is_active() {
         return true;
     }
@@ -199,7 +213,7 @@ pub(crate) fn follow(card: HWND) {
         });
         // The compositor clips a window's visuals to its visible region, so the
         // plate is cut to the same curve as the card.
-        crate::backdrop::refresh_region(plate.hwnd, width, height);
+        crate::window_chrome::refresh_region(plate.hwnd, width, height);
         if !plate.placed {
             plate.placed = true;
             crate::diagnose::log("glass plate: host backdrop brush is live");

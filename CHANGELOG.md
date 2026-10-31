@@ -18,11 +18,12 @@ changes grouped into Added, Changed, Fixed, and Removed where applicable.
 
 ### Changed
 
-- The frost behind a floating card is no longer a magnifying glass: it was copying one eighth of the covered
-  desktop and stretching it back, so everything behind the card was enlarged eight times. It now stretches the
-  whole window rectangle into the small buffer and blurs it more gently, so the desktop stays at its own scale.
-- The frost is re-captured every 900 ms instead of staying frozen at the moment the card was painted, so windows
-  behind the card keep moving. A capture and blur of a few thousand pixels costs well under a millisecond.
+- The frost behind a floating card has a single implementation again: DWM composites a blurred plate window
+  under the card (`CreateHostBackdropBrush`), and when that plate cannot be installed the card simply renders
+  translucent. The self-captured frost — `BitBlt` of the desktop, box blur, `WDA_EXCLUDEFROMCAPTURE`, the
+  900 ms refresh timer and the magnifying-glass fix that preceded it — is removed together with the unused
+  acrylic accent path, so there is no second, differently-behaving blur to fall back to. `--no-glass` now
+  means "skip the plate and draw the plain translucent card".
 
 - Self-update follows this fork: the package repository is `kpulka/Claude-Code-Usage-Monitor`, and a
   release is refused unless its asset URL belongs to that repository. The WinGet path is derived from

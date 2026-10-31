@@ -71,38 +71,6 @@ pub fn render_theme(theme: &ThemeDocument, data: Option<&AppUsageData>) -> Rende
     render_theme_surface_with_runtime(theme, 0, data, ThemeRuntime::default())
 }
 
-thread_local! {
-    /// Pre-blurred desktop capture for floating cards, supplied by the window
-    /// layer because only it knows where the card sits on screen.
-    static BACKDROP: std::cell::RefCell<Option<(u32, u32, Vec<u32>)>> =
-        const { std::cell::RefCell::new(None) };
-}
-
-/// Hand the renderer the frost to paint under a floating card.
-pub fn set_backdrop(width: u32, height: u32, pixels: Vec<u32>) {
-    BACKDROP.with(|slot| {
-        *slot.borrow_mut() = Some((width, height, pixels));
-    });
-}
-
-/// Whether a frost layer is installed, so the refresh timer can stop itself
-/// once a theme stops drawing floating surfaces.
-pub fn backdrop_installed() -> bool {
-    BACKDROP.with(|backdrop| backdrop.borrow().is_some())
-}
-
-pub fn clear_backdrop() {
-    BACKDROP.with(|slot| *slot.borrow_mut() = None);
-}
-
-fn take_backdrop(width: u32, height: u32) -> Option<Vec<u32>> {
-    BACKDROP.with(|slot| {
-        let borrow = slot.borrow();
-        let (w, h, pixels) = borrow.as_ref()?;
-        (*w == width && *h == height).then(|| pixels.clone())
-    })
-}
-
 pub fn render_theme_surface_with_runtime(
     theme: &ThemeDocument,
     surface_index: usize,
@@ -148,15 +116,9 @@ pub fn render_theme_surface_with_runtime_at_scale(
     };
     let context = DataContext::from_usage_with_runtime(data, &resolved_canvas, runtime);
     let mut pixels = vec![0u32; width as usize * height as usize];
-    // A self-blurred backdrop is drawn first; the theme's translucent card then
-    // composites over it, so the frost shares the card's rounded outline.
-    let frosted = runtime.surface_nest == SurfaceNest::Floating
-        && take_backdrop(width, height).is_some_and(|backdrop| {
-            pixels.copy_from_slice(&backdrop);
-            true
-        });
-    if !frosted
-        && runtime.surface_nest == SurfaceNest::Floating
+    // The blur behind a floating card is DWM's job (`crate::frost`); here the
+    // card only needs its own translucent body so the plate shows through.
+    if runtime.surface_nest == SurfaceNest::Floating
         && matches!(surface.background, LayerBackground::None)
     {
         let alpha = ((runtime.floating_card_opacity.min(100) as u32 * 255) / 100) as u8;
@@ -291,29 +253,6 @@ pub fn render_theme_surface_with_runtime_at_scale(
         pixels,
         warnings,
     }
-}
-
-/// Pixel size a surface will render at, so callers can capture a backdrop that
-/// matches it exactly.
-pub fn surface_render_size(
-    theme: &ThemeDocument,
-    surface_index: usize,
-    data: Option<&AppUsageData>,
-    runtime: ThemeRuntime,
-    scale: f64,
-) -> (u32, u32) {
-    let Some(surface) = theme.surfaces.get(surface_index) else {
-        return (1, 1);
-    };
-    let scale = normalized_render_scale(scale);
-    let mut warnings = Vec::new();
-    let (logical_width, logical_height) =
-        resolve_object_size(surface, data, runtime, &mut warnings);
-    let padding = surface_horizontal_padding(theme, surface_index, runtime);
-    (
-        scaled_render_dimension(logical_width + 2 * padding, scale),
-        scaled_render_dimension(logical_height, scale),
-    )
 }
 
 pub(super) fn normalized_render_scale(scale: f64) -> f64 {

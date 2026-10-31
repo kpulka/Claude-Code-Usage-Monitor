@@ -3672,8 +3672,10 @@ fn missing_antigravity_external_pool_draws_an_empty_gauge() {
 }
 
 #[test]
-fn floating_card_clips_the_frost_to_its_rounded_outline() {
-    // The grid card is the built-in theme with an explicit rounded background.
+fn floating_card_paints_a_translucent_body_inside_its_rounded_outline() {
+    // The blur itself is DWM's plate window (`crate::frost`); the renderer only
+    // owes the card a translucent body whose corners are cut, so the plate
+    // cannot square them off.
     let mut theme: ThemeDocument = serde_json::from_str(
         BUILTIN_THEME_SOURCES
             .iter()
@@ -3686,16 +3688,12 @@ fn floating_card_clips_the_frost_to_its_rounded_outline() {
 
     let runtime = ThemeRuntime::from_providers(ProviderSet::from_enabled([ProviderId::Claude]))
         .with_nest(SurfaceNest::Floating);
-    let (width, height) = surface_render_size(&theme, 0, None, runtime, 1.0);
-    // A flat grey desktop stands in for the captured wallpaper.
-    set_backdrop(width, height, vec![0xFF80_8080; (width * height) as usize]);
-
     let rendered = render_theme_surface_with_runtime(&theme, 0, None, runtime);
     let alpha_at =
         |x: u32, y: u32| (rendered.pixels[(y * rendered.width + x) as usize] >> 24) & 0xFF;
 
-    // Corner pixels fall outside the 14px curve: fully transparent, so the
-    // desktop shows through and the frost cannot square them off.
+    // Corner pixels fall outside the curve: fully transparent, so the desktop
+    // and the blurred plate show through.
     assert_eq!(alpha_at(0, 0), 0, "top-left corner must be cut");
     assert_eq!(
         alpha_at(rendered.width - 1, 0),
@@ -3707,10 +3705,22 @@ fn floating_card_clips_the_frost_to_its_rounded_outline() {
         0,
         "bottom-left corner must be cut"
     );
-    // The card itself is opaque and carries the frosted backdrop.
-    assert_eq!(alpha_at(rendered.width / 2, rendered.height / 2), 255);
-    assert!(alpha_at(8, 8) > 200, "curve interior stays solid");
-    clear_backdrop();
+    // The body is translucent rather than opaque: the plate behind it has to
+    // stay visible for the blur to read as glass.
+    let body = alpha_at(rendered.width / 2, rendered.height / 2);
+    assert!(
+        (1..255).contains(&body),
+        "card body should be translucent, got alpha {body}"
+    );
+    // Away from the cut corners the body holds that one alpha value, so the
+    // plate behind it shows through evenly instead of banding.
+    for x in [20, rendered.width / 4, rendered.width - 20] {
+        assert_eq!(
+            alpha_at(x, rendered.height / 2),
+            body,
+            "card body should be uniform at x={x}"
+        );
+    }
 }
 
 #[test]

@@ -3,13 +3,13 @@
 mod accounts;
 mod alerts;
 mod app_settings;
-mod backdrop;
+mod window_chrome;
 mod context_menu;
 mod dashboard;
 mod desktop_compositor;
 mod diagnose;
 mod font_catalog;
-mod glass_plate;
+mod frost;
 mod history;
 #[cfg(test)]
 mod https_test;
@@ -51,7 +51,7 @@ fn main() {
     }
 
     if args.iter().any(|arg| arg == "--no-glass") {
-        backdrop::disable_glass();
+        frost::disable();
     }
 
     if args.iter().any(|arg| arg == "--test-alert-sound") {

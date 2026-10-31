@@ -31,7 +31,6 @@ pub const TIMER_CLOCK: usize = 8;
 pub const TIMER_TRAY_REPOSITION: usize = 9;
 /// Re-captures the desktop behind a floating card so the frost follows the
 /// screen instead of freezing at the moment the card was painted.
-pub const TIMER_FROST: usize = 10;
 pub const TIMER_CROSSFADE_SCHEDULE: usize = 14;
 
 // Custom messages
@@ -543,8 +542,8 @@ pub fn move_window(hwnd: HWND, x: i32, y: i32, w: i32, h: i32) {
         let _ = MoveWindow(hwnd, x, y, w, h, true);
     }
     // The window rectangle (and the frost behind it) follow the theme's curve.
-    crate::backdrop::refresh_region(hwnd, w, h);
-    crate::glass_plate::follow(hwnd);
+    crate::window_chrome::refresh_region(hwnd, w, h);
+    crate::frost::follow(hwnd);
 }
 
 /// Set up a WinEvent hook for tray location changes

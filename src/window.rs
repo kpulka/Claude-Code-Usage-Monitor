@@ -33,7 +33,7 @@ use crate::diagnose;
 use crate::localization::{self, LanguageId, Strings};
 use crate::models::AppUsageData;
 use crate::native_interop::{
-    self, TIMER_CLOCK, TIMER_COUNTDOWN, TIMER_CROSSFADE_SCHEDULE, TIMER_FROST, TIMER_MOUSE_CLICK,
+    self, TIMER_CLOCK, TIMER_COUNTDOWN, TIMER_CROSSFADE_SCHEDULE, TIMER_MOUSE_CLICK,
     TIMER_POLL, TIMER_RESET_POLL, TIMER_TRAY_HOVER, TIMER_TRAY_REPOSITION, TIMER_UPDATE_CHECK,
     TIMER_WINDOW_STATE, WM_APP_DISABLE_DIAGNOSTICS, WM_APP_ENABLE_DIAGNOSTICS,
     WM_APP_OPEN_DASHBOARD, WM_APP_QUIT, WM_APP_REFRESH_NOW, WM_APP_SETTINGS_UPDATED,
@@ -1937,7 +1937,7 @@ fn replace_active_theme(state: &mut AppState, loaded: ThemeDocument, path: Optio
         clear_auto_ejection(state);
     }
     // Keep the window region in step with the theme that is about to be used.
-    crate::backdrop::set_card_radius(card_corner_radius(&loaded));
+    crate::window_chrome::set_card_radius(card_corner_radius(&loaded));
     state.active_theme = Some(loaded);
     if path.is_some() {
         state.active_theme_path = path;
@@ -2527,7 +2527,7 @@ pub fn run() {
         // Startup bypasses replace_active_theme, so publish the theme's corner
         // radius here as well: the window region depends on it.
         if let Some(theme) = active_theme.as_ref() {
-            crate::backdrop::set_card_radius(card_corner_radius(theme));
+            crate::window_chrome::set_card_radius(card_corner_radius(theme));
         }
         let custom_theme_enabled = true;
         let theme_clock_interval = active_theme
@@ -2684,19 +2684,16 @@ pub fn run() {
 
         // Theme surfaces decide whether their windows render.
         position_at_taskbar();
-        // Frost the desktop behind the card. Harmless when the compositor or
-        // the theme declines; the translucent background still renders.
-        crate::backdrop::suppress_system_frame(hwnd);
-        let excluded = crate::backdrop::exclude_from_capture(hwnd);
-        // Preferred frost: a plate window under the card that DWM blurs on the
-        // GPU. The CPU capture stays as a fallback for machines where the
-        // compositor route is unavailable.
-        let plate = crate::glass_plate::install(hwnd);
+        // One frost path: a plate window under the card that DWM blurs on the
+        // GPU. When it cannot be installed the card keeps its translucent
+        // background and simply is not blurred.
+        crate::window_chrome::suppress_system_frame(hwnd);
+        let frosted = crate::frost::install(hwnd);
         diagnose::log_lazy(|| {
-            if plate {
+            if frosted {
                 "frost mode: host backdrop plate (compositor blur)".to_string()
             } else {
-                format!("frost mode: own blurred capture (excluded from capture: {excluded})")
+                "frost mode: none (translucent card only)".to_string()
             }
         });
         diagnose::log("window shown");
@@ -2730,9 +2727,6 @@ pub fn run() {
                 .unwrap_or(POLL_15_MIN)
         };
         set_controller_timer(Some(hwnd), TIMER_POLL, initial_poll_ms, None);
-        // The frost behind a floating card is a screenshot: without its own
-        // timer it would stay frozen at the moment the card was last painted.
-        set_controller_timer(Some(hwnd), TIMER_FROST, FROST_REFRESH_MS, None);
         sync_window_state_timer(hwnd);
 
         // Sample collision geometry off-thread and ask the stable controller to
@@ -2775,11 +2769,6 @@ pub fn run() {
 
 /// Render every theme surface, then dispatch it to the presenter selected by
 /// its nest: DirectComposition for desktop and layered windows elsewhere.
-/// How often the frost behind a floating card is re-captured. A screenshot and
-/// a blur of a few thousand pixels is well under a millisecond, so the card can
-/// follow the desktop instead of freezing at paint time.
-pub(crate) const FROST_REFRESH_MS: u32 = 2000;
-
 fn render_layered() {
     refresh_dpi();
     sync_surface_windows();
@@ -2853,31 +2842,6 @@ fn render_layered() {
         }
 
         let scale = theme_surface_scale(&theme, surface_index);
-        if nest == SurfaceNest::Floating {
-            // Frost comes from the plate window behind the card when the
-            // compositor route is available; otherwise we paint it ourselves,
-            // because DWM acrylic cannot follow the rounded region.
-            if crate::glass_plate::is_active() {
-                theme_engine::clear_backdrop();
-            } else {
-                let (pixel_width, pixel_height) = theme_engine::surface_render_size(
-                    &theme,
-                    surface_index,
-                    usage_data.as_ref(),
-                    surface_runtime,
-                    scale,
-                );
-                match crate::backdrop::capture_behind(target_hwnd, pixel_width, pixel_height) {
-                    Some(pixels) => theme_engine::set_backdrop(pixel_width, pixel_height, pixels),
-                    None => {
-                        diagnose::log("backdrop capture failed; card renders translucent only");
-                        theme_engine::clear_backdrop();
-                    }
-                }
-            }
-        } else {
-            theme_engine::clear_backdrop();
-        }
         let rendered = theme_engine::render_theme_surface_with_runtime_at_scale(
             &theme,
             surface_index,
@@ -2919,7 +2883,7 @@ fn render_layered() {
         }
         if nest == SurfaceNest::Floating {
             // The plate copies the card's final rectangle, never a predicted one.
-            crate::glass_plate::follow(target_hwnd);
+            crate::frost::follow(target_hwnd);
         }
     }
 
