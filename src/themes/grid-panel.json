@@ -21,7 +21,7 @@
         "offset_y": 0
       },
       "width": "340",
-      "height": "30 + providers.count * 76",
+      "height": "30 + providers.count * 76 + 20 * opencode.monthly.available",
       "corner_radius": "14",
       "background": {
         "type": "gradient",
@@ -68,7 +68,7 @@
           "height": "18",
           "content": {
             "type": "text",
-            "template": "\u2192 {summary.recommendation}",
+            "template": "→ {summary.recommendation}",
             "font_family": "Segoe UI",
             "font_size": "11",
             "weight": "semibold",
@@ -1643,7 +1643,7 @@
           "parent": "grid",
           "render": "providers.opencode.enabled",
           "width": "canvas.width",
-          "height": "76"
+          "height": "76 + 20 * opencode.monthly.available"
         },
         {
           "id": "opencode-burn-eta",
@@ -2146,6 +2146,166 @@
           "content": {
             "type": "progress",
             "value": "opencode.weekly.display",
+            "direction": "left_to_right",
+            "fill": {
+              "color": "#8B5CF6"
+            },
+            "track": {
+              "color": "#FFFFFF1A"
+            },
+            "corner_radius": "3"
+          }
+        },
+        {
+          "id": "opencode-monthly-label-dark",
+          "name": "opencode-monthly-label-dark",
+          "parent": "opencode-provider",
+          "render": "system.dark",
+          "x": "30",
+          "y": "71",
+          "width": "30",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{opencode.monthly.label}",
+            "font_family": "Segoe UI",
+            "font_size": "10",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "opencode-monthly-label-light",
+          "name": "opencode-monthly-label-light",
+          "parent": "opencode-provider",
+          "render": "1 - system.dark",
+          "x": "30",
+          "y": "71",
+          "width": "30",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{opencode.monthly.label}",
+            "font_family": "Segoe UI",
+            "font_size": "10",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#5F6368FF"
+            }
+          }
+        },
+        {
+          "id": "opencode-monthly-value-dark",
+          "name": "opencode-monthly-value-dark",
+          "parent": "opencode-provider",
+          "render": "system.dark",
+          "x": "212",
+          "y": "69",
+          "width": "60",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{opencode.monthly.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#ECECECFF"
+            }
+          }
+        },
+        {
+          "id": "opencode-monthly-value-light",
+          "name": "opencode-monthly-value-light",
+          "parent": "opencode-provider",
+          "render": "1 - system.dark",
+          "x": "212",
+          "y": "69",
+          "width": "60",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{opencode.monthly.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#1A1A1AFF"
+            }
+          }
+        },
+        {
+          "id": "opencode-monthly-reset-dark",
+          "name": "opencode-monthly-reset-dark",
+          "parent": "opencode-provider",
+          "render": "system.dark",
+          "x": "276",
+          "y": "71",
+          "width": "50",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{opencode.monthly.reset.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "regular",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "opencode-monthly-reset-light",
+          "name": "opencode-monthly-reset-light",
+          "parent": "opencode-provider",
+          "render": "1 - system.dark",
+          "x": "276",
+          "y": "71",
+          "width": "50",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{opencode.monthly.reset.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "regular",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#5F6368FF"
+            }
+          }
+        },
+        {
+          "id": "opencode-monthly-bar",
+          "name": "opencode-monthly-bar",
+          "parent": "opencode-provider",
+          "render": "opencode.monthly.available",
+          "x": "62",
+          "y": "74",
+          "width": "146",
+          "height": "6",
+          "content": {
+            "type": "progress",
+            "value": "opencode.monthly.display",
             "direction": "left_to_right",
             "fill": {
               "color": "#8B5CF6"

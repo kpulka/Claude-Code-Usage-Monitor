@@ -213,8 +213,9 @@ fn usage_data_from_windows(usage: DashboardUsage, source: &str) -> Result<UsageD
         weekly,
         weekly_label,
         // The monthly window is kept available to themes alongside the
-        // auto-selected `weekly` slot (which prefers the more constrained
-        // of the two windows, as before).
+        // auto-selected `weekly` slot. Both windows are reported separately so
+        // a theme can draw 7d and 30d side by side; the weekly slot only falls
+        // back to the monthly window when the account has no weekly window.
         monthly: usage.monthly.as_ref().map(section_from_window),
         credits: None,
         stale: false,
@@ -224,10 +225,8 @@ fn usage_data_from_windows(usage: DashboardUsage, source: &str) -> Result<UsageD
 
 fn select_long_window(usage: &DashboardUsage) -> (UsageSection, Option<String>) {
     match (&usage.weekly, &usage.monthly) {
-        (Some(weekly), Some(monthly)) if monthly.usage_percent > weekly.usage_percent => {
-            (section_from_window(monthly), Some("30d".to_string()))
-        }
         (Some(weekly), _) => (section_from_window(weekly), Some("7d".to_string())),
+        // No weekly window at all: surface the monthly one rather than nothing.
         (None, Some(monthly)) => (section_from_window(monthly), Some("30d".to_string())),
         (None, None) => (UsageSection::default(), None),
     }
@@ -684,9 +683,20 @@ mod tests {
             parse_iso8601(Some("2026-09-21T00:00:00Z"))
         );
         let (long, label) = select_long_window(&usage);
-        assert_eq!(long.percentage, 60.0);
-        assert_eq!(label.as_deref(), Some("30d"));
-        assert_eq!(long.resets_at, parse_iso8601(Some("2026-10-01T00:00:00Z")));
+        assert_eq!(long.percentage, 45.0);
+        assert_eq!(label.as_deref(), Some("7d"));
+        assert_eq!(
+            long.resets_at,
+            parse_iso8601(Some("2026-09-21T00:00:00Z"))
+        );
+        // The monthly window is reported alongside the weekly one instead of
+        // replacing it, so a theme can draw both rows.
+        let monthly = usage.monthly.as_ref().unwrap();
+        assert_eq!(monthly.usage_percent, 60.0);
+        assert_eq!(
+            monthly.resets_at,
+            parse_iso8601(Some("2026-10-01T00:00:00Z"))
+        );
     }
 
     #[test]
@@ -857,7 +867,7 @@ mod tests {
     }
 
     #[test]
-    fn most_constrained_long_window_is_selected() {
+    fn weekly_window_owns_the_long_slot_even_when_monthly_is_more_constrained() {
         let usage = DashboardUsage {
             weekly: Some(UsageWindow {
                 usage_percent: 40.0,
@@ -870,8 +880,11 @@ mod tests {
             ..Default::default()
         };
         let (section, label) = select_long_window(&usage);
-        assert_eq!(section.percentage, 70.0);
-        assert_eq!(label.as_deref(), Some("30d"));
+        assert_eq!(section.percentage, 40.0);
+        assert_eq!(label.as_deref(), Some("7d"));
+        // The more constrained monthly window is not lost: themes get it as a
+        // separate row through `UsageData::monthly`.
+        assert_eq!(usage.monthly.as_ref().unwrap().usage_percent, 70.0);
     }
 
     #[test]
@@ -988,10 +1001,11 @@ mod tests {
         );
         assert_eq!(usage.weekly.as_ref().unwrap().usage_percent, 0.0);
         assert_eq!(usage.monthly.as_ref().unwrap().usage_percent, 69.0);
-        // Monthly is the most constrained long window, so it owns the long slot.
+        // Weekly owns the long slot even at 0%; monthly stays available as its
+        // own row instead of hijacking the weekly one.
         let (long, label) = select_long_window(&usage);
-        assert_eq!(long.percentage, 69.0);
-        assert_eq!(label.as_deref(), Some("30d"));
+        assert_eq!(long.percentage, 0.0);
+        assert_eq!(label.as_deref(), Some("7d"));
     }
 
     #[test]
@@ -1100,7 +1114,10 @@ mod tests {
         )
         .unwrap();
         assert_eq!(usage.session.percentage, 9.0);
-        assert_eq!(usage.weekly.percentage, 69.0);
+        // Weekly owns the long slot; monthly rides alongside it as its own row.
+        assert_eq!(usage.weekly.percentage, 0.0);
+        assert_eq!(usage.weekly_label.as_deref(), Some("7d"));
+        assert_eq!(usage.monthly.as_ref().unwrap().percentage, 69.0);
         requests.join().unwrap();
     }
 
