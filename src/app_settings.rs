@@ -10,7 +10,7 @@ use windows::Win32::Storage::FileSystem::{
     MoveFileExW, MOVEFILE_REPLACE_EXISTING, MOVEFILE_WRITE_THROUGH,
 };
 
-use crate::models::{AppUsageData, CodexCreditsState};
+use crate::models::{AppUsageData, CodexCreditsState, DeepSeekCreditsState};
 use crate::providers::{ProviderId, ProviderSet};
 
 pub const POLL_1_MIN_SECONDS: u32 = 60;
@@ -69,6 +69,8 @@ pub struct SettingsFile {
     show_copilot: bool,
     #[serde(default)]
     show_command_code: bool,
+    #[serde(default)]
+    show_deepseek: bool,
     #[serde(default = "default_true")]
     pub custom_theme_enabled: bool,
     /// Show what is left of each allowance instead of what has been spent, so
@@ -157,6 +159,7 @@ impl Default for SettingsFile {
             show_grok: false,
             show_copilot: false,
             show_command_code: false,
+            show_deepseek: false,
             custom_theme_enabled: true,
             usage_countdown: false,
             alert_sound: false,
@@ -317,6 +320,7 @@ impl SettingsFile {
             ProviderId::Grok => self.show_grok,
             ProviderId::Copilot => self.show_copilot,
             ProviderId::CommandCode => self.show_command_code,
+            ProviderId::DeepSeek => self.show_deepseek,
         }
     }
 
@@ -366,6 +370,7 @@ impl SettingsFile {
             ProviderId::Grok => self.show_grok = enabled,
             ProviderId::Copilot => self.show_copilot = enabled,
             ProviderId::CommandCode => self.show_command_code = enabled,
+            ProviderId::DeepSeek => self.show_deepseek = enabled,
         }
     }
 
@@ -507,6 +512,20 @@ pub fn load_codex_credits() -> Option<CodexCreditsState> {
 
 pub fn save_codex_credits(state: &CodexCreditsState) -> Result<(), String> {
     write_json_atomic(&codex_credits_path(), state)
+}
+
+/// DeepSeek's wallet baseline and burn clock, kept beside the Codex credit
+/// state so both live in the same per-user data directory.
+pub fn deepseek_credits_path() -> PathBuf {
+    app_data_directory().join("deepseek-credits.json")
+}
+
+pub fn load_deepseek_credits() -> Option<DeepSeekCreditsState> {
+    read_json(&deepseek_credits_path())
+}
+
+pub fn save_deepseek_credits(state: &DeepSeekCreditsState) -> Result<(), String> {
+    write_json_atomic(&deepseek_credits_path(), state)
 }
 
 pub fn alert_state_path() -> PathBuf {
@@ -745,6 +764,7 @@ mod tests {
             ProviderId::Grok,
             ProviderId::Copilot,
             ProviderId::CommandCode,
+            ProviderId::DeepSeek,
         ]));
 
         let json = settings_json(&settings);
@@ -756,6 +776,7 @@ mod tests {
         assert_eq!(json["show_grok"], true);
         assert_eq!(json["show_copilot"], true);
         assert_eq!(json["show_command_code"], true);
+        assert_eq!(json["show_deepseek"], true);
 
         let decoded = decode_settings(&json.to_string()).unwrap();
         assert_eq!(decoded.enabled_providers(), settings.enabled_providers());

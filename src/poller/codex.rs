@@ -309,6 +309,7 @@ fn codex_credits(
             percentage,
             remaining: balance / CODEX_CREDITS_PER_DOLLAR,
             total: baseline / CODEX_CREDITS_PER_DOLLAR,
+            ..Default::default()
         }),
     )
 }

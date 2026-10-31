@@ -349,6 +349,7 @@ fn claude_credits(spend: &SpendResponse, data: &UsageData) -> Option<CreditsSect
         percentage: ((used / total) * 100.0).clamp(0.0, 100.0),
         remaining: (total - used).max(0.0),
         total,
+        ..Default::default()
     })
 }
 

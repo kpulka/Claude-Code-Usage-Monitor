@@ -17,6 +17,7 @@ pub enum ProviderId {
     Grok = 5,
     Copilot = 6,
     CommandCode = 7,
+    DeepSeek = 8,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -35,7 +36,7 @@ pub struct ProviderDescriptor {
     pub default_enabled: bool,
 }
 
-pub const PROVIDER_DESCRIPTORS: [ProviderDescriptor; 8] = [
+pub const PROVIDER_DESCRIPTORS: [ProviderDescriptor; 9] = [
     ProviderDescriptor {
         id: ProviderId::Claude,
         key: "claude",
@@ -108,10 +109,19 @@ pub const PROVIDER_DESCRIPTORS: [ProviderDescriptor; 8] = [
         native_menu_command_id: 67,
         default_enabled: false,
     },
+    ProviderDescriptor {
+        id: ProviderId::DeepSeek,
+        key: "deepseek",
+        cache_key: "deepseek",
+        display_name: "DeepSeek",
+        settings_description: "Show the DeepSeek API balance",
+        native_menu_command_id: 68,
+        default_enabled: false,
+    },
 ];
 
 impl ProviderId {
-    pub const ALL: [Self; 8] = [
+    pub const ALL: [Self; 9] = [
         Self::Claude,
         Self::Codex,
         Self::Antigravity,
@@ -120,6 +130,7 @@ impl ProviderId {
         Self::Grok,
         Self::Copilot,
         Self::CommandCode,
+        Self::DeepSeek,
     ];
 
     pub const fn descriptor(self) -> &'static ProviderDescriptor {

@@ -1973,9 +1973,9 @@ fn starter_adapts_width_segments_and_collapsed_provider_rows() {
             10,
         ),
         (
-            // Eight providers pay for a full ten-segment row each.
+            // Nine providers pay for a full ten-segment row each.
             ThemeRuntime::from_providers(ProviderSet::from_enabled(ProviderId::ALL)),
-            815,
+            905,
             2,
         ),
     ] {
@@ -2321,6 +2321,7 @@ fn compact_fluent_quad_widget_respects_usage_direction() {
                     percentage: 25.0,
                     remaining: 24.1,
                     total: 40.83,
+                    ..Default::default()
                 }),
                 external_pool: (provider == ProviderId::Antigravity).then(|| {
                     Box::new(UsageData {
@@ -2788,10 +2789,69 @@ fn headline_follows_the_window_closest_to_its_limit() {
             percentage: 41.0,
             remaining: 24.1,
             total: 40.83,
+            ..Default::default()
         }),
         ..Default::default()
     });
     assert_eq!(on_credits.get("codex.headline.percentage"), Some(41.0));
+}
+
+#[test]
+fn a_credits_only_provider_binds_its_balance_currency_and_burn_down_eta() {
+    use crate::models::{CreditsSection, UsageData};
+
+    let usage = UsageData {
+        // A prepaid wallet has no windows at all: every percentage row must
+        // stay unavailable so a theme can hide them with the existing gates.
+        credits: Some(CreditsSection {
+            percentage: 25.0,
+            remaining: 38.0,
+            total: 60.0,
+            currency: Some("USD".into()),
+            eta_seconds: Some(4.5 * 86_400.0),
+        }),
+        ..Default::default()
+    };
+    let context = DataContext::from_usage(
+        Some(&AppUsageData::from_iter([(ProviderId::DeepSeek, usage)])),
+        &Canvas::default(),
+    );
+
+    assert_eq!(context.get("deepseek.credits.available"), Some(1.0));
+    assert_eq!(context.get("deepseek.credits.percentage"), Some(25.0));
+    // `remaining` is the unused share of the gauge; `balance` is the money.
+    assert_eq!(context.get("deepseek.credits.remaining"), Some(75.0));
+    assert_eq!(context.get("deepseek.credits.balance"), Some(38.0));
+    assert_eq!(context.get("deepseek.credits.total"), Some(60.0));
+    assert_eq!(context.get("deepseek.credits.eta.seconds"), Some(388_800.0));
+    assert_eq!(context.get_string("deepseek.credits.currency"), Some("USD"));
+    // The wallet is the headline figure, and no window claims to be reported.
+    assert_eq!(context.get("deepseek.headline.percentage"), Some(25.0));
+    for window in ["session", "weekly"] {
+        assert_eq!(
+            context.get(&format!("deepseek.{window}.available")),
+            Some(0.0),
+            "{window}"
+        );
+    }
+    assert_eq!(context.get("deepseek.monthly.available"), Some(0.0));
+
+    // The two new bindings exist even when nothing reported a wallet, so a
+    // template using them validates instead of failing as an unknown name.
+    let empty = DataContext::from_usage(None, &Canvas::default());
+    assert_eq!(empty.get("deepseek.credits.eta.seconds"), Some(0.0));
+    assert_eq!(empty.get_string("deepseek.credits.currency"), Some(""));
+    assert_eq!(empty.get("deepseek.credits.available"), Some(0.0));
+    for template in [
+        "{deepseek.credits.balance:0.00} {deepseek.credits.currency}",
+        "{deepseek.credits.eta.seconds:duration}",
+    ] {
+        assert!(
+            validate_template(template, &empty).is_empty(),
+            "{template}: {:?}",
+            validate_template(template, &empty)
+        );
+    }
 }
 
 #[test]
@@ -3011,6 +3071,7 @@ fn credit_badges_abbreviate_a_balance_too_wide_for_the_tray() {
                         percentage: 10.0,
                         remaining: balance,
                         total: 2000.0,
+                        ..Default::default()
                     }),
                     ..Default::default()
                 },
@@ -3056,6 +3117,7 @@ fn countdown_display_values_invert_usage_without_moving_the_thresholds() {
                 percentage: 40.0,
                 remaining: 24.1,
                 total: 40.83,
+                ..Default::default()
             }),
             ..Default::default()
         },

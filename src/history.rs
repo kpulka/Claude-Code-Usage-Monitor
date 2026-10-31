@@ -193,6 +193,15 @@ fn push_windows(
     if let Some(monthly) = usage.monthly.as_ref() {
         add("monthly", monthly);
     }
+    // A prepaid wallet has no window, but the share already spent against the
+    // current top-up is the one trend worth drawing. Providers that report no
+    // credits contribute nothing, so their series stay untouched.
+    if let Some(credits) = usage.credits.as_ref() {
+        samples.push((
+            History::key(&format!("{provider_key}{suffix}"), "credits"),
+            credits.percentage,
+        ));
+    }
 }
 
 /// Process-wide snapshot: folded by the window's poll callback and read while

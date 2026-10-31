@@ -119,6 +119,7 @@ impl DataContext {
                     | "grok"
                     | "copilot"
                     | "commandcode"
+                    | "deepseek"
                     | "active"
             ) {
                 return None;

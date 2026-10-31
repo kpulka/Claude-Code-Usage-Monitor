@@ -432,6 +432,13 @@ pub fn classic_context_menu() -> ContextMenuDocument {
                     provider: Provider::CommandCode,
                 },
             ),
+            ContextMenuItem::action(
+                "provider-deepseek",
+                "DeepSeek",
+                Action::ToggleProvider {
+                    provider: Provider::DeepSeek,
+                },
+            ),
         ],
     );
     let languages = std::iter::once(ContextMenuItem::action(
@@ -741,6 +748,9 @@ mod tests {
         assert!(serde_json::to_string(&menu)
             .unwrap()
             .contains("provider-commandcode"));
+        assert!(serde_json::to_string(&menu)
+            .unwrap()
+            .contains("provider-deepseek"));
         assert!(menu.items.iter().any(|item| {
             item.id == "toggle-widget"
                 && matches!(

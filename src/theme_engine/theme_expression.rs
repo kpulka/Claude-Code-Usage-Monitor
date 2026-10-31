@@ -524,6 +524,7 @@ pub(super) fn format_usage_line(base: &str, context: &DataContext) -> Option<Str
                 | "grok"
                 | "copilot"
                 | "commandcode"
+                | "deepseek"
         ))
         || (dynamic.is_none()
             && !matches!(

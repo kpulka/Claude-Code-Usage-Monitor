@@ -69,6 +69,9 @@ pub(crate) fn provider_mark_glyph(provider: ProviderId) -> char {
         // Command Code has no licensed brand mark, so it reuses a Lucide
         // glyph from the same family: a terminal prompt, matching its CLI.
         ProviderId::CommandCode => LucideIcon::SquareTerminal.unicode(),
+        // DeepSeek sells a prepaid wallet rather than a plan, so it borrows
+        // Lucide's coin stack for the same reason.
+        ProviderId::DeepSeek => LucideIcon::Coins.unicode(),
     }
 }
 

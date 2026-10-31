@@ -69,6 +69,16 @@ pub struct CreditsSection {
     /// plan's cap where there is one, otherwise the balance recorded at the
     /// last top-up.
     pub total: f64,
+    /// ISO-ish currency code the amounts are denominated in, when the provider
+    /// reports one (DeepSeek bills in USD or CNY). Providers that only ever
+    /// show a unit-free figure leave this empty.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub currency: Option<String>,
+    /// Projected seconds until the balance is exhausted at the observed burn
+    /// rate. Only prepaid wallets fill this in; a quota has a reset date
+    /// instead. `None` means no trend is known yet.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub eta_seconds: Option<f64>,
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
@@ -147,6 +157,32 @@ pub struct CodexCreditsState {
     /// Balance recorded at the last observed top-up, in raw credits. Seeded
     /// from the first balance we ever see.
     pub baseline: f64,
+}
+
+/// DeepSeek sells a prepaid wallet with no quota and no reset date, so the
+/// trend is the only thing that can be learned: spending per day since the
+/// wallet was seeded, and how long the balance lasts at that rate.
+///
+/// Every field carries a `serde` default so a state file written by an older
+/// build (or hand-edited) still loads instead of silently resetting the trend.
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+pub struct DeepSeekCreditsState {
+    /// Currency the two balances below are denominated in, e.g. `USD`.
+    #[serde(default)]
+    pub currency: String,
+    /// Balance at the previous poll, in whole currency units.
+    #[serde(default)]
+    pub balance: f64,
+    /// Balance recorded when the wallet was last seeded or topped up.
+    #[serde(default)]
+    pub baseline: f64,
+    /// Unix seconds the burn clock started: the first sighting of this wallet,
+    /// or the moment the last top-up was observed.
+    #[serde(default)]
+    pub seeded_at_unix: u64,
+    /// Unix seconds of the poll that wrote this file.
+    #[serde(default)]
+    pub updated_at_unix: u64,
 }
 
 #[derive(Clone, Debug, Default, PartialEq)]
@@ -471,6 +507,41 @@ mod tests {
         json.as_object_mut().unwrap().remove("session_label");
         let legacy: UsageData = serde_json::from_value(json).unwrap();
         assert!(legacy.session_label.is_none());
+    }
+
+    #[test]
+    fn usage_cache_still_reads_a_credits_entry_written_before_currency_and_eta() {
+        // Caches written by an older build carry only the three original
+        // fields. They must keep loading, and the new ones must stay absent
+        // rather than defaulting to a currency nobody reported.
+        let legacy = r#"{"percentage":40.0,"remaining":36.0,"total":60.0}"#;
+        let credits: CreditsSection = serde_json::from_str(legacy).unwrap();
+        assert_eq!(credits.remaining, 36.0);
+        assert_eq!(credits.total, 60.0);
+        assert_eq!(credits.currency, None);
+        assert_eq!(credits.eta_seconds, None);
+
+        // And a cache without the new keys at all still round-trips.
+        let with_fields = CreditsSection {
+            percentage: 40.0,
+            remaining: 36.0,
+            total: 60.0,
+            currency: Some("USD".into()),
+            eta_seconds: Some(388_800.0),
+        };
+        let json = serde_json::to_value(&with_fields).unwrap();
+        assert_eq!(json["currency"], "USD");
+        assert_eq!(json["eta_seconds"], 388_800.0);
+        assert_eq!(
+            serde_json::from_value::<CreditsSection>(json).unwrap(),
+            with_fields
+        );
+
+        // Absent fields are omitted, so an old build reading a new cache still
+        // sees the shape it knows.
+        let bare = serde_json::to_value(CreditsSection::default()).unwrap();
+        assert!(bare.get("currency").is_none());
+        assert!(bare.get("eta_seconds").is_none());
     }
 
     #[test]

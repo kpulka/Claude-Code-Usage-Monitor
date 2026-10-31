@@ -4551,6 +4551,348 @@
             },
             "corner_radius": "3"
           }
+        },
+        {
+          "id": "deepseek-provider",
+          "name": "DeepSeek",
+          "parent": "grid",
+          "render": "providers.deepseek.enabled",
+          "width": "canvas.width",
+          "height": "76"
+        },
+        {
+          "id": "deepseek-badge",
+          "name": "deepseek-badge",
+          "parent": "deepseek-provider",
+          "x": "14",
+          "y": "15",
+          "width": "10",
+          "height": "10",
+          "corner_radius": "5",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#4D6BFE"
+            }
+          }
+        },
+        {
+          "id": "deepseek-name-dark",
+          "name": "deepseek-name-dark",
+          "parent": "deepseek-provider",
+          "render": "system.dark",
+          "x": "30",
+          "y": "9",
+          "width": "200",
+          "height": "16",
+          "content": {
+            "type": "text",
+            "template": "DeepSeek",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "semibold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#F5F5F5FF"
+            }
+          }
+        },
+        {
+          "id": "deepseek-name-light",
+          "name": "deepseek-name-light",
+          "parent": "deepseek-provider",
+          "render": "1 - system.dark",
+          "x": "30",
+          "y": "9",
+          "width": "200",
+          "height": "16",
+          "content": {
+            "type": "text",
+            "template": "DeepSeek",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "semibold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#1A1A1AFF"
+            }
+          }
+        },
+        {
+          "id": "deepseek-headline-dark",
+          "name": "deepseek-headline-dark",
+          "parent": "deepseek-provider",
+          "render": "system.dark",
+          "x": "212",
+          "y": "7",
+          "width": "110",
+          "height": "20",
+          "content": {
+            "type": "text",
+            "template": "{deepseek.headline.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "15",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#9DB2FF"
+            }
+          }
+        },
+        {
+          "id": "deepseek-headline-light",
+          "name": "deepseek-headline-light",
+          "parent": "deepseek-provider",
+          "render": "1 - system.dark",
+          "x": "212",
+          "y": "7",
+          "width": "110",
+          "height": "20",
+          "content": {
+            "type": "text",
+            "template": "{deepseek.headline.display:usage_line}",
+            "font_family": "Segoe UI",
+            "font_size": "15",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#1F3AE0"
+            }
+          }
+        },
+        {
+          "id": "deepseek-history",
+          "name": "deepseek wallet burn-down",
+          "parent": "deepseek-provider",
+          "render": "providers.deepseek.enabled",
+          "x": "232",
+          "y": "26",
+          "width": "84",
+          "height": "10",
+          "content": {
+            "type": "sparkline",
+            "source": "deepseek.credits.history",
+            "color": {
+              "color": "#4D6BFE"
+            },
+            "fill": {
+              "color": "#4D6BFE26"
+            }
+          }
+        },
+        {
+          "id": "deepseek-balance-label-dark",
+          "name": "deepseek-balance-label-dark",
+          "parent": "deepseek-provider",
+          "render": "system.dark",
+          "x": "30",
+          "y": "31",
+          "width": "64",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "saldo",
+            "font_family": "Segoe UI",
+            "font_size": "10",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "deepseek-balance-label-light",
+          "name": "deepseek-balance-label-light",
+          "parent": "deepseek-provider",
+          "render": "1 - system.dark",
+          "x": "30",
+          "y": "31",
+          "width": "64",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "saldo",
+            "font_family": "Segoe UI",
+            "font_size": "10",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#5F6368FF"
+            }
+          }
+        },
+        {
+          "id": "deepseek-balance-value-dark",
+          "name": "deepseek-balance-value-dark",
+          "parent": "deepseek-provider",
+          "render": "system.dark",
+          "x": "180",
+          "y": "29",
+          "width": "120",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{deepseek.credits.balance:0.00} {deepseek.credits.currency}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#F5F5F5FF"
+            }
+          }
+        },
+        {
+          "id": "deepseek-balance-value-light",
+          "name": "deepseek-balance-value-light",
+          "parent": "deepseek-provider",
+          "render": "1 - system.dark",
+          "x": "180",
+          "y": "29",
+          "width": "120",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{deepseek.credits.balance:0.00} {deepseek.credits.currency}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#1A1A1AFF"
+            }
+          }
+        },
+        {
+          "id": "deepseek-balance-bar",
+          "name": "deepseek wallet spent",
+          "parent": "deepseek-provider",
+          "render": "deepseek.credits.available",
+          "x": "62",
+          "y": "34",
+          "width": "146",
+          "height": "6",
+          "content": {
+            "type": "progress",
+            "value": "deepseek.credits.display",
+            "direction": "left_to_right",
+            "fill": {
+              "color": "#4D6BFE"
+            },
+            "track": {
+              "color": "#FFFFFF1A"
+            },
+            "corner_radius": "3"
+          }
+        },
+        {
+          "id": "deepseek-eta-label-dark",
+          "name": "deepseek-eta-label-dark",
+          "parent": "deepseek-provider",
+          "render": "deepseek.credits.available && deepseek.credits.eta.seconds > 0",
+          "x": "30",
+          "y": "51",
+          "width": "64",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "starczy",
+            "font_family": "Segoe UI",
+            "font_size": "10",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "deepseek-eta-value-dark",
+          "name": "deepseek-eta-value-dark",
+          "parent": "deepseek-provider",
+          "render": "deepseek.credits.available && deepseek.credits.eta.seconds > 0",
+          "x": "180",
+          "y": "49",
+          "width": "120",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{deepseek.credits.eta.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#F5F5F5FF"
+            }
+          }
+        },
+        {
+          "id": "deepseek-eta-label-light",
+          "name": "deepseek-eta-label-light",
+          "parent": "deepseek-provider",
+          "render": "deepseek.credits.available && deepseek.credits.eta.seconds > 0",
+          "x": "30",
+          "y": "51",
+          "width": "64",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "starczy",
+            "font_family": "Segoe UI",
+            "font_size": "10",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#5F6368FF"
+            }
+          }
+        },
+        {
+          "id": "deepseek-eta-value-light",
+          "name": "deepseek-eta-value-light",
+          "parent": "deepseek-provider",
+          "render": "deepseek.credits.available && deepseek.credits.eta.seconds > 0",
+          "x": "180",
+          "y": "49",
+          "width": "120",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{deepseek.credits.eta.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#1A1A1AFF"
+            }
+          }
         }
       ],
       "border": {

@@ -353,6 +353,7 @@ fn grok_credits(
         percentage: (used / total * 100.0).clamp(0.0, 100.0),
         remaining: (total - used).max(0.0),
         total,
+        ..Default::default()
     })
 }
 

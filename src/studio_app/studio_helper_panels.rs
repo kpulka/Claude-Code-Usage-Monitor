@@ -527,6 +527,30 @@ pub(super) const TEXT_TEMPLATE_VALUES: &[TextTemplateValue] = &[
         kind: TextTemplateValueKind::Duration,
     },
     TextTemplateValue {
+        group: "DeepSeek",
+        label: "Balance",
+        expression: "deepseek.credits.balance",
+        kind: TextTemplateValueKind::Number,
+    },
+    TextTemplateValue {
+        group: "DeepSeek",
+        label: "Balance currency",
+        expression: "deepseek.credits.currency",
+        kind: TextTemplateValueKind::Text,
+    },
+    TextTemplateValue {
+        group: "DeepSeek",
+        label: "Spent against the top-up",
+        expression: "deepseek.credits.percentage",
+        kind: TextTemplateValueKind::Percentage,
+    },
+    TextTemplateValue {
+        group: "DeepSeek",
+        label: "Time left at the current burn rate",
+        expression: "deepseek.credits.eta.seconds",
+        kind: TextTemplateValueKind::Duration,
+    },
+    TextTemplateValue {
         group: "Cursor",
         label: "Auto summary",
         expression: "cursor.session",

@@ -26,7 +26,9 @@ pub const GRID_PANEL_THEME_ID: &str = "grid-panel";
 pub const MINECRAFT_THEME_ID: &str = "theme-minecraft";
 
 /// Windows that get a history binding (`<provider>.<window>.history`).
-pub const HISTORY_WINDOWS: [&str; 3] = ["session", "weekly", "monthly"];
+/// `credits` is not a window but the spent share of a prepaid wallet, which is
+/// the only series a provider without quotas can draw a trend from.
+pub const HISTORY_WINDOWS: [&str; 4] = ["session", "weekly", "monthly", "credits"];
 
 const BUILTIN_THEME_SOURCES: &[(&str, &str)] = &[
     (
@@ -1890,6 +1892,22 @@ impl DataContext {
         self.insert(
             &format!("{name}.credits.total"),
             credits.map(|credits| credits.total).unwrap_or(0.0),
+        );
+        // Two extras a prepaid wallet needs and a quota does not: the currency
+        // the amounts are in, and how long the money lasts at the observed burn
+        // rate. Both read as absent rather than stale when there is no wallet,
+        // so a theme can still gate on `credits.available`.
+        self.insert(
+            &format!("{name}.credits.eta.seconds"),
+            credits
+                .and_then(|credits| credits.eta_seconds)
+                .unwrap_or(0.0),
+        );
+        self.insert_string(
+            &format!("{name}.credits.currency"),
+            credits
+                .and_then(|credits| credits.currency.as_deref())
+                .unwrap_or(""),
         );
         self.insert(
             &format!("{name}.credits.available"),
