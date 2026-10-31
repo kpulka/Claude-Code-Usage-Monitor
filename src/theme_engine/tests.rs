@@ -1973,8 +1973,9 @@ fn starter_adapts_width_segments_and_collapsed_provider_rows() {
             10,
         ),
         (
+            // Eight providers pay for a full ten-segment row each.
             ThemeRuntime::from_providers(ProviderSet::from_enabled(ProviderId::ALL)),
-            725,
+            815,
             2,
         ),
     ] {

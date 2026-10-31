@@ -1,6 +1,7 @@
 use std::path::PathBuf;
 
 use eframe::egui;
+use lucide_icons::Icon as LucideIcon;
 use windows::Win32::Graphics::Gdi::{
     CreateFontIndirectW, DeleteObject, GetDC, GetFontData, ReleaseDC, SelectObject, GDI_ERROR,
 };
@@ -40,6 +41,9 @@ const UI_FALLBACK_FONT_BYTES: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/
 /// | U+F006    | Grok        | Lobe Icons (MIT)                       |
 /// | U+F007    | Copilot     | Lobe Icons (MIT)                       |
 ///
+/// Command Code owns no brand mark here: it draws Lucide's `SquareTerminal`
+/// glyph from the generated subset instead of a codepoint in this font.
+///
 /// Those licences cover the path data. The logos remain the trademarks of their
 /// owners and identify the provider a setting belongs to.
 const BRAND_MARK_FONT_BYTES: &[u8] = include_bytes!("../icons/brand-marks.ttf");
@@ -62,6 +66,9 @@ pub(crate) fn provider_mark_glyph(provider: ProviderId) -> char {
         ProviderId::Cursor => '\u{f005}',
         ProviderId::Grok => '\u{f006}',
         ProviderId::Copilot => '\u{f007}',
+        // Command Code has no licensed brand mark, so it reuses a Lucide
+        // glyph from the same family: a terminal prompt, matching its CLI.
+        ProviderId::CommandCode => LucideIcon::SquareTerminal.unicode(),
     }
 }
 

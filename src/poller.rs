@@ -283,6 +283,7 @@ mod antigravity;
 mod claude;
 mod claude_desktop;
 mod codex;
+mod commandcode;
 mod copilot;
 mod cursor;
 mod grok;
@@ -298,7 +299,7 @@ struct ProviderPoller {
     credential_watch: fn(bool) -> CredentialWatchSnapshot,
 }
 
-const PROVIDER_POLLERS: [ProviderPoller; 7] = [
+const PROVIDER_POLLERS: [ProviderPoller; 8] = [
     ProviderPoller {
         id: ProviderId::Claude,
         poll: claude::poll_claude_code,
@@ -333,6 +334,11 @@ const PROVIDER_POLLERS: [ProviderPoller; 7] = [
         id: ProviderId::Copilot,
         poll: copilot::poll_copilot,
         credential_watch: copilot::credential_watch_snapshot,
+    },
+    ProviderPoller {
+        id: ProviderId::CommandCode,
+        poll: commandcode::poll_command_code,
+        credential_watch: commandcode::credential_watch_snapshot,
     },
 ];
 

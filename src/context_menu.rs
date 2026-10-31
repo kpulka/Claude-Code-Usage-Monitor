@@ -316,6 +316,7 @@ pub fn rendered_label(
         "Cursor" => language.text("Cursor"),
         "Grok" => language.text("Grok"),
         "Copilot" => language.text("Copilot"),
+        "Command Code" => language.text("Command Code"),
         "Open Dashboard" => language.text("Open Dashboard"),
         "Every minute" => language.text("Every minute"),
         "Every 5 minutes" => language.text("Every 5 minutes"),
@@ -422,6 +423,13 @@ pub fn classic_context_menu() -> ContextMenuDocument {
                 "Copilot",
                 Action::ToggleProvider {
                     provider: Provider::Copilot,
+                },
+            ),
+            ContextMenuItem::action(
+                "provider-commandcode",
+                "Command Code",
+                Action::ToggleProvider {
+                    provider: Provider::CommandCode,
                 },
             ),
         ],
@@ -730,6 +738,9 @@ mod tests {
         assert!(serde_json::to_string(&menu)
             .unwrap()
             .contains("provider-copilot"));
+        assert!(serde_json::to_string(&menu)
+            .unwrap()
+            .contains("provider-commandcode"));
         assert!(menu.items.iter().any(|item| {
             item.id == "toggle-widget"
                 && matches!(
