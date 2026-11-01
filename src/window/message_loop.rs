@@ -369,6 +369,10 @@ pub(super) unsafe extern "system" fn wnd_proc(
                             SWP_NOACTIVATE | SWP_NOSIZE,
                         );
                     }
+                    // The frost plate is a second window: without this it stays
+                    // where the card was until the next full render, which made
+                    // the blur look absent for the whole drag.
+                    crate::frost::follow(hwnd);
                 }
             } else {
                 update_mouse_hover(hwnd, lparam);
