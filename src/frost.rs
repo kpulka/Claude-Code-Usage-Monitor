@@ -25,7 +25,6 @@ use windows::Win32::System::WinRT::{
     DispatcherQueueOptions, RoInitialize, DQTAT_COM_NONE, DQTYPE_THREAD_CURRENT,
     RO_INIT_MULTITHREADED,
 };
-use windows::Win32::UI::HiDpi::GetDpiForWindow;
 use windows::Win32::UI::WindowsAndMessaging::{
     CreateWindowExW, DefWindowProcW, GetWindowRect, LoadCursorW, RegisterClassExW, SetWindowPos,
     ShowWindow, HTTRANSPARENT, IDC_ARROW, SWP_NOACTIVATE, SWP_NOOWNERZORDER, SWP_NOSENDCHANGING,
@@ -191,10 +190,9 @@ pub(crate) fn follow(card: HWND) {
         }
         let width = (rect.right - rect.left).max(1);
         let height = (rect.bottom - rect.top).max(1);
-        let scale = unsafe { GetDpiForWindow(card) }.max(96) as f32 / 96.0;
+        // Insert the plate right below the card, so both stay in the same
+        // topmost band and no other window slips between them.
         unsafe {
-            // Insert the plate right below the card, so both stay in the same
-            // topmost band and no other window slips between them.
             let _ = SetWindowPos(
                 plate.hwnd,
                 Some(plate.owner),
@@ -205,18 +203,23 @@ pub(crate) fn follow(card: HWND) {
                 SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOSENDCHANGING,
             );
         }
-        let dips_w = width as f32 / scale;
-        let dips_h = height as f32 / scale;
+        // A desktop window target composites in *physical* pixels: dividing by
+        // the DPI scale here shrank the sprite to 1/1.5 of the window, so only a
+        // small square in the corner was frosted. The rounded corner comes from
+        // the window region set below (the compositor clips visuals to it), not
+        // from this size.
         let _ = plate.visual.SetSize(Vector2 {
-            X: dips_w,
-            Y: dips_h,
+            X: width as f32,
+            Y: height as f32,
         });
         // The compositor clips a window's visuals to its visible region, so the
         // plate is cut to the same curve as the card.
         crate::window_chrome::refresh_region(plate.hwnd, width, height);
         if !plate.placed {
             plate.placed = true;
-            crate::diagnose::log("glass plate: host backdrop brush is live");
+            crate::diagnose::log(format!(
+                "glass plate: host backdrop brush is live at {width}x{height}px"
+            ));
         }
     });
 }
