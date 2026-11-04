@@ -174,7 +174,7 @@
             "type": "sparkline",
             "source": "claude.weekly.history",
             "color": {
-              "color": "#DA9E7F"
+              "color": "#C86835"
             },
             "fill": {
               "color": "#00000000"
@@ -418,7 +418,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#DA9E7F"
+              "color": "#C86835"
             }
           }
         },
@@ -579,7 +579,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#B38268"
+              "color": "#A4552B"
             }
           }
         },
@@ -667,7 +667,7 @@
             "value": "claude.weekly.display",
             "direction": "left_to_right",
             "fill": {
-              "color": "#DA9E7F"
+              "color": "#C86835"
             },
             "track": {
               "color": "#FFFFFF1A"
@@ -792,7 +792,7 @@
             "type": "sparkline",
             "source": "codex.weekly.history",
             "color": {
-              "color": "#1CBFA8"
+              "color": "#0F7163"
             },
             "fill": {
               "color": "#00000000"
@@ -1036,7 +1036,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#1CBFA8"
+              "color": "#0F7163"
             }
           }
         },
@@ -1197,7 +1197,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#179D8A"
+              "color": "#0C5D51"
             }
           }
         },
@@ -1285,7 +1285,7 @@
             "value": "codex.weekly.display",
             "direction": "left_to_right",
             "fill": {
-              "color": "#1CBFA8"
+              "color": "#0F7163"
             },
             "track": {
               "color": "#FFFFFF1A"
@@ -1410,7 +1410,7 @@
             "type": "sparkline",
             "source": "antigravity.weekly.history",
             "color": {
-              "color": "#6F93F0"
+              "color": "#1852EB"
             },
             "fill": {
               "color": "#00000000"
@@ -1654,7 +1654,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#6F93F0"
+              "color": "#1852EB"
             }
           }
         },
@@ -1815,7 +1815,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#5B79C5"
+              "color": "#1443C1"
             }
           }
         },
@@ -1903,7 +1903,7 @@
             "value": "antigravity.weekly.display",
             "direction": "left_to_right",
             "fill": {
-              "color": "#6F93F0"
+              "color": "#1852EB"
             },
             "track": {
               "color": "#FFFFFF1A"
@@ -2028,7 +2028,7 @@
             "type": "sparkline",
             "source": "opencode.monthly.history",
             "color": {
-              "color": "#6646E3"
+              "color": "#3F18D4"
             },
             "fill": {
               "color": "#00000000"
@@ -2050,7 +2050,7 @@
             "type": "sparkline",
             "source": "opencode.weekly.history",
             "color": {
-              "color": "#B388F3"
+              "color": "#7E31EE"
             },
             "fill": {
               "color": "#00000000"
@@ -2294,7 +2294,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#B388F3"
+              "color": "#7E31EE"
             }
           }
         },
@@ -2455,7 +2455,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#9370C7"
+              "color": "#6728C3"
             }
           }
         },
@@ -2543,7 +2543,7 @@
             "value": "opencode.weekly.display",
             "direction": "left_to_right",
             "fill": {
-              "color": "#B388F3"
+              "color": "#7E31EE"
             },
             "track": {
               "color": "#FFFFFF1A"
@@ -2572,7 +2572,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#6646E3"
+              "color": "#3F18D4"
             }
           }
         },
@@ -2595,7 +2595,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#5439BA"
+              "color": "#3414AE"
             }
           }
         },
@@ -2705,7 +2705,7 @@
             "value": "opencode.monthly.display",
             "direction": "left_to_right",
             "fill": {
-              "color": "#6646E3"
+              "color": "#3F18D4"
             },
             "track": {
               "color": "#FFFFFF1A"
@@ -2830,7 +2830,7 @@
             "type": "sparkline",
             "source": "cursor.weekly.history",
             "color": {
-              "color": "#B7BCC5"
+              "color": "#808998"
             },
             "fill": {
               "color": "#00000000"
@@ -3074,7 +3074,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#B7BCC5"
+              "color": "#808998"
             }
           }
         },
@@ -3235,7 +3235,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#969AA2"
+              "color": "#69707D"
             }
           }
         },
@@ -3323,7 +3323,7 @@
             "value": "cursor.weekly.display",
             "direction": "left_to_right",
             "fill": {
-              "color": "#B7BCC5"
+              "color": "#808998"
             },
             "track": {
               "color": "#FFFFFF1A"
@@ -3448,7 +3448,7 @@
             "type": "sparkline",
             "source": "grok.weekly.history",
             "color": {
-              "color": "#E2E4E9"
+              "color": "#C8CCD5"
             },
             "fill": {
               "color": "#00000000"
@@ -3692,7 +3692,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#E2E4E9"
+              "color": "#C8CCD5"
             }
           }
         },
@@ -3853,7 +3853,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#B9BBBF"
+              "color": "#A4A7AF"
             }
           }
         },
@@ -3941,7 +3941,7 @@
             "value": "grok.weekly.display",
             "direction": "left_to_right",
             "fill": {
-              "color": "#E2E4E9"
+              "color": "#C8CCD5"
             },
             "track": {
               "color": "#FFFFFF1A"
@@ -4066,7 +4066,7 @@
             "type": "sparkline",
             "source": "copilot.weekly.history",
             "color": {
-              "color": "#878F99"
+              "color": "#575D65"
             },
             "fill": {
               "color": "#00000000"
@@ -4310,7 +4310,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#878F99"
+              "color": "#575D65"
             }
           }
         },
@@ -4471,7 +4471,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#6F757D"
+              "color": "#474C53"
             }
           }
         },
@@ -4559,7 +4559,7 @@
             "value": "copilot.weekly.display",
             "direction": "left_to_right",
             "fill": {
-              "color": "#878F99"
+              "color": "#575D65"
             },
             "track": {
               "color": "#FFFFFF1A"
@@ -4684,7 +4684,7 @@
             "type": "sparkline",
             "source": "commandcode.monthly.history",
             "color": {
-              "color": "#C78249"
+              "color": "#A7642B"
             },
             "fill": {
               "color": "#00000000"
@@ -4706,7 +4706,7 @@
             "type": "sparkline",
             "source": "commandcode.weekly.history",
             "color": {
-              "color": "#E0C081"
+              "color": "#D29C33"
             },
             "fill": {
               "color": "#00000000"
@@ -4950,7 +4950,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#E0C081"
+              "color": "#D29C33"
             }
           }
         },
@@ -5111,7 +5111,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#B89D6A"
+              "color": "#AC802A"
             }
           }
         },
@@ -5199,7 +5199,7 @@
             "value": "commandcode.weekly.display",
             "direction": "left_to_right",
             "fill": {
-              "color": "#E0C081"
+              "color": "#D29C33"
             },
             "track": {
               "color": "#FFFFFF1A"
@@ -5228,7 +5228,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#C78249"
+              "color": "#A7642B"
             }
           }
         },
@@ -5251,7 +5251,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#A36B3C"
+              "color": "#895223"
             }
           }
         },
@@ -5361,7 +5361,7 @@
             "value": "commandcode.monthly.display",
             "direction": "left_to_right",
             "fill": {
-              "color": "#C78249"
+              "color": "#A7642B"
             },
             "track": {
               "color": "#FFFFFF1A"
