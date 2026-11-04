@@ -107,6 +107,10 @@ impl DataContext {
                 return None;
             }
             (&name[..name.len() - field.len() - 1], field)
+        } else if let Some(field) = name.strip_prefix("antigravity.gemini.") {
+            ("antigravity.gemini", field)
+        } else if let Some(field) = name.strip_prefix("antigravity.external.") {
+            ("antigravity.external", field)
         } else {
             let (owner, field) = name.split_once('.')?;
             if !matches!(

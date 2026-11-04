@@ -38,10 +38,19 @@ changes grouped into Added, Changed, Fixed, and Removed where applicable.
   darkest and thickest, so a dim colour still reads. Brightness and saturation step down with only a
   six-degree hue shift, keeping the three curves in one colour family rather than looking like three
   providers. The row labels and progress bars use the same three shades, and the coloured 5h/7d/30d labels
-  are bold. The percentage column moved next to the gauge, which widens the chart, and a 0-100% axis with
-  faint 25/50/75 gridlines frames it. The recommendation banner and the dead headline row are gone; the provider with the most room is
-  marked with a halo, and the burn or forecast warning is one marker beside the ETA. A two-pixel border
-  keeps the card's edge visible at 150% DPI.
+  are bold. The window label and reset are packed against the left edge, the percentage sits immediately
+  after the gauge, and the chart is 102px wide with a deliberate gap between the value and the chart. A
+  0-100% axis with faint 25/50/75 gridlines frames it. Each curve now runs from its own window's reset to the
+  next reset: x is the window itself, every curve starts at 100% at the reset and stops at the current
+  progress, so 7d/30d no longer collapse into flat 24-hour lines. History keeps 31 days; the 5h chart uses
+  the same hourly samples until a finer bucket lands. The recommendation banner and the dead headline row
+  are gone; the provider with the most room is marked with a halo, and the burn or forecast warning is one
+  marker beside the ETA. A two-pixel border keeps the card's edge visible at 150% DPI.
+
+- Antigravity can show the Gemini and Claude/GPT model groups as extra rows below its weekly window, plus
+  an Argon row when the quota summary returns that group. The rows appear when the Gemini pool is enabled
+  and stay hidden otherwise; Flash and Pro remain one aggregate group because the summary does not split
+  them.
 - A sparkline bridges an hour without a sample between two known points instead of breaking the trend into
   disconnected blocks. Gaps before the first and after the last sample still stay empty.
 

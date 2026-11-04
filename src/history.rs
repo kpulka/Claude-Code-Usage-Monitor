@@ -18,11 +18,15 @@ use serde::{Deserialize, Serialize};
 use crate::models::{AppUsageData, UsageData};
 use crate::providers::ProviderId;
 
-/// How long a sample stays in the file: one week of hourly buckets.
-pub const RETENTION_HOURS: u64 = 7 * 24;
+/// How long a sample stays in the file. A 30-day window needs the whole
+/// month, so the hourly ring keeps a little more than that.
+pub const RETENTION_HOURS: u64 = 31 * 24;
 
 /// How many hourly points a theme binding carries (the sparkline window).
 pub const BINDING_POINTS: usize = 24;
+
+/// How many points the normalized per-window cycle chart samples.
+pub const CYCLE_POINTS: usize = 48;
 
 /// Hard cap on tracked series so a misconfigured provider cannot bloat the file.
 pub const MAX_SERIES: usize = 128;
@@ -145,6 +149,63 @@ impl History {
         }
         Some(tokens.join(","))
     }
+
+    /// Points of the current window, from its reset to the next reset, spread
+    /// over a fixed number of slots. The x axis is the window itself: slot 0
+    /// is the reset, the last slot is the next reset, and slots after `now`
+    /// stay empty. The first slot reports 0% spent, because a reset starts the
+    /// window at full capacity even when the first poll lands later.
+    pub fn cycle_binding(
+        &self,
+        key: &str,
+        now: SystemTime,
+        reset: SystemTime,
+        duration: std::time::Duration,
+        points: usize,
+    ) -> Option<String> {
+        let now_secs = now.duration_since(UNIX_EPOCH).ok()?.as_secs();
+        let reset_secs = reset.duration_since(UNIX_EPOCH).ok()?.as_secs();
+        let duration_secs = duration.as_secs();
+        if duration_secs == 0 || points < 2 || reset_secs <= now_secs {
+            return None;
+        }
+        let start = reset_secs.saturating_sub(duration_secs);
+        let start_hour = start / 3_600;
+        let buckets = self.series.get(key);
+        // Do not invent a full window at the reset when the app was not yet
+        // running: the first retained sample has to sit at the reset for the
+        // synthetic 0% to be honest.
+        let covers_start = start + RETENTION_HOURS * 3_600 >= now_secs
+            && buckets.is_some_and(|series| {
+                let index = series.partition_point(|point| point.hour < start_hour);
+                series
+                    .get(index)
+                    .is_some_and(|point| point.hour <= start_hour + 1)
+            });
+        let mut tokens = Vec::with_capacity(points);
+        for index in 0..points {
+            let offset = (duration_secs as f64 * index as f64 / (points - 1) as f64).round() as u64;
+            let target = start + offset;
+            if target > now_secs {
+                tokens.push(String::new());
+                continue;
+            }
+            let hour = target / 3_600;
+            let value = buckets.and_then(|series| {
+                series
+                    .binary_search_by_key(&hour, |point| point.hour)
+                    .ok()
+                    .map(|index| series[index].percent)
+            });
+            let value = if index == 0 && covers_start {
+                Some(0.0)
+            } else {
+                value
+            };
+            tokens.push(value.map_or_else(String::new, |percent| format!("{percent:.0}")));
+        }
+        Some(tokens.join(","))
+    }
 }
 
 /// Hours since the Unix epoch, the bucket identity of a sample.
@@ -235,6 +296,25 @@ pub fn binding(provider_key: &str, window: &str) -> Option<String> {
     binding_at(provider_key, window, SystemTime::now())
 }
 
+/// Binding value for the current window, normalized from its reset to its
+/// next reset. `None` when the history, the reset or the duration is missing.
+pub fn cycle_binding(
+    provider_key: &str,
+    window: &str,
+    reset: SystemTime,
+    duration: std::time::Duration,
+    points: usize,
+) -> Option<String> {
+    let guard = read_snapshot();
+    guard.as_ref()?.cycle_binding(
+        &History::key(provider_key, window),
+        SystemTime::now(),
+        reset,
+        duration,
+        points,
+    )
+}
+
 fn binding_at(provider_key: &str, window: &str, now: SystemTime) -> Option<String> {
     let hour = hour_of(now);
     let guard = read_snapshot();
@@ -300,7 +380,30 @@ mod tests {
     }
 
     #[test]
-    fn history_forgets_samples_older_than_seven_days() {
+    fn cycle_binding_is_normalized_to_the_window_and_stops_at_now() {
+        let mut history = History::default();
+        history.fold(&[sample("claude", 0.0)], 95);
+        history.fold(&[sample("claude", 10.0)], 96);
+        history.fold(&[sample("claude", 30.0)], 97);
+        let reset = UNIX_EPOCH + std::time::Duration::from_secs(100 * 3_600);
+        let now = UNIX_EPOCH + std::time::Duration::from_secs(97 * 3_600 + 1_800);
+        let binding = history
+            .cycle_binding(
+                &History::key("claude", "session"),
+                now,
+                reset,
+                std::time::Duration::from_secs(5 * 3_600),
+                6,
+            )
+            .expect("cycle binding");
+        assert_eq!(
+            binding.split(',').collect::<Vec<_>>(),
+            ["0", "10", "30", "", "", ""]
+        );
+    }
+
+    #[test]
+    fn history_forgets_samples_older_than_the_retention() {
         let mut history = History::default();
         for hour in 0..(RETENTION_HOURS + 50) {
             history.fold(&[sample("claude", (hour % 100) as f64)], hour);

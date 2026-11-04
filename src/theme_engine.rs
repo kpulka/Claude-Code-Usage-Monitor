@@ -1629,10 +1629,28 @@ impl DataContext {
         // Hourly peaks of the last day, one comma-separated binding per window,
         // so themes can draw a sparkline without asking the poller for more.
         for descriptor in PROVIDER_DESCRIPTORS {
+            let usage = data.and_then(|data| data.get(descriptor.id));
             for window in HISTORY_WINDOWS {
+                let standard = crate::history::binding(descriptor.key, window).unwrap_or_default();
+                context.insert_string(&format!("{}.{window}.history", descriptor.key), &standard);
+                let duration = window_duration_seconds(window, usage);
+                let cycle = match (window_reset(window, usage), duration) {
+                    (Some(reset), Some(duration)) => crate::history::cycle_binding(
+                        descriptor.key,
+                        window,
+                        reset,
+                        std::time::Duration::from_secs(duration),
+                        crate::history::CYCLE_POINTS,
+                    ),
+                    _ => None,
+                };
                 context.insert_string(
-                    &format!("{}.{window}.history", descriptor.key),
-                    crate::history::binding(descriptor.key, window).unwrap_or_default(),
+                    &format!("{}.{window}.history.cycle", descriptor.key),
+                    &cycle.unwrap_or_else(|| standard.clone()),
+                );
+                context.insert(
+                    &format!("{}.{window}.window.seconds", descriptor.key),
+                    duration.unwrap_or(0) as f64,
                 );
             }
         }
@@ -2994,6 +3012,35 @@ pub fn validate_template(template: &str, context: &DataContext) -> Vec<String> {
 
 /// Provider with the most headroom on its tightest window, and that headroom in
 /// percentage points. `None` when no enabled provider reported anything.
+/// The provider window whose report this binding describes. A missing label
+/// means the provider's documented default; Cursor's Auto/API windows have no
+/// fixed length and stay on the plain 24-hour sparkline.
+fn window_duration_seconds(window: &str, usage: Option<&crate::models::UsageData>) -> Option<u64> {
+    match window {
+        "session" | "five_hour" => Some(5 * 3_600),
+        "monthly" => Some(30 * 24 * 3_600),
+        "weekly" => match usage.and_then(|usage| usage.weekly_label.as_deref()) {
+            Some("30d") => Some(30 * 24 * 3_600),
+            Some("Auto") | Some("API") => None,
+            _ => Some(7 * 24 * 3_600),
+        },
+        _ => None,
+    }
+}
+
+fn window_reset(
+    window: &str,
+    usage: Option<&crate::models::UsageData>,
+) -> Option<std::time::SystemTime> {
+    let usage = usage?;
+    match window {
+        "session" | "five_hour" => usage.session.resets_at,
+        "weekly" => usage.weekly.resets_at,
+        "monthly" => usage.monthly.as_ref().and_then(|section| section.resets_at),
+        _ => None,
+    }
+}
+
 fn recommended_provider(
     data: Option<&AppUsageData>,
     providers: ProviderSet,
