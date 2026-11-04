@@ -68,25 +68,119 @@
           "height": "76"
         },
         {
+          "id": "claude-axis-100",
+          "name": "claude chart 100",
+          "parent": "claude-provider",
+          "render": "claude.available",
+          "x": "312",
+          "y": "10",
+          "width": "86",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "100%",
+            "font_family": "Segoe UI",
+            "font_size": "7",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "claude-grid-25",
+          "name": "claude chart grid 25",
+          "parent": "claude-provider",
+          "render": "claude.available",
+          "x": "312",
+          "y": "35",
+          "width": "86",
+          "height": "1",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#9AA0A624"
+            }
+          }
+        },
+        {
+          "id": "claude-grid-50",
+          "name": "claude chart grid 50",
+          "parent": "claude-provider",
+          "render": "claude.available",
+          "x": "312",
+          "y": "46",
+          "width": "86",
+          "height": "1",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#9AA0A624"
+            }
+          }
+        },
+        {
+          "id": "claude-grid-75",
+          "name": "claude chart grid 75",
+          "parent": "claude-provider",
+          "render": "claude.available",
+          "x": "312",
+          "y": "57",
+          "width": "86",
+          "height": "1",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#9AA0A624"
+            }
+          }
+        },
+        {
+          "id": "claude-axis-0",
+          "name": "claude chart 0",
+          "parent": "claude-provider",
+          "render": "claude.available",
+          "x": "312",
+          "y": "69",
+          "width": "86",
+          "height": "7",
+          "content": {
+            "type": "text",
+            "template": "0%",
+            "font_family": "Segoe UI",
+            "font_size": "7",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
           "id": "claude-chart-weekly",
           "name": "claude usage history (7d)",
           "parent": "claude-provider",
           "render": "claude.weekly.available",
-          "x": "334",
+          "x": "312",
           "y": "24",
-          "width": "64",
+          "width": "86",
           "height": "44",
           "content": {
             "type": "sparkline",
             "source": "claude.weekly.history",
             "color": {
-              "color": "#D97757",
-              "opacity": "0.55 + 0.45 * (1 - claude.five_hour.available)"
+              "color": "#DA9E7F"
             },
             "fill": {
               "color": "#00000000"
             },
-            "invert": "display.countdown"
+            "invert": "display.countdown",
+            "line_width": "1.5 + 0.5 * (1 - claude.five_hour.available)"
           }
         },
         {
@@ -94,9 +188,9 @@
           "name": "claude usage history (5h)",
           "parent": "claude-provider",
           "render": "claude.five_hour.available",
-          "x": "334",
+          "x": "312",
           "y": "24",
-          "width": "64",
+          "width": "86",
           "height": "44",
           "content": {
             "type": "sparkline",
@@ -107,7 +201,8 @@
             "fill": {
               "color": "#00000000"
             },
-            "invert": "display.countdown"
+            "invert": "display.countdown",
+            "line_width": "2"
           }
         },
         {
@@ -254,7 +349,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#B6BCC4FF"
+              "color": "#D97757"
             }
           }
         },
@@ -263,9 +358,9 @@
           "name": "claude-session-value-dark",
           "parent": "claude-provider",
           "render": "system.dark && claude.five_hour.available",
-          "x": "246",
+          "x": "240",
           "y": "29",
-          "width": "80",
+          "width": "64",
           "height": "14",
           "content": {
             "type": "text",
@@ -323,7 +418,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#B6BCC4FF"
+              "color": "#DA9E7F"
             }
           }
         },
@@ -332,9 +427,9 @@
           "name": "claude-weekly-value-dark",
           "parent": "claude-provider",
           "render": "system.dark && claude.weekly.available",
-          "x": "246",
+          "x": "240",
           "y": "49",
-          "width": "80",
+          "width": "64",
           "height": "14",
           "content": {
             "type": "text",
@@ -415,7 +510,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#4A4F55FF"
+              "color": "#D97757"
             }
           }
         },
@@ -424,9 +519,9 @@
           "name": "claude-session-value-light",
           "parent": "claude-provider",
           "render": "1 - system.dark && claude.five_hour.available",
-          "x": "246",
+          "x": "240",
           "y": "29",
-          "width": "80",
+          "width": "64",
           "height": "14",
           "content": {
             "type": "text",
@@ -484,7 +579,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#4A4F55FF"
+              "color": "#B38268"
             }
           }
         },
@@ -493,9 +588,9 @@
           "name": "claude-weekly-value-light",
           "parent": "claude-provider",
           "render": "1 - system.dark && claude.weekly.available",
-          "x": "246",
+          "x": "240",
           "y": "49",
-          "width": "80",
+          "width": "64",
           "height": "14",
           "content": {
             "type": "text",
@@ -572,7 +667,7 @@
             "value": "claude.weekly.display",
             "direction": "left_to_right",
             "fill": {
-              "color": "#D97757"
+              "color": "#DA9E7F"
             },
             "track": {
               "color": "#FFFFFF1A"
@@ -591,25 +686,119 @@
           "height": "76"
         },
         {
+          "id": "codex-axis-100",
+          "name": "codex chart 100",
+          "parent": "codex-provider",
+          "render": "codex.available",
+          "x": "312",
+          "y": "10",
+          "width": "86",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "100%",
+            "font_family": "Segoe UI",
+            "font_size": "7",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "codex-grid-25",
+          "name": "codex chart grid 25",
+          "parent": "codex-provider",
+          "render": "codex.available",
+          "x": "312",
+          "y": "35",
+          "width": "86",
+          "height": "1",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#9AA0A624"
+            }
+          }
+        },
+        {
+          "id": "codex-grid-50",
+          "name": "codex chart grid 50",
+          "parent": "codex-provider",
+          "render": "codex.available",
+          "x": "312",
+          "y": "46",
+          "width": "86",
+          "height": "1",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#9AA0A624"
+            }
+          }
+        },
+        {
+          "id": "codex-grid-75",
+          "name": "codex chart grid 75",
+          "parent": "codex-provider",
+          "render": "codex.available",
+          "x": "312",
+          "y": "57",
+          "width": "86",
+          "height": "1",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#9AA0A624"
+            }
+          }
+        },
+        {
+          "id": "codex-axis-0",
+          "name": "codex chart 0",
+          "parent": "codex-provider",
+          "render": "codex.available",
+          "x": "312",
+          "y": "69",
+          "width": "86",
+          "height": "7",
+          "content": {
+            "type": "text",
+            "template": "0%",
+            "font_family": "Segoe UI",
+            "font_size": "7",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
           "id": "codex-chart-weekly",
           "name": "codex usage history (7d)",
           "parent": "codex-provider",
           "render": "codex.weekly.available",
-          "x": "334",
+          "x": "312",
           "y": "24",
-          "width": "64",
+          "width": "86",
           "height": "44",
           "content": {
             "type": "sparkline",
             "source": "codex.weekly.history",
             "color": {
-              "color": "#10A37F",
-              "opacity": "0.55 + 0.45 * (1 - codex.five_hour.available)"
+              "color": "#1CBFA8"
             },
             "fill": {
               "color": "#00000000"
             },
-            "invert": "display.countdown"
+            "invert": "display.countdown",
+            "line_width": "1.5 + 0.5 * (1 - codex.five_hour.available)"
           }
         },
         {
@@ -617,9 +806,9 @@
           "name": "codex usage history (5h)",
           "parent": "codex-provider",
           "render": "codex.five_hour.available",
-          "x": "334",
+          "x": "312",
           "y": "24",
-          "width": "64",
+          "width": "86",
           "height": "44",
           "content": {
             "type": "sparkline",
@@ -630,7 +819,8 @@
             "fill": {
               "color": "#00000000"
             },
-            "invert": "display.countdown"
+            "invert": "display.countdown",
+            "line_width": "2"
           }
         },
         {
@@ -777,7 +967,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#B6BCC4FF"
+              "color": "#10A37F"
             }
           }
         },
@@ -786,9 +976,9 @@
           "name": "codex-session-value-dark",
           "parent": "codex-provider",
           "render": "system.dark && codex.five_hour.available",
-          "x": "246",
+          "x": "240",
           "y": "29",
-          "width": "80",
+          "width": "64",
           "height": "14",
           "content": {
             "type": "text",
@@ -846,7 +1036,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#B6BCC4FF"
+              "color": "#1CBFA8"
             }
           }
         },
@@ -855,9 +1045,9 @@
           "name": "codex-weekly-value-dark",
           "parent": "codex-provider",
           "render": "system.dark && codex.weekly.available",
-          "x": "246",
+          "x": "240",
           "y": "49",
-          "width": "80",
+          "width": "64",
           "height": "14",
           "content": {
             "type": "text",
@@ -938,7 +1128,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#4A4F55FF"
+              "color": "#10A37F"
             }
           }
         },
@@ -947,9 +1137,9 @@
           "name": "codex-session-value-light",
           "parent": "codex-provider",
           "render": "1 - system.dark && codex.five_hour.available",
-          "x": "246",
+          "x": "240",
           "y": "29",
-          "width": "80",
+          "width": "64",
           "height": "14",
           "content": {
             "type": "text",
@@ -1007,7 +1197,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#4A4F55FF"
+              "color": "#179D8A"
             }
           }
         },
@@ -1016,9 +1206,9 @@
           "name": "codex-weekly-value-light",
           "parent": "codex-provider",
           "render": "1 - system.dark && codex.weekly.available",
-          "x": "246",
+          "x": "240",
           "y": "49",
-          "width": "80",
+          "width": "64",
           "height": "14",
           "content": {
             "type": "text",
@@ -1095,7 +1285,7 @@
             "value": "codex.weekly.display",
             "direction": "left_to_right",
             "fill": {
-              "color": "#10A37F"
+              "color": "#1CBFA8"
             },
             "track": {
               "color": "#FFFFFF1A"
@@ -1114,25 +1304,119 @@
           "height": "76"
         },
         {
+          "id": "antigravity-axis-100",
+          "name": "antigravity chart 100",
+          "parent": "antigravity-provider",
+          "render": "antigravity.available",
+          "x": "312",
+          "y": "10",
+          "width": "86",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "100%",
+            "font_family": "Segoe UI",
+            "font_size": "7",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "antigravity-grid-25",
+          "name": "antigravity chart grid 25",
+          "parent": "antigravity-provider",
+          "render": "antigravity.available",
+          "x": "312",
+          "y": "35",
+          "width": "86",
+          "height": "1",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#9AA0A624"
+            }
+          }
+        },
+        {
+          "id": "antigravity-grid-50",
+          "name": "antigravity chart grid 50",
+          "parent": "antigravity-provider",
+          "render": "antigravity.available",
+          "x": "312",
+          "y": "46",
+          "width": "86",
+          "height": "1",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#9AA0A624"
+            }
+          }
+        },
+        {
+          "id": "antigravity-grid-75",
+          "name": "antigravity chart grid 75",
+          "parent": "antigravity-provider",
+          "render": "antigravity.available",
+          "x": "312",
+          "y": "57",
+          "width": "86",
+          "height": "1",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#9AA0A624"
+            }
+          }
+        },
+        {
+          "id": "antigravity-axis-0",
+          "name": "antigravity chart 0",
+          "parent": "antigravity-provider",
+          "render": "antigravity.available",
+          "x": "312",
+          "y": "69",
+          "width": "86",
+          "height": "7",
+          "content": {
+            "type": "text",
+            "template": "0%",
+            "font_family": "Segoe UI",
+            "font_size": "7",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
           "id": "antigravity-chart-weekly",
           "name": "antigravity usage history (7d)",
           "parent": "antigravity-provider",
           "render": "antigravity.weekly.available",
-          "x": "334",
+          "x": "312",
           "y": "24",
-          "width": "64",
+          "width": "86",
           "height": "44",
           "content": {
             "type": "sparkline",
             "source": "antigravity.weekly.history",
             "color": {
-              "color": "#4285F4",
-              "opacity": "0.55 + 0.45 * (1 - antigravity.five_hour.available)"
+              "color": "#6F93F0"
             },
             "fill": {
               "color": "#00000000"
             },
-            "invert": "display.countdown"
+            "invert": "display.countdown",
+            "line_width": "1.5 + 0.5 * (1 - antigravity.five_hour.available)"
           }
         },
         {
@@ -1140,9 +1424,9 @@
           "name": "antigravity usage history (5h)",
           "parent": "antigravity-provider",
           "render": "antigravity.five_hour.available",
-          "x": "334",
+          "x": "312",
           "y": "24",
-          "width": "64",
+          "width": "86",
           "height": "44",
           "content": {
             "type": "sparkline",
@@ -1153,7 +1437,8 @@
             "fill": {
               "color": "#00000000"
             },
-            "invert": "display.countdown"
+            "invert": "display.countdown",
+            "line_width": "2"
           }
         },
         {
@@ -1300,7 +1585,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#B6BCC4FF"
+              "color": "#4285F4"
             }
           }
         },
@@ -1309,9 +1594,9 @@
           "name": "antigravity-session-value-dark",
           "parent": "antigravity-provider",
           "render": "system.dark && antigravity.five_hour.available",
-          "x": "246",
+          "x": "240",
           "y": "29",
-          "width": "80",
+          "width": "64",
           "height": "14",
           "content": {
             "type": "text",
@@ -1369,7 +1654,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#B6BCC4FF"
+              "color": "#6F93F0"
             }
           }
         },
@@ -1378,9 +1663,9 @@
           "name": "antigravity-weekly-value-dark",
           "parent": "antigravity-provider",
           "render": "system.dark && antigravity.weekly.available",
-          "x": "246",
+          "x": "240",
           "y": "49",
-          "width": "80",
+          "width": "64",
           "height": "14",
           "content": {
             "type": "text",
@@ -1461,7 +1746,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#4A4F55FF"
+              "color": "#4285F4"
             }
           }
         },
@@ -1470,9 +1755,9 @@
           "name": "antigravity-session-value-light",
           "parent": "antigravity-provider",
           "render": "1 - system.dark && antigravity.five_hour.available",
-          "x": "246",
+          "x": "240",
           "y": "29",
-          "width": "80",
+          "width": "64",
           "height": "14",
           "content": {
             "type": "text",
@@ -1530,7 +1815,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#4A4F55FF"
+              "color": "#5B79C5"
             }
           }
         },
@@ -1539,9 +1824,9 @@
           "name": "antigravity-weekly-value-light",
           "parent": "antigravity-provider",
           "render": "1 - system.dark && antigravity.weekly.available",
-          "x": "246",
+          "x": "240",
           "y": "49",
-          "width": "80",
+          "width": "64",
           "height": "14",
           "content": {
             "type": "text",
@@ -1618,7 +1903,7 @@
             "value": "antigravity.weekly.display",
             "direction": "left_to_right",
             "fill": {
-              "color": "#4285F4"
+              "color": "#6F93F0"
             },
             "track": {
               "color": "#FFFFFF1A"
@@ -1637,25 +1922,119 @@
           "height": "76 + 20 * opencode.monthly.available"
         },
         {
+          "id": "opencode-axis-100",
+          "name": "opencode chart 100",
+          "parent": "opencode-provider",
+          "render": "opencode.available",
+          "x": "312",
+          "y": "10",
+          "width": "86",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "100%",
+            "font_family": "Segoe UI",
+            "font_size": "7",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "opencode-grid-25",
+          "name": "opencode chart grid 25",
+          "parent": "opencode-provider",
+          "render": "opencode.available",
+          "x": "312",
+          "y": "35 + 5 * opencode.monthly.available",
+          "width": "86",
+          "height": "1",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#9AA0A624"
+            }
+          }
+        },
+        {
+          "id": "opencode-grid-50",
+          "name": "opencode chart grid 50",
+          "parent": "opencode-provider",
+          "render": "opencode.available",
+          "x": "312",
+          "y": "46 + 10 * opencode.monthly.available",
+          "width": "86",
+          "height": "1",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#9AA0A624"
+            }
+          }
+        },
+        {
+          "id": "opencode-grid-75",
+          "name": "opencode chart grid 75",
+          "parent": "opencode-provider",
+          "render": "opencode.available",
+          "x": "312",
+          "y": "57 + 15 * opencode.monthly.available",
+          "width": "86",
+          "height": "1",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#9AA0A624"
+            }
+          }
+        },
+        {
+          "id": "opencode-axis-0",
+          "name": "opencode chart 0",
+          "parent": "opencode-provider",
+          "render": "opencode.available",
+          "x": "312",
+          "y": "69 + 20 * opencode.monthly.available",
+          "width": "86",
+          "height": "7",
+          "content": {
+            "type": "text",
+            "template": "0%",
+            "font_family": "Segoe UI",
+            "font_size": "7",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
           "id": "opencode-chart-monthly",
           "name": "opencode usage history (30d)",
           "parent": "opencode-provider",
           "render": "opencode.monthly.available",
-          "x": "334",
+          "x": "312",
           "y": "24",
-          "width": "64",
+          "width": "86",
           "height": "44 + 20 * opencode.monthly.available",
           "content": {
             "type": "sparkline",
             "source": "opencode.monthly.history",
             "color": {
-              "color": "#8B5CF6",
-              "opacity": "0.4 + 0.6 * (1 - opencode.five_hour.available) * (1 - opencode.weekly.available)"
+              "color": "#6646E3"
             },
             "fill": {
               "color": "#00000000"
             },
-            "invert": "display.countdown"
+            "invert": "display.countdown",
+            "line_width": "1 + 0.6 * (1 - opencode.five_hour.available) * (1 - opencode.weekly.available)"
           }
         },
         {
@@ -1663,21 +2042,21 @@
           "name": "opencode usage history (7d)",
           "parent": "opencode-provider",
           "render": "opencode.weekly.available",
-          "x": "334",
+          "x": "312",
           "y": "24",
-          "width": "64",
+          "width": "86",
           "height": "44 + 20 * opencode.monthly.available",
           "content": {
             "type": "sparkline",
             "source": "opencode.weekly.history",
             "color": {
-              "color": "#8B5CF6",
-              "opacity": "0.55 + 0.45 * (1 - opencode.five_hour.available)"
+              "color": "#B388F3"
             },
             "fill": {
               "color": "#00000000"
             },
-            "invert": "display.countdown"
+            "invert": "display.countdown",
+            "line_width": "1.5 + 0.5 * (1 - opencode.five_hour.available)"
           }
         },
         {
@@ -1685,9 +2064,9 @@
           "name": "opencode usage history (5h)",
           "parent": "opencode-provider",
           "render": "opencode.five_hour.available",
-          "x": "334",
+          "x": "312",
           "y": "24",
-          "width": "64",
+          "width": "86",
           "height": "44 + 20 * opencode.monthly.available",
           "content": {
             "type": "sparkline",
@@ -1698,7 +2077,8 @@
             "fill": {
               "color": "#00000000"
             },
-            "invert": "display.countdown"
+            "invert": "display.countdown",
+            "line_width": "2"
           }
         },
         {
@@ -1845,7 +2225,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#B6BCC4FF"
+              "color": "#8B5CF6"
             }
           }
         },
@@ -1854,9 +2234,9 @@
           "name": "opencode-session-value-dark",
           "parent": "opencode-provider",
           "render": "system.dark && opencode.five_hour.available",
-          "x": "246",
+          "x": "240",
           "y": "29",
-          "width": "80",
+          "width": "64",
           "height": "14",
           "content": {
             "type": "text",
@@ -1914,7 +2294,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#B6BCC4FF"
+              "color": "#B388F3"
             }
           }
         },
@@ -1923,9 +2303,9 @@
           "name": "opencode-weekly-value-dark",
           "parent": "opencode-provider",
           "render": "system.dark && opencode.weekly.available",
-          "x": "246",
+          "x": "240",
           "y": "49",
-          "width": "80",
+          "width": "64",
           "height": "14",
           "content": {
             "type": "text",
@@ -2006,7 +2386,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#4A4F55FF"
+              "color": "#8B5CF6"
             }
           }
         },
@@ -2015,9 +2395,9 @@
           "name": "opencode-session-value-light",
           "parent": "opencode-provider",
           "render": "1 - system.dark && opencode.five_hour.available",
-          "x": "246",
+          "x": "240",
           "y": "29",
-          "width": "80",
+          "width": "64",
           "height": "14",
           "content": {
             "type": "text",
@@ -2075,7 +2455,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#4A4F55FF"
+              "color": "#9370C7"
             }
           }
         },
@@ -2084,9 +2464,9 @@
           "name": "opencode-weekly-value-light",
           "parent": "opencode-provider",
           "render": "1 - system.dark && opencode.weekly.available",
-          "x": "246",
+          "x": "240",
           "y": "49",
-          "width": "80",
+          "width": "64",
           "height": "14",
           "content": {
             "type": "text",
@@ -2163,7 +2543,7 @@
             "value": "opencode.weekly.display",
             "direction": "left_to_right",
             "fill": {
-              "color": "#8B5CF6"
+              "color": "#B388F3"
             },
             "track": {
               "color": "#FFFFFF1A"
@@ -2192,7 +2572,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#B6BCC4FF"
+              "color": "#6646E3"
             }
           }
         },
@@ -2215,7 +2595,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#4A4F55FF"
+              "color": "#5439BA"
             }
           }
         },
@@ -2224,9 +2604,9 @@
           "name": "opencode-monthly-value-dark",
           "parent": "opencode-provider",
           "render": "system.dark && opencode.monthly.available",
-          "x": "246",
+          "x": "240",
           "y": "69",
-          "width": "80",
+          "width": "64",
           "height": "14",
           "content": {
             "type": "text",
@@ -2247,9 +2627,9 @@
           "name": "opencode-monthly-value-light",
           "parent": "opencode-provider",
           "render": "1 - system.dark && opencode.monthly.available",
-          "x": "246",
+          "x": "240",
           "y": "69",
-          "width": "80",
+          "width": "64",
           "height": "14",
           "content": {
             "type": "text",
@@ -2325,7 +2705,7 @@
             "value": "opencode.monthly.display",
             "direction": "left_to_right",
             "fill": {
-              "color": "#8B5CF6"
+              "color": "#6646E3"
             },
             "track": {
               "color": "#FFFFFF1A"
@@ -2344,25 +2724,119 @@
           "height": "76"
         },
         {
+          "id": "cursor-axis-100",
+          "name": "cursor chart 100",
+          "parent": "cursor-provider",
+          "render": "cursor.available",
+          "x": "312",
+          "y": "10",
+          "width": "86",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "100%",
+            "font_family": "Segoe UI",
+            "font_size": "7",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "cursor-grid-25",
+          "name": "cursor chart grid 25",
+          "parent": "cursor-provider",
+          "render": "cursor.available",
+          "x": "312",
+          "y": "35",
+          "width": "86",
+          "height": "1",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#9AA0A624"
+            }
+          }
+        },
+        {
+          "id": "cursor-grid-50",
+          "name": "cursor chart grid 50",
+          "parent": "cursor-provider",
+          "render": "cursor.available",
+          "x": "312",
+          "y": "46",
+          "width": "86",
+          "height": "1",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#9AA0A624"
+            }
+          }
+        },
+        {
+          "id": "cursor-grid-75",
+          "name": "cursor chart grid 75",
+          "parent": "cursor-provider",
+          "render": "cursor.available",
+          "x": "312",
+          "y": "57",
+          "width": "86",
+          "height": "1",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#9AA0A624"
+            }
+          }
+        },
+        {
+          "id": "cursor-axis-0",
+          "name": "cursor chart 0",
+          "parent": "cursor-provider",
+          "render": "cursor.available",
+          "x": "312",
+          "y": "69",
+          "width": "86",
+          "height": "7",
+          "content": {
+            "type": "text",
+            "template": "0%",
+            "font_family": "Segoe UI",
+            "font_size": "7",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
           "id": "cursor-chart-weekly",
           "name": "cursor usage history (7d)",
           "parent": "cursor-provider",
           "render": "cursor.weekly.available",
-          "x": "334",
+          "x": "312",
           "y": "24",
-          "width": "64",
+          "width": "86",
           "height": "44",
           "content": {
             "type": "sparkline",
             "source": "cursor.weekly.history",
             "color": {
-              "color": "#9CA3AF",
-              "opacity": "0.55 + 0.45 * (1 - cursor.five_hour.available)"
+              "color": "#B7BCC5"
             },
             "fill": {
               "color": "#00000000"
             },
-            "invert": "display.countdown"
+            "invert": "display.countdown",
+            "line_width": "1.5 + 0.5 * (1 - cursor.five_hour.available)"
           }
         },
         {
@@ -2370,9 +2844,9 @@
           "name": "cursor usage history (5h)",
           "parent": "cursor-provider",
           "render": "cursor.five_hour.available",
-          "x": "334",
+          "x": "312",
           "y": "24",
-          "width": "64",
+          "width": "86",
           "height": "44",
           "content": {
             "type": "sparkline",
@@ -2383,7 +2857,8 @@
             "fill": {
               "color": "#00000000"
             },
-            "invert": "display.countdown"
+            "invert": "display.countdown",
+            "line_width": "2"
           }
         },
         {
@@ -2530,7 +3005,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#B6BCC4FF"
+              "color": "#9CA3AF"
             }
           }
         },
@@ -2539,9 +3014,9 @@
           "name": "cursor-session-value-dark",
           "parent": "cursor-provider",
           "render": "system.dark && cursor.five_hour.available",
-          "x": "246",
+          "x": "240",
           "y": "29",
-          "width": "80",
+          "width": "64",
           "height": "14",
           "content": {
             "type": "text",
@@ -2599,7 +3074,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#B6BCC4FF"
+              "color": "#B7BCC5"
             }
           }
         },
@@ -2608,9 +3083,9 @@
           "name": "cursor-weekly-value-dark",
           "parent": "cursor-provider",
           "render": "system.dark && cursor.weekly.available",
-          "x": "246",
+          "x": "240",
           "y": "49",
-          "width": "80",
+          "width": "64",
           "height": "14",
           "content": {
             "type": "text",
@@ -2691,7 +3166,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#4A4F55FF"
+              "color": "#9CA3AF"
             }
           }
         },
@@ -2700,9 +3175,9 @@
           "name": "cursor-session-value-light",
           "parent": "cursor-provider",
           "render": "1 - system.dark && cursor.five_hour.available",
-          "x": "246",
+          "x": "240",
           "y": "29",
-          "width": "80",
+          "width": "64",
           "height": "14",
           "content": {
             "type": "text",
@@ -2760,7 +3235,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#4A4F55FF"
+              "color": "#969AA2"
             }
           }
         },
@@ -2769,9 +3244,9 @@
           "name": "cursor-weekly-value-light",
           "parent": "cursor-provider",
           "render": "1 - system.dark && cursor.weekly.available",
-          "x": "246",
+          "x": "240",
           "y": "49",
-          "width": "80",
+          "width": "64",
           "height": "14",
           "content": {
             "type": "text",
@@ -2848,7 +3323,7 @@
             "value": "cursor.weekly.display",
             "direction": "left_to_right",
             "fill": {
-              "color": "#9CA3AF"
+              "color": "#B7BCC5"
             },
             "track": {
               "color": "#FFFFFF1A"
@@ -2867,25 +3342,119 @@
           "height": "76"
         },
         {
+          "id": "grok-axis-100",
+          "name": "grok chart 100",
+          "parent": "grok-provider",
+          "render": "grok.available",
+          "x": "312",
+          "y": "10",
+          "width": "86",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "100%",
+            "font_family": "Segoe UI",
+            "font_size": "7",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "grok-grid-25",
+          "name": "grok chart grid 25",
+          "parent": "grok-provider",
+          "render": "grok.available",
+          "x": "312",
+          "y": "35",
+          "width": "86",
+          "height": "1",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#9AA0A624"
+            }
+          }
+        },
+        {
+          "id": "grok-grid-50",
+          "name": "grok chart grid 50",
+          "parent": "grok-provider",
+          "render": "grok.available",
+          "x": "312",
+          "y": "46",
+          "width": "86",
+          "height": "1",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#9AA0A624"
+            }
+          }
+        },
+        {
+          "id": "grok-grid-75",
+          "name": "grok chart grid 75",
+          "parent": "grok-provider",
+          "render": "grok.available",
+          "x": "312",
+          "y": "57",
+          "width": "86",
+          "height": "1",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#9AA0A624"
+            }
+          }
+        },
+        {
+          "id": "grok-axis-0",
+          "name": "grok chart 0",
+          "parent": "grok-provider",
+          "render": "grok.available",
+          "x": "312",
+          "y": "69",
+          "width": "86",
+          "height": "7",
+          "content": {
+            "type": "text",
+            "template": "0%",
+            "font_family": "Segoe UI",
+            "font_size": "7",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
           "id": "grok-chart-weekly",
           "name": "grok usage history (7d)",
           "parent": "grok-provider",
           "render": "grok.weekly.available",
-          "x": "334",
+          "x": "312",
           "y": "24",
-          "width": "64",
+          "width": "86",
           "height": "44",
           "content": {
             "type": "sparkline",
             "source": "grok.weekly.history",
             "color": {
-              "color": "#E5E7EB",
-              "opacity": "0.55 + 0.45 * (1 - grok.five_hour.available)"
+              "color": "#E2E4E9"
             },
             "fill": {
               "color": "#00000000"
             },
-            "invert": "display.countdown"
+            "invert": "display.countdown",
+            "line_width": "1.5 + 0.5 * (1 - grok.five_hour.available)"
           }
         },
         {
@@ -2893,9 +3462,9 @@
           "name": "grok usage history (5h)",
           "parent": "grok-provider",
           "render": "grok.five_hour.available",
-          "x": "334",
+          "x": "312",
           "y": "24",
-          "width": "64",
+          "width": "86",
           "height": "44",
           "content": {
             "type": "sparkline",
@@ -2906,7 +3475,8 @@
             "fill": {
               "color": "#00000000"
             },
-            "invert": "display.countdown"
+            "invert": "display.countdown",
+            "line_width": "2"
           }
         },
         {
@@ -3053,7 +3623,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#B6BCC4FF"
+              "color": "#E5E7EB"
             }
           }
         },
@@ -3062,9 +3632,9 @@
           "name": "grok-session-value-dark",
           "parent": "grok-provider",
           "render": "system.dark && grok.five_hour.available",
-          "x": "246",
+          "x": "240",
           "y": "29",
-          "width": "80",
+          "width": "64",
           "height": "14",
           "content": {
             "type": "text",
@@ -3122,7 +3692,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#B6BCC4FF"
+              "color": "#E2E4E9"
             }
           }
         },
@@ -3131,9 +3701,9 @@
           "name": "grok-weekly-value-dark",
           "parent": "grok-provider",
           "render": "system.dark && grok.weekly.available",
-          "x": "246",
+          "x": "240",
           "y": "49",
-          "width": "80",
+          "width": "64",
           "height": "14",
           "content": {
             "type": "text",
@@ -3214,7 +3784,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#4A4F55FF"
+              "color": "#E5E7EB"
             }
           }
         },
@@ -3223,9 +3793,9 @@
           "name": "grok-session-value-light",
           "parent": "grok-provider",
           "render": "1 - system.dark && grok.five_hour.available",
-          "x": "246",
+          "x": "240",
           "y": "29",
-          "width": "80",
+          "width": "64",
           "height": "14",
           "content": {
             "type": "text",
@@ -3283,7 +3853,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#4A4F55FF"
+              "color": "#B9BBBF"
             }
           }
         },
@@ -3292,9 +3862,9 @@
           "name": "grok-weekly-value-light",
           "parent": "grok-provider",
           "render": "1 - system.dark && grok.weekly.available",
-          "x": "246",
+          "x": "240",
           "y": "49",
-          "width": "80",
+          "width": "64",
           "height": "14",
           "content": {
             "type": "text",
@@ -3371,7 +3941,7 @@
             "value": "grok.weekly.display",
             "direction": "left_to_right",
             "fill": {
-              "color": "#E5E7EB"
+              "color": "#E2E4E9"
             },
             "track": {
               "color": "#FFFFFF1A"
@@ -3390,25 +3960,119 @@
           "height": "76"
         },
         {
+          "id": "copilot-axis-100",
+          "name": "copilot chart 100",
+          "parent": "copilot-provider",
+          "render": "copilot.available",
+          "x": "312",
+          "y": "10",
+          "width": "86",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "100%",
+            "font_family": "Segoe UI",
+            "font_size": "7",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "copilot-grid-25",
+          "name": "copilot chart grid 25",
+          "parent": "copilot-provider",
+          "render": "copilot.available",
+          "x": "312",
+          "y": "35",
+          "width": "86",
+          "height": "1",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#9AA0A624"
+            }
+          }
+        },
+        {
+          "id": "copilot-grid-50",
+          "name": "copilot chart grid 50",
+          "parent": "copilot-provider",
+          "render": "copilot.available",
+          "x": "312",
+          "y": "46",
+          "width": "86",
+          "height": "1",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#9AA0A624"
+            }
+          }
+        },
+        {
+          "id": "copilot-grid-75",
+          "name": "copilot chart grid 75",
+          "parent": "copilot-provider",
+          "render": "copilot.available",
+          "x": "312",
+          "y": "57",
+          "width": "86",
+          "height": "1",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#9AA0A624"
+            }
+          }
+        },
+        {
+          "id": "copilot-axis-0",
+          "name": "copilot chart 0",
+          "parent": "copilot-provider",
+          "render": "copilot.available",
+          "x": "312",
+          "y": "69",
+          "width": "86",
+          "height": "7",
+          "content": {
+            "type": "text",
+            "template": "0%",
+            "font_family": "Segoe UI",
+            "font_size": "7",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
           "id": "copilot-chart-weekly",
           "name": "copilot usage history (7d)",
           "parent": "copilot-provider",
           "render": "copilot.weekly.available",
-          "x": "334",
+          "x": "312",
           "y": "24",
-          "width": "64",
+          "width": "86",
           "height": "44",
           "content": {
             "type": "sparkline",
             "source": "copilot.weekly.history",
             "color": {
-              "color": "#6E7681",
-              "opacity": "0.55 + 0.45 * (1 - copilot.five_hour.available)"
+              "color": "#878F99"
             },
             "fill": {
               "color": "#00000000"
             },
-            "invert": "display.countdown"
+            "invert": "display.countdown",
+            "line_width": "1.5 + 0.5 * (1 - copilot.five_hour.available)"
           }
         },
         {
@@ -3416,9 +4080,9 @@
           "name": "copilot usage history (5h)",
           "parent": "copilot-provider",
           "render": "copilot.five_hour.available",
-          "x": "334",
+          "x": "312",
           "y": "24",
-          "width": "64",
+          "width": "86",
           "height": "44",
           "content": {
             "type": "sparkline",
@@ -3429,7 +4093,8 @@
             "fill": {
               "color": "#00000000"
             },
-            "invert": "display.countdown"
+            "invert": "display.countdown",
+            "line_width": "2"
           }
         },
         {
@@ -3576,7 +4241,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#B6BCC4FF"
+              "color": "#6E7681"
             }
           }
         },
@@ -3585,9 +4250,9 @@
           "name": "copilot-session-value-dark",
           "parent": "copilot-provider",
           "render": "system.dark && copilot.five_hour.available",
-          "x": "246",
+          "x": "240",
           "y": "29",
-          "width": "80",
+          "width": "64",
           "height": "14",
           "content": {
             "type": "text",
@@ -3645,7 +4310,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#B6BCC4FF"
+              "color": "#878F99"
             }
           }
         },
@@ -3654,9 +4319,9 @@
           "name": "copilot-weekly-value-dark",
           "parent": "copilot-provider",
           "render": "system.dark && copilot.weekly.available",
-          "x": "246",
+          "x": "240",
           "y": "49",
-          "width": "80",
+          "width": "64",
           "height": "14",
           "content": {
             "type": "text",
@@ -3737,7 +4402,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#4A4F55FF"
+              "color": "#6E7681"
             }
           }
         },
@@ -3746,9 +4411,9 @@
           "name": "copilot-session-value-light",
           "parent": "copilot-provider",
           "render": "1 - system.dark && copilot.five_hour.available",
-          "x": "246",
+          "x": "240",
           "y": "29",
-          "width": "80",
+          "width": "64",
           "height": "14",
           "content": {
             "type": "text",
@@ -3806,7 +4471,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#4A4F55FF"
+              "color": "#6F757D"
             }
           }
         },
@@ -3815,9 +4480,9 @@
           "name": "copilot-weekly-value-light",
           "parent": "copilot-provider",
           "render": "1 - system.dark && copilot.weekly.available",
-          "x": "246",
+          "x": "240",
           "y": "49",
-          "width": "80",
+          "width": "64",
           "height": "14",
           "content": {
             "type": "text",
@@ -3894,7 +4559,7 @@
             "value": "copilot.weekly.display",
             "direction": "left_to_right",
             "fill": {
-              "color": "#6E7681"
+              "color": "#878F99"
             },
             "track": {
               "color": "#FFFFFF1A"
@@ -3913,25 +4578,119 @@
           "height": "76 + 20 * commandcode.monthly.available"
         },
         {
+          "id": "commandcode-axis-100",
+          "name": "commandcode chart 100",
+          "parent": "commandcode-provider",
+          "render": "commandcode.available",
+          "x": "312",
+          "y": "10",
+          "width": "86",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "100%",
+            "font_family": "Segoe UI",
+            "font_size": "7",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "commandcode-grid-25",
+          "name": "commandcode chart grid 25",
+          "parent": "commandcode-provider",
+          "render": "commandcode.available",
+          "x": "312",
+          "y": "35 + 5 * commandcode.monthly.available",
+          "width": "86",
+          "height": "1",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#9AA0A624"
+            }
+          }
+        },
+        {
+          "id": "commandcode-grid-50",
+          "name": "commandcode chart grid 50",
+          "parent": "commandcode-provider",
+          "render": "commandcode.available",
+          "x": "312",
+          "y": "46 + 10 * commandcode.monthly.available",
+          "width": "86",
+          "height": "1",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#9AA0A624"
+            }
+          }
+        },
+        {
+          "id": "commandcode-grid-75",
+          "name": "commandcode chart grid 75",
+          "parent": "commandcode-provider",
+          "render": "commandcode.available",
+          "x": "312",
+          "y": "57 + 15 * commandcode.monthly.available",
+          "width": "86",
+          "height": "1",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#9AA0A624"
+            }
+          }
+        },
+        {
+          "id": "commandcode-axis-0",
+          "name": "commandcode chart 0",
+          "parent": "commandcode-provider",
+          "render": "commandcode.available",
+          "x": "312",
+          "y": "69 + 20 * commandcode.monthly.available",
+          "width": "86",
+          "height": "7",
+          "content": {
+            "type": "text",
+            "template": "0%",
+            "font_family": "Segoe UI",
+            "font_size": "7",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
           "id": "commandcode-chart-monthly",
           "name": "commandcode usage history (30d)",
           "parent": "commandcode-provider",
           "render": "commandcode.monthly.available",
-          "x": "334",
+          "x": "312",
           "y": "24",
-          "width": "64",
+          "width": "86",
           "height": "44 + 20 * commandcode.monthly.available",
           "content": {
             "type": "sparkline",
             "source": "commandcode.monthly.history",
             "color": {
-              "color": "#E0A458",
-              "opacity": "0.4 + 0.6 * (1 - commandcode.five_hour.available) * (1 - commandcode.weekly.available)"
+              "color": "#C78249"
             },
             "fill": {
               "color": "#00000000"
             },
-            "invert": "display.countdown"
+            "invert": "display.countdown",
+            "line_width": "1 + 0.6 * (1 - commandcode.five_hour.available) * (1 - commandcode.weekly.available)"
           }
         },
         {
@@ -3939,21 +4698,21 @@
           "name": "commandcode usage history (7d)",
           "parent": "commandcode-provider",
           "render": "commandcode.weekly.available",
-          "x": "334",
+          "x": "312",
           "y": "24",
-          "width": "64",
+          "width": "86",
           "height": "44 + 20 * commandcode.monthly.available",
           "content": {
             "type": "sparkline",
             "source": "commandcode.weekly.history",
             "color": {
-              "color": "#E0A458",
-              "opacity": "0.55 + 0.45 * (1 - commandcode.five_hour.available)"
+              "color": "#E0C081"
             },
             "fill": {
               "color": "#00000000"
             },
-            "invert": "display.countdown"
+            "invert": "display.countdown",
+            "line_width": "1.5 + 0.5 * (1 - commandcode.five_hour.available)"
           }
         },
         {
@@ -3961,9 +4720,9 @@
           "name": "commandcode usage history (5h)",
           "parent": "commandcode-provider",
           "render": "commandcode.five_hour.available",
-          "x": "334",
+          "x": "312",
           "y": "24",
-          "width": "64",
+          "width": "86",
           "height": "44 + 20 * commandcode.monthly.available",
           "content": {
             "type": "sparkline",
@@ -3974,7 +4733,8 @@
             "fill": {
               "color": "#00000000"
             },
-            "invert": "display.countdown"
+            "invert": "display.countdown",
+            "line_width": "2"
           }
         },
         {
@@ -4121,7 +4881,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#B6BCC4FF"
+              "color": "#E0A458"
             }
           }
         },
@@ -4130,9 +4890,9 @@
           "name": "commandcode-session-value-dark",
           "parent": "commandcode-provider",
           "render": "system.dark && commandcode.five_hour.available",
-          "x": "246",
+          "x": "240",
           "y": "29",
-          "width": "80",
+          "width": "64",
           "height": "14",
           "content": {
             "type": "text",
@@ -4190,7 +4950,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#B6BCC4FF"
+              "color": "#E0C081"
             }
           }
         },
@@ -4199,9 +4959,9 @@
           "name": "commandcode-weekly-value-dark",
           "parent": "commandcode-provider",
           "render": "system.dark && commandcode.weekly.available",
-          "x": "246",
+          "x": "240",
           "y": "49",
-          "width": "80",
+          "width": "64",
           "height": "14",
           "content": {
             "type": "text",
@@ -4282,7 +5042,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#4A4F55FF"
+              "color": "#E0A458"
             }
           }
         },
@@ -4291,9 +5051,9 @@
           "name": "commandcode-session-value-light",
           "parent": "commandcode-provider",
           "render": "1 - system.dark && commandcode.five_hour.available",
-          "x": "246",
+          "x": "240",
           "y": "29",
-          "width": "80",
+          "width": "64",
           "height": "14",
           "content": {
             "type": "text",
@@ -4351,7 +5111,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#4A4F55FF"
+              "color": "#B89D6A"
             }
           }
         },
@@ -4360,9 +5120,9 @@
           "name": "commandcode-weekly-value-light",
           "parent": "commandcode-provider",
           "render": "1 - system.dark && commandcode.weekly.available",
-          "x": "246",
+          "x": "240",
           "y": "49",
-          "width": "80",
+          "width": "64",
           "height": "14",
           "content": {
             "type": "text",
@@ -4439,7 +5199,7 @@
             "value": "commandcode.weekly.display",
             "direction": "left_to_right",
             "fill": {
-              "color": "#E0A458"
+              "color": "#E0C081"
             },
             "track": {
               "color": "#FFFFFF1A"
@@ -4468,7 +5228,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#B6BCC4FF"
+              "color": "#C78249"
             }
           }
         },
@@ -4491,7 +5251,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#4A4F55FF"
+              "color": "#A36B3C"
             }
           }
         },
@@ -4500,9 +5260,9 @@
           "name": "commandcode-monthly-value-dark",
           "parent": "commandcode-provider",
           "render": "system.dark && commandcode.monthly.available",
-          "x": "246",
+          "x": "240",
           "y": "69",
-          "width": "80",
+          "width": "64",
           "height": "14",
           "content": {
             "type": "text",
@@ -4523,9 +5283,9 @@
           "name": "commandcode-monthly-value-light",
           "parent": "commandcode-provider",
           "render": "1 - system.dark && commandcode.monthly.available",
-          "x": "246",
+          "x": "240",
           "y": "69",
-          "width": "80",
+          "width": "64",
           "height": "14",
           "content": {
             "type": "text",
@@ -4601,7 +5361,7 @@
             "value": "commandcode.monthly.display",
             "direction": "left_to_right",
             "fill": {
-              "color": "#E0A458"
+              "color": "#C78249"
             },
             "track": {
               "color": "#FFFFFF1A"
@@ -4620,13 +5380,107 @@
           "height": "76"
         },
         {
+          "id": "deepseek-axis-100",
+          "name": "deepseek chart 100",
+          "parent": "deepseek-provider",
+          "render": "deepseek.available",
+          "x": "312",
+          "y": "10",
+          "width": "86",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "100%",
+            "font_family": "Segoe UI",
+            "font_size": "7",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "deepseek-grid-25",
+          "name": "deepseek chart grid 25",
+          "parent": "deepseek-provider",
+          "render": "deepseek.available",
+          "x": "312",
+          "y": "35",
+          "width": "86",
+          "height": "1",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#9AA0A624"
+            }
+          }
+        },
+        {
+          "id": "deepseek-grid-50",
+          "name": "deepseek chart grid 50",
+          "parent": "deepseek-provider",
+          "render": "deepseek.available",
+          "x": "312",
+          "y": "46",
+          "width": "86",
+          "height": "1",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#9AA0A624"
+            }
+          }
+        },
+        {
+          "id": "deepseek-grid-75",
+          "name": "deepseek chart grid 75",
+          "parent": "deepseek-provider",
+          "render": "deepseek.available",
+          "x": "312",
+          "y": "57",
+          "width": "86",
+          "height": "1",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#9AA0A624"
+            }
+          }
+        },
+        {
+          "id": "deepseek-axis-0",
+          "name": "deepseek chart 0",
+          "parent": "deepseek-provider",
+          "render": "deepseek.available",
+          "x": "312",
+          "y": "69",
+          "width": "86",
+          "height": "7",
+          "content": {
+            "type": "text",
+            "template": "0%",
+            "font_family": "Segoe UI",
+            "font_size": "7",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
           "id": "deepseek-chart-credits",
           "name": "deepseek usage history (balance)",
           "parent": "deepseek-provider",
           "render": "deepseek.credits.available",
-          "x": "334",
+          "x": "312",
           "y": "24",
-          "width": "64",
+          "width": "86",
           "height": "44",
           "content": {
             "type": "sparkline",
@@ -4637,7 +5491,8 @@
             "fill": {
               "color": "#00000000"
             },
-            "invert": "display.countdown"
+            "invert": "display.countdown",
+            "line_width": "2"
           }
         },
         {
@@ -4721,7 +5576,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#B6BCC4FF"
+              "color": "#4D6BFE"
             }
           }
         },
@@ -4744,7 +5599,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#4A4F55FF"
+              "color": "#4D6BFE"
             }
           }
         },
@@ -4753,9 +5608,9 @@
           "name": "deepseek-balance-value-dark",
           "parent": "deepseek-provider",
           "render": "system.dark && deepseek.credits.available",
-          "x": "246",
+          "x": "240",
           "y": "29",
-          "width": "80",
+          "width": "64",
           "height": "14",
           "content": {
             "type": "text",
@@ -4776,9 +5631,9 @@
           "name": "deepseek-balance-value-light",
           "parent": "deepseek-provider",
           "render": "1 - system.dark && deepseek.credits.available",
-          "x": "246",
+          "x": "240",
           "y": "29",
-          "width": "80",
+          "width": "64",
           "height": "14",
           "content": {
             "type": "text",
@@ -4846,9 +5701,9 @@
           "name": "deepseek-eta-value-dark",
           "parent": "deepseek-provider",
           "render": "system.dark && deepseek.credits.available && deepseek.credits.eta.seconds > 0",
-          "x": "246",
+          "x": "240",
           "y": "49",
-          "width": "80",
+          "width": "64",
           "height": "14",
           "content": {
             "type": "text",
@@ -4892,9 +5747,9 @@
           "name": "deepseek-eta-value-light",
           "parent": "deepseek-provider",
           "render": "1 - system.dark && deepseek.credits.available && deepseek.credits.eta.seconds > 0",
-          "x": "246",
+          "x": "240",
           "y": "49",
-          "width": "80",
+          "width": "64",
           "height": "14",
           "content": {
             "type": "text",

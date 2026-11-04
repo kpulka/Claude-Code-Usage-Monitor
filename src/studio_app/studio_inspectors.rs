@@ -820,6 +820,7 @@ pub(super) fn layer_properties_inspector(
                 color: Paint::new("#D97757FF"),
                 fill: Paint::new("#D9775726"),
                 invert: 0.0.into(),
+                line_width: 1.0.into(),
             },
             _ => SceneContent::None,
         };

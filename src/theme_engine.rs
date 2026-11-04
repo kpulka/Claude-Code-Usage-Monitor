@@ -339,6 +339,10 @@ pub enum SceneContent {
         /// so a chart can follow the usage direction without a second element.
         #[serde(default)]
         invert: Expression,
+        /// Stroke width in logical pixels; a wider curve reads as the shorter
+        /// window when several series share a chart.
+        #[serde(default = "default_sparkline_line_width")]
+        line_width: Expression,
     },
 }
 
@@ -3128,6 +3132,10 @@ fn default_font_contrast() -> Expression {
 fn default_stroke_width() -> Expression {
     1.0.into()
 }
+fn default_sparkline_line_width() -> Expression {
+    1.0.into()
+}
+
 fn default_segment_gap() -> Expression {
     2.0.into()
 }

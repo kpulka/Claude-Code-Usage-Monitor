@@ -1089,6 +1089,7 @@ pub(super) fn render_object_content(
             color,
             fill,
             invert,
+            line_width,
         } => {
             // A binding name resolves to the series string; anything else is
             // treated as a template so a theme can inline its own values.
@@ -1106,6 +1107,9 @@ pub(super) fn render_object_content(
                 }
             }
             let fill = fill.resolve(context);
+            let line_width = evaluate(&line_width.0, context)
+                .unwrap_or(1.0)
+                .clamp(0.5, 8.0);
             draw_sparkline(
                 pixels,
                 width,
@@ -1114,6 +1118,7 @@ pub(super) fn render_object_content(
                 color.resolve(context),
                 // A fully transparent fill means "line only".
                 (fill.a > 0).then_some(fill),
+                line_width * scale,
             );
         }
     }
@@ -1143,6 +1148,7 @@ pub(super) fn draw_sparkline(
     points: &[Option<f64>],
     line: Rgba,
     fill: Option<Rgba>,
+    line_width: f64,
 ) {
     if width == 0 || height == 0 || points.is_empty() || points.iter().all(Option::is_none) {
         return;
@@ -1155,6 +1161,7 @@ pub(super) fn draw_sparkline(
         }
     };
     let y_of = |percent: f64| -> f64 { (height as f64 - 1.0) * (1.0 - percent / 100.0) };
+    let radius = (line_width * 0.5).max(0.35);
     if let Some(fill) = fill {
         let source = premultiply(fill);
         for x in 0..width {
@@ -1187,10 +1194,11 @@ pub(super) fn draw_sparkline(
                 (x_of(previous_index), y_of(previous_percent)),
                 current,
                 source,
+                radius,
             ),
             // A sample with no neighbour on either side is still worth a dot.
             None if !(index + 1..points.len()).any(|next| points[next].is_some()) => {
-                paint_sparkline_dot(pixels, width, height, current, 1.0, source)
+                paint_sparkline_dot(pixels, width, height, current, radius, source)
             }
             None => {}
         }
@@ -1229,10 +1237,11 @@ fn draw_sparkline_segment(
     from: (f64, f64),
     to: (f64, f64),
     source: u32,
+    radius: f64,
 ) {
     let length = ((to.0 - from.0).powi(2) + (to.1 - from.1).powi(2)).sqrt();
     if length <= 0.0 {
-        paint_sparkline_dot(pixels, width, height, from, 1.0, source);
+        paint_sparkline_dot(pixels, width, height, from, radius, source);
         return;
     }
     let steps = (length * 2.0).ceil().max(1.0) as u32;
@@ -1242,7 +1251,7 @@ fn draw_sparkline_segment(
             from.0 + (to.0 - from.0) * amount,
             from.1 + (to.1 - from.1) * amount,
         );
-        paint_sparkline_dot(pixels, width, height, point, 0.7, source);
+        paint_sparkline_dot(pixels, width, height, point, radius, source);
     }
 }
 

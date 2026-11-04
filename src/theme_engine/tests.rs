@@ -1141,6 +1141,7 @@ fn grid_panel_charts_share_the_group_height_without_touching_text() {
             );
             for text in children.iter().copied() {
                 if text.id.contains("-chart-")
+                    || text.id.contains("-grid-")
                     || evaluate(&text.render.0, &context).unwrap_or(1.0) == 0.0
                 {
                     continue;
@@ -3931,7 +3932,7 @@ fn sparkline_parser_reads_points_and_leaves_gaps() {
     assert_eq!(parse_sparkline_points("NaN,inf"), vec![None, None]);
 }
 
-fn sparkline_pixels(series: &str, invert: &str) -> Vec<u32> {
+fn sparkline_pixels(series: &str, invert: &str, line_width: f64) -> Vec<u32> {
     use super::theme_rendering::render_object_content;
 
     let mut object = SceneObject::object("sparkline-test", "Sparkline");
@@ -3948,6 +3949,7 @@ fn sparkline_pixels(series: &str, invert: &str) -> Vec<u32> {
             opacity: 1.0.into(),
         },
         invert: Expression(invert.into()),
+        line_width: line_width.into(),
     };
     let resolved = ResolvedObject {
         source: &object,
@@ -3973,7 +3975,7 @@ fn sparkline_pixels(series: &str, invert: &str) -> Vec<u32> {
 
 #[test]
 fn sparkline_draws_a_line_for_a_series_and_nothing_for_empty_data() {
-    let painted = sparkline_pixels("10,40,20,80,55", "0");
+    let painted = sparkline_pixels("10,40,20,80,55", "0", 1.0);
     assert!(
         painted.iter().filter(|pixel| **pixel != 0).count() >= 20,
         "a non-empty series must paint the line"
@@ -3982,7 +3984,7 @@ fn sparkline_draws_a_line_for_a_series_and_nothing_for_empty_data() {
     assert!(painted[0] == 0);
 
     for empty in ["", "   ", ",,,"] {
-        let pixels = sparkline_pixels(empty, "0");
+        let pixels = sparkline_pixels(empty, "0", 1.0);
         assert!(
             pixels.iter().all(|pixel| *pixel == 0),
             "empty data must draw nothing"
@@ -3990,7 +3992,7 @@ fn sparkline_draws_a_line_for_a_series_and_nothing_for_empty_data() {
     }
 
     // A single hour still leaves a dot behind.
-    let single = sparkline_pixels("42", "0");
+    let single = sparkline_pixels("42", "0", 1.0);
     assert!(single.iter().any(|pixel| *pixel != 0));
 }
 
@@ -3998,22 +4000,35 @@ fn sparkline_draws_a_line_for_a_series_and_nothing_for_empty_data() {
 fn sparkline_bridges_a_gap_between_samples() {
     let painted_column =
         |pixels: &[u32], column: usize| (0..10).any(|row| pixels[row * 84 + column] != 0);
-    let bridged = sparkline_pixels("10,,90", "0");
+    let bridged = sparkline_pixels("10,,90", "0", 1.0);
     assert!(
         painted_column(&bridged, 42),
         "the hour without a sample must be bridged"
     );
     // A gap before the first sample is not invented data.
-    let leading = sparkline_pixels(",10,90", "0");
+    let leading = sparkline_pixels(",10,90", "0", 1.0);
     assert!(!painted_column(&leading, 0));
+}
+
+#[test]
+fn sparkline_line_width_thickens_the_curve() {
+    let top = |pixels: &[u32], column: usize| (0..10).find(|row| pixels[row * 84 + column] != 0);
+    let thin = sparkline_pixels("50,50,50,50", "0", 1.0);
+    let thick = sparkline_pixels("50,50,50,50", "0", 4.0);
+    let thin_top = top(&thin, 42).expect("the thin line paints");
+    let thick_top = top(&thick, 42).expect("the thick line paints");
+    assert!(
+        thick_top < thin_top,
+        "a thicker line covers more rows above the same value: {thick_top} vs {thin_top}"
+    );
 }
 
 #[test]
 fn sparkline_invert_follows_the_usage_direction() {
     // The history records spend, so a 10% series sits low in the box; with
     // invert on, the same sample means 90% left and must sit near the top.
-    let used = sparkline_pixels("10", "0");
-    let remaining = sparkline_pixels("10", "1");
+    let used = sparkline_pixels("10", "0", 1.0);
+    let remaining = sparkline_pixels("10", "1", 1.0);
     let top_row = |pixels: &[u32]| {
         pixels
             .iter()

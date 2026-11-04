@@ -16,7 +16,7 @@ changes grouped into Added, Changed, Fixed, and Removed where applicable.
 - Polish translations for every string this fork introduced (the catalogue now carries 114 extra keys
   across all 14 locales, so no locale falls back to English for them).
 - Sparkline content takes an `invert` expression, so a chart can draw what is left when the card is
-  counting down instead of up.
+  counting down instead of up, and a `line_width` for charts that overlay several series.
 
 ### Changed
 
@@ -33,11 +33,14 @@ changes grouped into Added, Changed, Fixed, and Removed where applicable.
   publisher - pressing "Check for updates" can no longer replace this build with upstream.
 
 - "Grid panel" is 412px wide and overlays a provider's windows as curves on one chart in a right-hand
-  column whose height follows the number of rows and starts under the provider name. The shortest window
-  is drawn brightest and the longer ones sit behind it at a lower opacity, so three windows read as one
-  trend instead of three separate strips. The recommendation banner and the dead headline row are gone;
-  the provider with the most room is marked with a halo, and the burn or forecast warning is one marker
-  beside the ETA. A two-pixel border keeps the card's edge visible at 150% DPI.
+  column whose height follows the number of rows and starts under the provider name. The five-hour curve
+  is the thickest and keeps the provider accent; 7d and 30d step lighter and more muted, or darker and more
+  muted, with only a six-degree hue shift, so the three read as one colour family rather than three
+  different providers. The row labels and progress bars use the same three shades. The percentage column
+  moved next to the gauge, which widens the chart, and a 0-100% axis with faint 25/50/75 gridlines frames
+  it. The recommendation banner and the dead headline row are gone; the provider with the most room is
+  marked with a halo, and the burn or forecast warning is one marker beside the ETA. A two-pixel border
+  keeps the card's edge visible at 150% DPI.
 - A sparkline bridges an hour without a sample between two known points instead of breaking the trend into
   disconnected blocks. Gaps before the first and after the last sample still stay empty.
 
