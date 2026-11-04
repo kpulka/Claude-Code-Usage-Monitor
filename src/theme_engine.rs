@@ -343,6 +343,10 @@ pub enum SceneContent {
         /// window when several series share a chart.
         #[serde(default = "default_sparkline_line_width")]
         line_width: Expression,
+        /// Breaks the curve into dashes when the expression is non-zero. A
+        /// bright series can then recede without changing its colour.
+        #[serde(default)]
+        dashed: Expression,
     },
 }
 

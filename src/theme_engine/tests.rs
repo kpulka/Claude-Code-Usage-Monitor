@@ -3950,6 +3950,7 @@ fn sparkline_pixels(series: &str, invert: &str, line_width: f64) -> Vec<u32> {
         },
         invert: Expression(invert.into()),
         line_width: line_width.into(),
+        dashed: 0.0.into(),
     };
     let resolved = ResolvedObject {
         source: &object,
@@ -4020,6 +4021,27 @@ fn sparkline_line_width_thickens_the_curve() {
     assert!(
         thick_top < thin_top,
         "a thicker line covers more rows above the same value: {thick_top} vs {thin_top}"
+    );
+}
+
+#[test]
+fn sparkline_dashes_leave_gaps_in_the_curve() {
+    use super::theme_rendering::draw_sparkline;
+    let points = parse_sparkline_points("10,90,10,90");
+    let line = Rgba {
+        r: 255,
+        g: 255,
+        b: 255,
+        a: 255,
+    };
+    let painted = |dashed: bool| {
+        let mut pixels = vec![0u32; 84 * 10];
+        draw_sparkline(&mut pixels, 84, 10, &points, line, None, 1.5, dashed, 1.0);
+        pixels.iter().filter(|pixel| **pixel != 0).count()
+    };
+    assert!(
+        painted(true) < painted(false),
+        "a dashed curve must cover fewer pixels than a solid one"
     );
 }
 

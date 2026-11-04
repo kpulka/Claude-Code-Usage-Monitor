@@ -180,7 +180,8 @@
               "color": "#00000000"
             },
             "invert": "display.countdown",
-            "line_width": "1.5 + 0.5 * (1 - claude.five_hour.available)"
+            "line_width": "1.4 + 0.4 * (1 - claude.five_hour.available)",
+            "dashed": "0"
           }
         },
         {
@@ -202,7 +203,8 @@
               "color": "#00000000"
             },
             "invert": "display.countdown",
-            "line_width": "2"
+            "line_width": "1",
+            "dashed": "1"
           }
         },
         {
@@ -343,8 +345,8 @@
             "type": "text",
             "template": "{claude.session.label}",
             "font_family": "Segoe UI",
-            "font_size": "10",
-            "weight": "medium",
+            "font_size": "11",
+            "weight": "bold",
             "rendering": "clear_type",
             "contrast": "1",
             "align": "left",
@@ -412,8 +414,8 @@
             "type": "text",
             "template": "{claude.weekly.label}",
             "font_family": "Segoe UI",
-            "font_size": "10",
-            "weight": "medium",
+            "font_size": "11",
+            "weight": "bold",
             "rendering": "clear_type",
             "contrast": "1",
             "align": "left",
@@ -504,8 +506,8 @@
             "type": "text",
             "template": "{claude.session.label}",
             "font_family": "Segoe UI",
-            "font_size": "10",
-            "weight": "medium",
+            "font_size": "11",
+            "weight": "bold",
             "rendering": "clear_type",
             "contrast": "1",
             "align": "left",
@@ -573,8 +575,8 @@
             "type": "text",
             "template": "{claude.weekly.label}",
             "font_family": "Segoe UI",
-            "font_size": "10",
-            "weight": "medium",
+            "font_size": "11",
+            "weight": "bold",
             "rendering": "clear_type",
             "contrast": "1",
             "align": "left",
@@ -798,7 +800,8 @@
               "color": "#00000000"
             },
             "invert": "display.countdown",
-            "line_width": "1.5 + 0.5 * (1 - codex.five_hour.available)"
+            "line_width": "1.4 + 0.4 * (1 - codex.five_hour.available)",
+            "dashed": "0"
           }
         },
         {
@@ -820,7 +823,8 @@
               "color": "#00000000"
             },
             "invert": "display.countdown",
-            "line_width": "2"
+            "line_width": "1",
+            "dashed": "1"
           }
         },
         {
@@ -961,8 +965,8 @@
             "type": "text",
             "template": "{codex.session.label}",
             "font_family": "Segoe UI",
-            "font_size": "10",
-            "weight": "medium",
+            "font_size": "11",
+            "weight": "bold",
             "rendering": "clear_type",
             "contrast": "1",
             "align": "left",
@@ -1030,8 +1034,8 @@
             "type": "text",
             "template": "{codex.weekly.label}",
             "font_family": "Segoe UI",
-            "font_size": "10",
-            "weight": "medium",
+            "font_size": "11",
+            "weight": "bold",
             "rendering": "clear_type",
             "contrast": "1",
             "align": "left",
@@ -1122,8 +1126,8 @@
             "type": "text",
             "template": "{codex.session.label}",
             "font_family": "Segoe UI",
-            "font_size": "10",
-            "weight": "medium",
+            "font_size": "11",
+            "weight": "bold",
             "rendering": "clear_type",
             "contrast": "1",
             "align": "left",
@@ -1191,8 +1195,8 @@
             "type": "text",
             "template": "{codex.weekly.label}",
             "font_family": "Segoe UI",
-            "font_size": "10",
-            "weight": "medium",
+            "font_size": "11",
+            "weight": "bold",
             "rendering": "clear_type",
             "contrast": "1",
             "align": "left",
@@ -1416,7 +1420,8 @@
               "color": "#00000000"
             },
             "invert": "display.countdown",
-            "line_width": "1.5 + 0.5 * (1 - antigravity.five_hour.available)"
+            "line_width": "1.4 + 0.4 * (1 - antigravity.five_hour.available)",
+            "dashed": "0"
           }
         },
         {
@@ -1438,7 +1443,8 @@
               "color": "#00000000"
             },
             "invert": "display.countdown",
-            "line_width": "2"
+            "line_width": "1",
+            "dashed": "1"
           }
         },
         {
@@ -1579,8 +1585,8 @@
             "type": "text",
             "template": "{antigravity.session.label}",
             "font_family": "Segoe UI",
-            "font_size": "10",
-            "weight": "medium",
+            "font_size": "11",
+            "weight": "bold",
             "rendering": "clear_type",
             "contrast": "1",
             "align": "left",
@@ -1648,8 +1654,8 @@
             "type": "text",
             "template": "{antigravity.weekly.label}",
             "font_family": "Segoe UI",
-            "font_size": "10",
-            "weight": "medium",
+            "font_size": "11",
+            "weight": "bold",
             "rendering": "clear_type",
             "contrast": "1",
             "align": "left",
@@ -1740,8 +1746,8 @@
             "type": "text",
             "template": "{antigravity.session.label}",
             "font_family": "Segoe UI",
-            "font_size": "10",
-            "weight": "medium",
+            "font_size": "11",
+            "weight": "bold",
             "rendering": "clear_type",
             "contrast": "1",
             "align": "left",
@@ -1809,8 +1815,8 @@
             "type": "text",
             "template": "{antigravity.weekly.label}",
             "font_family": "Segoe UI",
-            "font_size": "10",
-            "weight": "medium",
+            "font_size": "11",
+            "weight": "bold",
             "rendering": "clear_type",
             "contrast": "1",
             "align": "left",
@@ -2034,7 +2040,8 @@
               "color": "#00000000"
             },
             "invert": "display.countdown",
-            "line_width": "1 + 0.6 * (1 - opencode.five_hour.available) * (1 - opencode.weekly.available)"
+            "line_width": "2 + 0.2 * (1 - opencode.five_hour.available) * (1 - opencode.weekly.available)",
+            "dashed": "0"
           }
         },
         {
@@ -2056,7 +2063,8 @@
               "color": "#00000000"
             },
             "invert": "display.countdown",
-            "line_width": "1.5 + 0.5 * (1 - opencode.five_hour.available)"
+            "line_width": "1.4 + 0.4 * (1 - opencode.five_hour.available)",
+            "dashed": "0"
           }
         },
         {
@@ -2078,7 +2086,8 @@
               "color": "#00000000"
             },
             "invert": "display.countdown",
-            "line_width": "2"
+            "line_width": "1",
+            "dashed": "1"
           }
         },
         {
@@ -2219,8 +2228,8 @@
             "type": "text",
             "template": "{opencode.session.label}",
             "font_family": "Segoe UI",
-            "font_size": "10",
-            "weight": "medium",
+            "font_size": "11",
+            "weight": "bold",
             "rendering": "clear_type",
             "contrast": "1",
             "align": "left",
@@ -2288,8 +2297,8 @@
             "type": "text",
             "template": "{opencode.weekly.label}",
             "font_family": "Segoe UI",
-            "font_size": "10",
-            "weight": "medium",
+            "font_size": "11",
+            "weight": "bold",
             "rendering": "clear_type",
             "contrast": "1",
             "align": "left",
@@ -2380,8 +2389,8 @@
             "type": "text",
             "template": "{opencode.session.label}",
             "font_family": "Segoe UI",
-            "font_size": "10",
-            "weight": "medium",
+            "font_size": "11",
+            "weight": "bold",
             "rendering": "clear_type",
             "contrast": "1",
             "align": "left",
@@ -2449,8 +2458,8 @@
             "type": "text",
             "template": "{opencode.weekly.label}",
             "font_family": "Segoe UI",
-            "font_size": "10",
-            "weight": "medium",
+            "font_size": "11",
+            "weight": "bold",
             "rendering": "clear_type",
             "contrast": "1",
             "align": "left",
@@ -2566,8 +2575,8 @@
             "type": "text",
             "template": "{opencode.monthly.label}",
             "font_family": "Segoe UI",
-            "font_size": "10",
-            "weight": "medium",
+            "font_size": "11",
+            "weight": "bold",
             "rendering": "clear_type",
             "contrast": "1",
             "align": "left",
@@ -2589,8 +2598,8 @@
             "type": "text",
             "template": "{opencode.monthly.label}",
             "font_family": "Segoe UI",
-            "font_size": "10",
-            "weight": "medium",
+            "font_size": "11",
+            "weight": "bold",
             "rendering": "clear_type",
             "contrast": "1",
             "align": "left",
@@ -2836,7 +2845,8 @@
               "color": "#00000000"
             },
             "invert": "display.countdown",
-            "line_width": "1.5 + 0.5 * (1 - cursor.five_hour.available)"
+            "line_width": "1.4 + 0.4 * (1 - cursor.five_hour.available)",
+            "dashed": "0"
           }
         },
         {
@@ -2858,7 +2868,8 @@
               "color": "#00000000"
             },
             "invert": "display.countdown",
-            "line_width": "2"
+            "line_width": "1",
+            "dashed": "1"
           }
         },
         {
@@ -2999,8 +3010,8 @@
             "type": "text",
             "template": "{cursor.session.label}",
             "font_family": "Segoe UI",
-            "font_size": "10",
-            "weight": "medium",
+            "font_size": "11",
+            "weight": "bold",
             "rendering": "clear_type",
             "contrast": "1",
             "align": "left",
@@ -3068,8 +3079,8 @@
             "type": "text",
             "template": "{cursor.weekly.label}",
             "font_family": "Segoe UI",
-            "font_size": "10",
-            "weight": "medium",
+            "font_size": "11",
+            "weight": "bold",
             "rendering": "clear_type",
             "contrast": "1",
             "align": "left",
@@ -3160,8 +3171,8 @@
             "type": "text",
             "template": "{cursor.session.label}",
             "font_family": "Segoe UI",
-            "font_size": "10",
-            "weight": "medium",
+            "font_size": "11",
+            "weight": "bold",
             "rendering": "clear_type",
             "contrast": "1",
             "align": "left",
@@ -3229,8 +3240,8 @@
             "type": "text",
             "template": "{cursor.weekly.label}",
             "font_family": "Segoe UI",
-            "font_size": "10",
-            "weight": "medium",
+            "font_size": "11",
+            "weight": "bold",
             "rendering": "clear_type",
             "contrast": "1",
             "align": "left",
@@ -3454,7 +3465,8 @@
               "color": "#00000000"
             },
             "invert": "display.countdown",
-            "line_width": "1.5 + 0.5 * (1 - grok.five_hour.available)"
+            "line_width": "1.4 + 0.4 * (1 - grok.five_hour.available)",
+            "dashed": "0"
           }
         },
         {
@@ -3476,7 +3488,8 @@
               "color": "#00000000"
             },
             "invert": "display.countdown",
-            "line_width": "2"
+            "line_width": "1",
+            "dashed": "1"
           }
         },
         {
@@ -3617,8 +3630,8 @@
             "type": "text",
             "template": "{grok.session.label}",
             "font_family": "Segoe UI",
-            "font_size": "10",
-            "weight": "medium",
+            "font_size": "11",
+            "weight": "bold",
             "rendering": "clear_type",
             "contrast": "1",
             "align": "left",
@@ -3686,8 +3699,8 @@
             "type": "text",
             "template": "{grok.weekly.label}",
             "font_family": "Segoe UI",
-            "font_size": "10",
-            "weight": "medium",
+            "font_size": "11",
+            "weight": "bold",
             "rendering": "clear_type",
             "contrast": "1",
             "align": "left",
@@ -3778,8 +3791,8 @@
             "type": "text",
             "template": "{grok.session.label}",
             "font_family": "Segoe UI",
-            "font_size": "10",
-            "weight": "medium",
+            "font_size": "11",
+            "weight": "bold",
             "rendering": "clear_type",
             "contrast": "1",
             "align": "left",
@@ -3847,8 +3860,8 @@
             "type": "text",
             "template": "{grok.weekly.label}",
             "font_family": "Segoe UI",
-            "font_size": "10",
-            "weight": "medium",
+            "font_size": "11",
+            "weight": "bold",
             "rendering": "clear_type",
             "contrast": "1",
             "align": "left",
@@ -4072,7 +4085,8 @@
               "color": "#00000000"
             },
             "invert": "display.countdown",
-            "line_width": "1.5 + 0.5 * (1 - copilot.five_hour.available)"
+            "line_width": "1.4 + 0.4 * (1 - copilot.five_hour.available)",
+            "dashed": "0"
           }
         },
         {
@@ -4094,7 +4108,8 @@
               "color": "#00000000"
             },
             "invert": "display.countdown",
-            "line_width": "2"
+            "line_width": "1",
+            "dashed": "1"
           }
         },
         {
@@ -4235,8 +4250,8 @@
             "type": "text",
             "template": "{copilot.session.label}",
             "font_family": "Segoe UI",
-            "font_size": "10",
-            "weight": "medium",
+            "font_size": "11",
+            "weight": "bold",
             "rendering": "clear_type",
             "contrast": "1",
             "align": "left",
@@ -4304,8 +4319,8 @@
             "type": "text",
             "template": "{copilot.weekly.label}",
             "font_family": "Segoe UI",
-            "font_size": "10",
-            "weight": "medium",
+            "font_size": "11",
+            "weight": "bold",
             "rendering": "clear_type",
             "contrast": "1",
             "align": "left",
@@ -4396,8 +4411,8 @@
             "type": "text",
             "template": "{copilot.session.label}",
             "font_family": "Segoe UI",
-            "font_size": "10",
-            "weight": "medium",
+            "font_size": "11",
+            "weight": "bold",
             "rendering": "clear_type",
             "contrast": "1",
             "align": "left",
@@ -4465,8 +4480,8 @@
             "type": "text",
             "template": "{copilot.weekly.label}",
             "font_family": "Segoe UI",
-            "font_size": "10",
-            "weight": "medium",
+            "font_size": "11",
+            "weight": "bold",
             "rendering": "clear_type",
             "contrast": "1",
             "align": "left",
@@ -4690,7 +4705,8 @@
               "color": "#00000000"
             },
             "invert": "display.countdown",
-            "line_width": "1 + 0.6 * (1 - commandcode.five_hour.available) * (1 - commandcode.weekly.available)"
+            "line_width": "2 + 0.2 * (1 - commandcode.five_hour.available) * (1 - commandcode.weekly.available)",
+            "dashed": "0"
           }
         },
         {
@@ -4712,7 +4728,8 @@
               "color": "#00000000"
             },
             "invert": "display.countdown",
-            "line_width": "1.5 + 0.5 * (1 - commandcode.five_hour.available)"
+            "line_width": "1.4 + 0.4 * (1 - commandcode.five_hour.available)",
+            "dashed": "0"
           }
         },
         {
@@ -4734,7 +4751,8 @@
               "color": "#00000000"
             },
             "invert": "display.countdown",
-            "line_width": "2"
+            "line_width": "1",
+            "dashed": "1"
           }
         },
         {
@@ -4875,8 +4893,8 @@
             "type": "text",
             "template": "{commandcode.session.label}",
             "font_family": "Segoe UI",
-            "font_size": "10",
-            "weight": "medium",
+            "font_size": "11",
+            "weight": "bold",
             "rendering": "clear_type",
             "contrast": "1",
             "align": "left",
@@ -4944,8 +4962,8 @@
             "type": "text",
             "template": "{commandcode.weekly.label}",
             "font_family": "Segoe UI",
-            "font_size": "10",
-            "weight": "medium",
+            "font_size": "11",
+            "weight": "bold",
             "rendering": "clear_type",
             "contrast": "1",
             "align": "left",
@@ -5036,8 +5054,8 @@
             "type": "text",
             "template": "{commandcode.session.label}",
             "font_family": "Segoe UI",
-            "font_size": "10",
-            "weight": "medium",
+            "font_size": "11",
+            "weight": "bold",
             "rendering": "clear_type",
             "contrast": "1",
             "align": "left",
@@ -5105,8 +5123,8 @@
             "type": "text",
             "template": "{commandcode.weekly.label}",
             "font_family": "Segoe UI",
-            "font_size": "10",
-            "weight": "medium",
+            "font_size": "11",
+            "weight": "bold",
             "rendering": "clear_type",
             "contrast": "1",
             "align": "left",
@@ -5222,8 +5240,8 @@
             "type": "text",
             "template": "{commandcode.monthly.label}",
             "font_family": "Segoe UI",
-            "font_size": "10",
-            "weight": "medium",
+            "font_size": "11",
+            "weight": "bold",
             "rendering": "clear_type",
             "contrast": "1",
             "align": "left",
@@ -5245,8 +5263,8 @@
             "type": "text",
             "template": "{commandcode.monthly.label}",
             "font_family": "Segoe UI",
-            "font_size": "10",
-            "weight": "medium",
+            "font_size": "11",
+            "weight": "bold",
             "rendering": "clear_type",
             "contrast": "1",
             "align": "left",
@@ -5492,7 +5510,8 @@
               "color": "#00000000"
             },
             "invert": "display.countdown",
-            "line_width": "2"
+            "line_width": "2",
+            "dashed": "0"
           }
         },
         {
@@ -5570,8 +5589,8 @@
             "type": "text",
             "template": "{i18n.balance}",
             "font_family": "Segoe UI",
-            "font_size": "10",
-            "weight": "medium",
+            "font_size": "11",
+            "weight": "bold",
             "rendering": "clear_type",
             "contrast": "1",
             "align": "left",
@@ -5593,8 +5612,8 @@
             "type": "text",
             "template": "{i18n.balance}",
             "font_family": "Segoe UI",
-            "font_size": "10",
-            "weight": "medium",
+            "font_size": "11",
+            "weight": "bold",
             "rendering": "clear_type",
             "contrast": "1",
             "align": "left",

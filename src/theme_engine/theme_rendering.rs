@@ -1090,6 +1090,7 @@ pub(super) fn render_object_content(
             fill,
             invert,
             line_width,
+            dashed,
         } => {
             // A binding name resolves to the series string; anything else is
             // treated as a template so a theme can inline its own values.
@@ -1110,6 +1111,7 @@ pub(super) fn render_object_content(
             let line_width = evaluate(&line_width.0, context)
                 .unwrap_or(1.0)
                 .clamp(0.5, 8.0);
+            let dashed = evaluate(&dashed.0, context).unwrap_or(0.0) != 0.0;
             draw_sparkline(
                 pixels,
                 width,
@@ -1119,6 +1121,8 @@ pub(super) fn render_object_content(
                 // A fully transparent fill means "line only".
                 (fill.a > 0).then_some(fill),
                 line_width * scale,
+                dashed,
+                scale,
             );
         }
     }
@@ -1149,6 +1153,8 @@ pub(super) fn draw_sparkline(
     line: Rgba,
     fill: Option<Rgba>,
     line_width: f64,
+    dashed: bool,
+    scale: f64,
 ) {
     if width == 0 || height == 0 || points.is_empty() || points.iter().all(Option::is_none) {
         return;
@@ -1175,33 +1181,41 @@ pub(super) fn draw_sparkline(
         }
     }
     let source = premultiply(line);
-    for index in 0..points.len() {
-        let Some(percent) = points[index] else {
-            continue;
-        };
-        let current = (x_of(index), y_of(percent));
-        let previous = (0..index)
-            .rev()
-            .find_map(|previous| points[previous].map(|value| (previous, value)));
-        match previous {
-            // Bridge an hour without a sample: the chart keeps its trend
-            // instead of breaking into disconnected blocks. Leading and
-            // trailing gaps still stay empty.
-            Some((previous_index, previous_percent)) => draw_sparkline_segment(
-                pixels,
-                width,
-                height,
-                (x_of(previous_index), y_of(previous_percent)),
-                current,
-                source,
-                radius,
-            ),
-            // A sample with no neighbour on either side is still worth a dot.
-            None if !(index + 1..points.len()).any(|next| points[next].is_some()) => {
-                paint_sparkline_dot(pixels, width, height, current, radius, source)
-            }
-            None => {}
-        }
+    let samples = points
+        .iter()
+        .enumerate()
+        .filter_map(|(index, value)| value.map(|value| (index, value)))
+        .collect::<Vec<_>>();
+    if samples.len() == 1 {
+        let (index, percent) = samples[0];
+        paint_sparkline_dot(
+            pixels,
+            width,
+            height,
+            (x_of(index), y_of(percent)),
+            radius,
+            source,
+        );
+    }
+    let dash_on = 4.0 * scale;
+    let dash_off = 3.0 * scale;
+    let mut phase = 0.0;
+    for pair in samples.windows(2) {
+        let (from_index, from_percent) = pair[0];
+        let (to_index, to_percent) = pair[1];
+        draw_sparkline_segment(
+            pixels,
+            width,
+            height,
+            (x_of(from_index), y_of(from_percent)),
+            (x_of(to_index), y_of(to_percent)),
+            source,
+            radius,
+            dashed,
+            dash_on,
+            dash_off,
+            &mut phase,
+        );
     }
 }
 
@@ -1238,21 +1252,32 @@ fn draw_sparkline_segment(
     to: (f64, f64),
     source: u32,
     radius: f64,
+    dashed: bool,
+    dash_on: f64,
+    dash_off: f64,
+    phase: &mut f64,
 ) {
     let length = ((to.0 - from.0).powi(2) + (to.1 - from.1).powi(2)).sqrt();
+    let period = (dash_on + dash_off).max(1.0);
     if length <= 0.0 {
-        paint_sparkline_dot(pixels, width, height, from, radius, source);
+        if !dashed || *phase % period < dash_on {
+            paint_sparkline_dot(pixels, width, height, from, radius, source);
+        }
         return;
     }
     let steps = (length * 2.0).ceil().max(1.0) as u32;
     for step in 0..=steps {
         let amount = step as f64 / steps as f64;
+        if dashed && (*phase + length * amount) % period >= dash_on {
+            continue;
+        }
         let point = (
             from.0 + (to.0 - from.0) * amount,
             from.1 + (to.1 - from.1) * amount,
         );
         paint_sparkline_dot(pixels, width, height, point, radius, source);
     }
+    *phase += length;
 }
 
 /// Blend a soft dot so a sloped polyline does not look like a staircase.

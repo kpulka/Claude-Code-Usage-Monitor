@@ -34,12 +34,12 @@ changes grouped into Added, Changed, Fixed, and Removed where applicable.
 
 - "Grid panel" is 412px wide and overlays a provider's windows as curves on one chart in a right-hand
   column whose height follows the number of rows and starts under the provider name. The five-hour curve
-  is the thickest and brightest and keeps the provider accent; 7d and 30d step down in brightness and
-  saturation, with only a six-degree hue shift, so the longest window is the darkest and the three read as
-  one colour family rather than three different providers. The row labels and progress bars use the same
-  three shades. The percentage column
-  moved next to the gauge, which widens the chart, and a 0-100% axis with faint 25/50/75 gridlines frames
-  it. The recommendation banner and the dead headline row are gone; the provider with the most room is
+  keeps the provider accent and is the brightest, thinnest and dashed; 7d is a solid mid stroke; 30d is the
+  darkest and thickest, so a dim colour still reads. Brightness and saturation step down with only a
+  six-degree hue shift, keeping the three curves in one colour family rather than looking like three
+  providers. The row labels and progress bars use the same three shades, and the coloured 5h/7d/30d labels
+  are bold. The percentage column moved next to the gauge, which widens the chart, and a 0-100% axis with
+  faint 25/50/75 gridlines frames it. The recommendation banner and the dead headline row are gone; the provider with the most room is
   marked with a halo, and the burn or forecast warning is one marker beside the ETA. A two-pixel border
   keeps the card's edge visible at 150% DPI.
 - A sparkline bridges an hour without a sample between two known points instead of breaking the trend into
