@@ -32,11 +32,12 @@ changes grouped into Added, Changed, Fixed, and Removed where applicable.
   the package id and stays disabled here, because `CodeZeno.ClaudeCodeUsageMonitor` belongs to another
   publisher - pressing "Check for updates" can no longer replace this build with upstream.
 
-- "Grid panel" is 412px wide and gives every window its own sparkline in a right-hand column whose height
-  follows the number of rows and starts under the provider name. The recommendation banner and the dead
-  headline row are gone; the provider with the most room is marked with a halo, and the burn or forecast
-  warning is one marker beside the ETA. A two-pixel border keeps the card's edge visible at 150% DPI, and
-  the card's scrim is darker so its text stays readable over a light page.
+- "Grid panel" is 412px wide and overlays a provider's windows as curves on one chart in a right-hand
+  column whose height follows the number of rows and starts under the provider name. The shortest window
+  is drawn brightest and the longer ones sit behind it at a lower opacity, so three windows read as one
+  trend instead of three separate strips. The recommendation banner and the dead headline row are gone;
+  the provider with the most room is marked with a halo, and the burn or forecast warning is one marker
+  beside the ETA. A two-pixel border keeps the card's edge visible at 150% DPI.
 - A sparkline bridges an hour without a sample between two known points instead of breaking the trend into
   disconnected blocks. Gaps before the first and after the last sample still stay empty.
 

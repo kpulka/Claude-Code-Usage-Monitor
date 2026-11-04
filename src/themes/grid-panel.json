@@ -26,10 +26,10 @@
       "background": {
         "type": "gradient",
         "start": {
-          "color": "#16161CB4"
+          "color": "#1A1A206E"
         },
         "end": {
-          "color": "#0B0B10A8"
+          "color": "#0E0E1360"
         },
         "angle": "90"
       },
@@ -68,19 +68,20 @@
           "height": "76"
         },
         {
-          "id": "claude-chart-session",
-          "name": "claude usage history (5h)",
+          "id": "claude-chart-weekly",
+          "name": "claude usage history (7d)",
           "parent": "claude-provider",
-          "render": "claude.five_hour.available",
+          "render": "claude.weekly.available",
           "x": "334",
           "y": "24",
           "width": "64",
-          "height": "22",
+          "height": "44",
           "content": {
             "type": "sparkline",
-            "source": "claude.session.history",
+            "source": "claude.weekly.history",
             "color": {
-              "color": "#D97757"
+              "color": "#D97757",
+              "opacity": "0.55 + 0.45 * (1 - claude.five_hour.available)"
             },
             "fill": {
               "color": "#00000000"
@@ -89,17 +90,17 @@
           }
         },
         {
-          "id": "claude-chart-weekly",
-          "name": "claude usage history (7d)",
+          "id": "claude-chart-session",
+          "name": "claude usage history (5h)",
           "parent": "claude-provider",
-          "render": "claude.weekly.available",
+          "render": "claude.five_hour.available",
           "x": "334",
-          "y": "24 + 22 * claude.five_hour.available",
+          "y": "24",
           "width": "64",
-          "height": "22 + 22 * (1 - claude.five_hour.available)",
+          "height": "44",
           "content": {
             "type": "sparkline",
-            "source": "claude.weekly.history",
+            "source": "claude.session.history",
             "color": {
               "color": "#D97757"
             },
@@ -590,19 +591,20 @@
           "height": "76"
         },
         {
-          "id": "codex-chart-session",
-          "name": "codex usage history (5h)",
+          "id": "codex-chart-weekly",
+          "name": "codex usage history (7d)",
           "parent": "codex-provider",
-          "render": "codex.five_hour.available",
+          "render": "codex.weekly.available",
           "x": "334",
           "y": "24",
           "width": "64",
-          "height": "22",
+          "height": "44",
           "content": {
             "type": "sparkline",
-            "source": "codex.session.history",
+            "source": "codex.weekly.history",
             "color": {
-              "color": "#10A37F"
+              "color": "#10A37F",
+              "opacity": "0.55 + 0.45 * (1 - codex.five_hour.available)"
             },
             "fill": {
               "color": "#00000000"
@@ -611,17 +613,17 @@
           }
         },
         {
-          "id": "codex-chart-weekly",
-          "name": "codex usage history (7d)",
+          "id": "codex-chart-session",
+          "name": "codex usage history (5h)",
           "parent": "codex-provider",
-          "render": "codex.weekly.available",
+          "render": "codex.five_hour.available",
           "x": "334",
-          "y": "24 + 22 * codex.five_hour.available",
+          "y": "24",
           "width": "64",
-          "height": "22 + 22 * (1 - codex.five_hour.available)",
+          "height": "44",
           "content": {
             "type": "sparkline",
-            "source": "codex.weekly.history",
+            "source": "codex.session.history",
             "color": {
               "color": "#10A37F"
             },
@@ -1112,19 +1114,20 @@
           "height": "76"
         },
         {
-          "id": "antigravity-chart-session",
-          "name": "antigravity usage history (5h)",
+          "id": "antigravity-chart-weekly",
+          "name": "antigravity usage history (7d)",
           "parent": "antigravity-provider",
-          "render": "antigravity.five_hour.available",
+          "render": "antigravity.weekly.available",
           "x": "334",
           "y": "24",
           "width": "64",
-          "height": "22",
+          "height": "44",
           "content": {
             "type": "sparkline",
-            "source": "antigravity.session.history",
+            "source": "antigravity.weekly.history",
             "color": {
-              "color": "#4285F4"
+              "color": "#4285F4",
+              "opacity": "0.55 + 0.45 * (1 - antigravity.five_hour.available)"
             },
             "fill": {
               "color": "#00000000"
@@ -1133,17 +1136,17 @@
           }
         },
         {
-          "id": "antigravity-chart-weekly",
-          "name": "antigravity usage history (7d)",
+          "id": "antigravity-chart-session",
+          "name": "antigravity usage history (5h)",
           "parent": "antigravity-provider",
-          "render": "antigravity.weekly.available",
+          "render": "antigravity.five_hour.available",
           "x": "334",
-          "y": "24 + 22 * antigravity.five_hour.available",
+          "y": "24",
           "width": "64",
-          "height": "22 + 22 * (1 - antigravity.five_hour.available)",
+          "height": "44",
           "content": {
             "type": "sparkline",
-            "source": "antigravity.weekly.history",
+            "source": "antigravity.session.history",
             "color": {
               "color": "#4285F4"
             },
@@ -1634,19 +1637,20 @@
           "height": "76 + 20 * opencode.monthly.available"
         },
         {
-          "id": "opencode-chart-session",
-          "name": "opencode usage history (5h)",
+          "id": "opencode-chart-monthly",
+          "name": "opencode usage history (30d)",
           "parent": "opencode-provider",
-          "render": "opencode.five_hour.available",
+          "render": "opencode.monthly.available",
           "x": "334",
           "y": "24",
           "width": "64",
-          "height": "22",
+          "height": "44 + 20 * opencode.monthly.available",
           "content": {
             "type": "sparkline",
-            "source": "opencode.session.history",
+            "source": "opencode.monthly.history",
             "color": {
-              "color": "#8B5CF6"
+              "color": "#8B5CF6",
+              "opacity": "0.4 + 0.6 * (1 - opencode.five_hour.available) * (1 - opencode.weekly.available)"
             },
             "fill": {
               "color": "#00000000"
@@ -1660,14 +1664,15 @@
           "parent": "opencode-provider",
           "render": "opencode.weekly.available",
           "x": "334",
-          "y": "24 + 22 * opencode.five_hour.available",
+          "y": "24",
           "width": "64",
-          "height": "22 + 22 * (1 - opencode.five_hour.available)",
+          "height": "44 + 20 * opencode.monthly.available",
           "content": {
             "type": "sparkline",
             "source": "opencode.weekly.history",
             "color": {
-              "color": "#8B5CF6"
+              "color": "#8B5CF6",
+              "opacity": "0.55 + 0.45 * (1 - opencode.five_hour.available)"
             },
             "fill": {
               "color": "#00000000"
@@ -1676,17 +1681,17 @@
           }
         },
         {
-          "id": "opencode-chart-monthly",
-          "name": "opencode usage history (30d)",
+          "id": "opencode-chart-session",
+          "name": "opencode usage history (5h)",
           "parent": "opencode-provider",
-          "render": "opencode.monthly.available",
+          "render": "opencode.five_hour.available",
           "x": "334",
-          "y": "68",
+          "y": "24",
           "width": "64",
-          "height": "22",
+          "height": "44 + 20 * opencode.monthly.available",
           "content": {
             "type": "sparkline",
-            "source": "opencode.monthly.history",
+            "source": "opencode.session.history",
             "color": {
               "color": "#8B5CF6"
             },
@@ -2339,19 +2344,20 @@
           "height": "76"
         },
         {
-          "id": "cursor-chart-session",
-          "name": "cursor usage history (5h)",
+          "id": "cursor-chart-weekly",
+          "name": "cursor usage history (7d)",
           "parent": "cursor-provider",
-          "render": "cursor.five_hour.available",
+          "render": "cursor.weekly.available",
           "x": "334",
           "y": "24",
           "width": "64",
-          "height": "22",
+          "height": "44",
           "content": {
             "type": "sparkline",
-            "source": "cursor.session.history",
+            "source": "cursor.weekly.history",
             "color": {
-              "color": "#9CA3AF"
+              "color": "#9CA3AF",
+              "opacity": "0.55 + 0.45 * (1 - cursor.five_hour.available)"
             },
             "fill": {
               "color": "#00000000"
@@ -2360,17 +2366,17 @@
           }
         },
         {
-          "id": "cursor-chart-weekly",
-          "name": "cursor usage history (7d)",
+          "id": "cursor-chart-session",
+          "name": "cursor usage history (5h)",
           "parent": "cursor-provider",
-          "render": "cursor.weekly.available",
+          "render": "cursor.five_hour.available",
           "x": "334",
-          "y": "24 + 22 * cursor.five_hour.available",
+          "y": "24",
           "width": "64",
-          "height": "22 + 22 * (1 - cursor.five_hour.available)",
+          "height": "44",
           "content": {
             "type": "sparkline",
-            "source": "cursor.weekly.history",
+            "source": "cursor.session.history",
             "color": {
               "color": "#9CA3AF"
             },
@@ -2861,19 +2867,20 @@
           "height": "76"
         },
         {
-          "id": "grok-chart-session",
-          "name": "grok usage history (5h)",
+          "id": "grok-chart-weekly",
+          "name": "grok usage history (7d)",
           "parent": "grok-provider",
-          "render": "grok.five_hour.available",
+          "render": "grok.weekly.available",
           "x": "334",
           "y": "24",
           "width": "64",
-          "height": "22",
+          "height": "44",
           "content": {
             "type": "sparkline",
-            "source": "grok.session.history",
+            "source": "grok.weekly.history",
             "color": {
-              "color": "#E5E7EB"
+              "color": "#E5E7EB",
+              "opacity": "0.55 + 0.45 * (1 - grok.five_hour.available)"
             },
             "fill": {
               "color": "#00000000"
@@ -2882,17 +2889,17 @@
           }
         },
         {
-          "id": "grok-chart-weekly",
-          "name": "grok usage history (7d)",
+          "id": "grok-chart-session",
+          "name": "grok usage history (5h)",
           "parent": "grok-provider",
-          "render": "grok.weekly.available",
+          "render": "grok.five_hour.available",
           "x": "334",
-          "y": "24 + 22 * grok.five_hour.available",
+          "y": "24",
           "width": "64",
-          "height": "22 + 22 * (1 - grok.five_hour.available)",
+          "height": "44",
           "content": {
             "type": "sparkline",
-            "source": "grok.weekly.history",
+            "source": "grok.session.history",
             "color": {
               "color": "#E5E7EB"
             },
@@ -3383,19 +3390,20 @@
           "height": "76"
         },
         {
-          "id": "copilot-chart-session",
-          "name": "copilot usage history (5h)",
+          "id": "copilot-chart-weekly",
+          "name": "copilot usage history (7d)",
           "parent": "copilot-provider",
-          "render": "copilot.five_hour.available",
+          "render": "copilot.weekly.available",
           "x": "334",
           "y": "24",
           "width": "64",
-          "height": "22",
+          "height": "44",
           "content": {
             "type": "sparkline",
-            "source": "copilot.session.history",
+            "source": "copilot.weekly.history",
             "color": {
-              "color": "#6E7681"
+              "color": "#6E7681",
+              "opacity": "0.55 + 0.45 * (1 - copilot.five_hour.available)"
             },
             "fill": {
               "color": "#00000000"
@@ -3404,17 +3412,17 @@
           }
         },
         {
-          "id": "copilot-chart-weekly",
-          "name": "copilot usage history (7d)",
+          "id": "copilot-chart-session",
+          "name": "copilot usage history (5h)",
           "parent": "copilot-provider",
-          "render": "copilot.weekly.available",
+          "render": "copilot.five_hour.available",
           "x": "334",
-          "y": "24 + 22 * copilot.five_hour.available",
+          "y": "24",
           "width": "64",
-          "height": "22 + 22 * (1 - copilot.five_hour.available)",
+          "height": "44",
           "content": {
             "type": "sparkline",
-            "source": "copilot.weekly.history",
+            "source": "copilot.session.history",
             "color": {
               "color": "#6E7681"
             },
@@ -3905,19 +3913,20 @@
           "height": "76 + 20 * commandcode.monthly.available"
         },
         {
-          "id": "commandcode-chart-session",
-          "name": "commandcode usage history (5h)",
+          "id": "commandcode-chart-monthly",
+          "name": "commandcode usage history (30d)",
           "parent": "commandcode-provider",
-          "render": "commandcode.five_hour.available",
+          "render": "commandcode.monthly.available",
           "x": "334",
           "y": "24",
           "width": "64",
-          "height": "22",
+          "height": "44 + 20 * commandcode.monthly.available",
           "content": {
             "type": "sparkline",
-            "source": "commandcode.session.history",
+            "source": "commandcode.monthly.history",
             "color": {
-              "color": "#E0A458"
+              "color": "#E0A458",
+              "opacity": "0.4 + 0.6 * (1 - commandcode.five_hour.available) * (1 - commandcode.weekly.available)"
             },
             "fill": {
               "color": "#00000000"
@@ -3931,14 +3940,15 @@
           "parent": "commandcode-provider",
           "render": "commandcode.weekly.available",
           "x": "334",
-          "y": "24 + 22 * commandcode.five_hour.available",
+          "y": "24",
           "width": "64",
-          "height": "22 + 22 * (1 - commandcode.five_hour.available)",
+          "height": "44 + 20 * commandcode.monthly.available",
           "content": {
             "type": "sparkline",
             "source": "commandcode.weekly.history",
             "color": {
-              "color": "#E0A458"
+              "color": "#E0A458",
+              "opacity": "0.55 + 0.45 * (1 - commandcode.five_hour.available)"
             },
             "fill": {
               "color": "#00000000"
@@ -3947,17 +3957,17 @@
           }
         },
         {
-          "id": "commandcode-chart-monthly",
-          "name": "commandcode usage history (30d)",
+          "id": "commandcode-chart-session",
+          "name": "commandcode usage history (5h)",
           "parent": "commandcode-provider",
-          "render": "commandcode.monthly.available",
+          "render": "commandcode.five_hour.available",
           "x": "334",
-          "y": "68",
+          "y": "24",
           "width": "64",
-          "height": "22",
+          "height": "44 + 20 * commandcode.monthly.available",
           "content": {
             "type": "sparkline",
-            "source": "commandcode.monthly.history",
+            "source": "commandcode.session.history",
             "color": {
               "color": "#E0A458"
             },

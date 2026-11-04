@@ -1114,6 +1114,25 @@ fn grid_panel_charts_share_the_group_height_without_touching_text() {
             .map(|(_, rect)| rect.1)
             .fold(f64::INFINITY, f64::min);
         assert!(top <= 25.0, "{}: chart starts at {top}", group.id);
+        // Every window in a provider shares one chart area: the curves are
+        // overlaid, never split into separate bands.
+        let first = charts[0].1;
+        for (object, rect) in &charts {
+            assert!(
+                (rect.1 - first.1).abs() < f64::EPSILON && (rect.3 - first.3).abs() < f64::EPSILON,
+                "{} is split away from {}: {rect:?} vs {first:?}",
+                object.id,
+                charts[0].0.id
+            );
+        }
+        assert!(
+            charts
+                .last()
+                .is_some_and(|(object, _)| object.id.ends_with("-session")
+                    || object.id.ends_with("-credits")),
+            "{} must draw the shortest window on top",
+            group.id
+        );
         for (chart_object, chart) in &charts {
             assert!(
                 chart.1 + chart.3 <= height,
