@@ -4098,6 +4098,59 @@ fn recommendation_names_the_plan_with_the_most_room() {
 }
 
 #[test]
+fn window_alerts_bind_the_flagged_row_and_the_external_pool() {
+    use crate::models::{AppUsageData, UsageData};
+
+    let data = AppUsageData::from_iter([(ProviderId::Claude, UsageData::default())]);
+    let claude = ProviderId::ALL
+        .iter()
+        .position(|provider| *provider == ProviderId::Claude)
+        .expect("claude is a provider");
+    let antigravity = ProviderId::ALL
+        .iter()
+        .position(|provider| *provider == ProviderId::Antigravity)
+        .expect("antigravity is a provider");
+    let mut alerts = [WindowAlert::default(); WINDOW_ALERT_SLOTS];
+    alerts[claude * WINDOW_KINDS.len()] = WindowAlert {
+        eta_seconds: 2_400,
+        forecast: false,
+    };
+    alerts[claude * WINDOW_KINDS.len() + 1] = WindowAlert {
+        eta_seconds: 0,
+        forecast: true,
+    };
+    let mut external = [WindowAlert::default(); WINDOW_ALERT_SLOTS];
+    external[antigravity * WINDOW_KINDS.len() + 1] = WindowAlert {
+        eta_seconds: 900,
+        forecast: false,
+    };
+    let runtime = ThemeRuntime::default()
+        .with_antigravity_pools(true, true, 1.0)
+        .with_window_alerts(alerts, external);
+    let context = DataContext::from_usage_with_runtime(Some(&data), &Canvas::default(), runtime);
+
+    assert_eq!(context.get("claude.session.burn.warning"), Some(1.0));
+    assert_eq!(
+        context.get("claude.session.burn.eta.seconds"),
+        Some(2_400.0)
+    );
+    assert_eq!(context.get("claude.weekly.burn.warning"), Some(0.0));
+    assert_eq!(context.get("claude.weekly.forecast.exhausted"), Some(1.0));
+    assert_eq!(
+        context.get("antigravity.external.weekly.burn.warning"),
+        Some(1.0)
+    );
+    assert_eq!(
+        context.get("antigravity.external.weekly.burn.eta.seconds"),
+        Some(900.0)
+    );
+    assert_eq!(
+        context.get("antigravity.weekly.forecast.exhausted"),
+        Some(0.0)
+    );
+}
+
+#[test]
 fn recommendation_stays_empty_without_figures() {
     use crate::models::AppUsageData;
 

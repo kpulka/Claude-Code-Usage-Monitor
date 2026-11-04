@@ -1,12 +1,15 @@
-//! Seven days of hourly usage samples per provider window.
+//! Usage samples per provider window: thirty-one days hourly, and a finer
+//! fifteen-minute ring for the fast session window.
 //!
 //! Every successful poll folds its figures into a small ring buffer keyed by
 //! the same series names alerts use (`claude:session`, `antigravity#external:weekly`,
 //! ...). One bucket per hour keeps the highest share seen in that hour, so a
 //! five-minute poll interval never grows the file and short spikes survive.
+//! Session windows also get a fifteen-minute ring for the last day, because a
+//! five-hour window only has a handful of hourly points.
 //!
 //! The data is persisted next to the usage cache and exposed to themes as a
-//! comma-separated list of the last day's hourly points, which a
+//! comma-separated list of points per window, which a
 //! [`crate::theme_engine::SceneContent::Sparkline`] can draw.
 
 use std::collections::BTreeMap;
@@ -28,6 +31,13 @@ pub const BINDING_POINTS: usize = 24;
 /// How many points the normalized per-window cycle chart samples.
 pub const CYCLE_POINTS: usize = 48;
 
+/// A fifteen-minute bucket is `900` seconds wide.
+pub const QUICK_SLOT_SECS: u64 = 15 * 60;
+
+/// The session window is short and changes fast, so it keeps a finer ring:
+/// one quarter-hour sample for the last day.
+pub const QUICK_RETENTION_SLOTS: u64 = 24 * 60 * 60 / QUICK_SLOT_SECS;
+
 /// Hard cap on tracked series so a misconfigured provider cannot bloat the file.
 pub const MAX_SERIES: usize = 128;
 
@@ -41,6 +51,15 @@ pub struct HistoryPoint {
     pub percent: f64,
 }
 
+/// A fifteen-minute bucket for the fast-moving session window.
+#[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
+pub struct QuickPoint {
+    /// Quarter-hours since the Unix epoch.
+    pub quarter: u64,
+    /// Highest share of the window spent inside that quarter-hour, 0 to 100.
+    pub percent: f64,
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct History {
     #[serde(default = "history_version")]
@@ -48,6 +67,10 @@ pub struct History {
     /// Series key (`<provider_key>:<window>`) to its hourly buckets, oldest first.
     #[serde(default)]
     pub series: BTreeMap<String, Vec<HistoryPoint>>,
+    /// Session windows only: fifteen-minute buckets for the last day. Older
+    /// files simply lack this map and fall back to the hourly ring.
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub quick: BTreeMap<String, Vec<QuickPoint>>,
 }
 
 fn history_version() -> u32 {
@@ -59,6 +82,7 @@ impl Default for History {
         Self {
             version: HISTORY_VERSION,
             series: BTreeMap::new(),
+            quick: BTreeMap::new(),
         }
     }
 }
@@ -89,6 +113,31 @@ impl History {
             }
         }
         self.enforce_series_cap();
+    }
+
+    /// Fold one poll's session samples into the fifteen-minute ring. The
+    /// quarter-hour bucket keeps the highest share, exactly like the hourly one.
+    pub fn fold_quick(&mut self, samples: &[(String, f64)], quarter: u64) {
+        for (key, percent) in samples {
+            if !percent.is_finite() {
+                continue;
+            }
+            let percent = percent.clamp(0.0, 100.0);
+            let buckets = self.quick.entry(key.clone()).or_default();
+            match buckets.binary_search_by_key(&quarter, |point| point.quarter) {
+                Ok(index) => buckets[index].percent = buckets[index].percent.max(percent),
+                Err(index) => buckets.insert(index, QuickPoint { quarter, percent }),
+            }
+            // Retention follows the newest sample of this series, so a clock
+            // that jumps backwards cannot silently wipe the day.
+            let newest = buckets
+                .last()
+                .map_or(quarter, |point| point.quarter.max(quarter));
+            buckets.retain(|point| point.quarter + QUICK_RETENTION_SLOTS > newest);
+            if buckets.is_empty() {
+                self.quick.remove(key);
+            }
+        }
     }
 
     /// Drop the least recently updated series until the cap holds again.
@@ -150,11 +199,14 @@ impl History {
         Some(tokens.join(","))
     }
 
-    /// Points of the current window, from its reset to the next reset, spread
-    /// over a fixed number of slots. The x axis is the window itself: slot 0
-    /// is the reset, the last slot is the next reset, and slots after `now`
-    /// stay empty. The first slot reports 0% spent, because a reset starts the
-    /// window at full capacity even when the first poll lands later.
+    /// Points of the current window from its start to now, spread over a fixed
+    /// number of slots. The x axis is the time already spent inside the window:
+    /// slot 0 is the window start, the last slot is the present. A curve fills
+    /// the chart shortly after a reset instead of leaving the rest of the
+    /// window blank, and it never invents future samples.
+    ///
+    /// Session series read the fifteen-minute ring when it has data; every
+    /// other window keeps the hourly buckets.
     pub fn cycle_binding(
         &self,
         key: &str,
@@ -170,33 +222,64 @@ impl History {
             return None;
         }
         let start = reset_secs.saturating_sub(duration_secs);
-        let start_hour = start / 3_600;
-        let buckets = self.series.get(key);
-        // Do not invent a full window at the reset when the app was not yet
-        // running: the first retained sample has to sit at the reset for the
+        let span = now_secs.saturating_sub(start).min(duration_secs);
+        if span == 0 {
+            return None;
+        }
+        let hourly = self.series.get(key);
+        let quick = self.quick.get(key).filter(|buckets| !buckets.is_empty());
+        // Use the fine ring only once it actually reaches the window start.
+        // Upgraded installs have an hourly history but an empty or young quick
+        // ring, and switching early would drop the older part of the session.
+        let quick_covers_start = quick.is_some_and(|buckets| {
+            let start_quarter = start / QUICK_SLOT_SECS;
+            let index = buckets.partition_point(|point| point.quarter < start_quarter);
+            buckets
+                .get(index)
+                .is_some_and(|point| point.quarter <= start_quarter + 1)
+        });
+        let quick = quick.filter(|_| quick_covers_start);
+        let slot_secs = if quick.is_some() {
+            QUICK_SLOT_SECS
+        } else {
+            3_600
+        };
+        // Do not invent a full window at the start when the app was not yet
+        // running: the first retained sample has to sit at the start for the
         // synthetic 0% to be honest.
         let covers_start = start + RETENTION_HOURS * 3_600 >= now_secs
-            && buckets.is_some_and(|series| {
-                let index = series.partition_point(|point| point.hour < start_hour);
-                series
+            && if let Some(quick) = quick {
+                let start_slot = start / QUICK_SLOT_SECS;
+                let index = quick.partition_point(|point| point.quarter < start_slot);
+                quick
                     .get(index)
-                    .is_some_and(|point| point.hour <= start_hour + 1)
-            });
+                    .is_some_and(|point| point.quarter <= start_slot + 1)
+            } else {
+                let start_hour = start / 3_600;
+                hourly.is_some_and(|series| {
+                    let index = series.partition_point(|point| point.hour < start_hour);
+                    series
+                        .get(index)
+                        .is_some_and(|point| point.hour <= start_hour + 1)
+                })
+            };
         let mut tokens = Vec::with_capacity(points);
         for index in 0..points {
-            let offset = (duration_secs as f64 * index as f64 / (points - 1) as f64).round() as u64;
-            let target = start + offset;
-            if target > now_secs {
-                tokens.push(String::new());
-                continue;
-            }
-            let hour = target / 3_600;
-            let value = buckets.and_then(|series| {
-                series
-                    .binary_search_by_key(&hour, |point| point.hour)
+            let offset = span.saturating_mul(index as u64) / (points as u64 - 1);
+            let slot = (start + offset) / slot_secs;
+            let value = if let Some(quick) = quick {
+                quick
+                    .binary_search_by_key(&slot, |point| point.quarter)
                     .ok()
-                    .map(|index| series[index].percent)
-            });
+                    .map(|index| quick[index].percent)
+            } else {
+                hourly.and_then(|series| {
+                    series
+                        .binary_search_by_key(&slot, |point| point.hour)
+                        .ok()
+                        .map(|index| series[index].percent)
+                })
+            };
             let value = if index == 0 && covers_start {
                 Some(0.0)
             } else {
@@ -214,6 +297,14 @@ pub fn hour_of(time: SystemTime) -> u64 {
         .unwrap_or_default()
         .as_secs()
         / 3_600
+}
+
+/// Quarter-hours since the Unix epoch, the bucket identity of a quick sample.
+pub fn quarter_of(time: SystemTime) -> u64 {
+    time.duration_since(UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_secs()
+        / QUICK_SLOT_SECS
 }
 
 /// Every reported window of a poll as `(series key, percentage)` samples.
@@ -281,11 +372,18 @@ fn write_snapshot() -> RwLockWriteGuard<'static, Option<History>> {
 /// alert settings: the graph is a record, not a notification.
 pub fn record_poll(data: &AppUsageData, now: SystemTime) {
     let hour = hour_of(now);
+    let quarter = quarter_of(now);
     let samples = samples_of(data);
+    let quick: Vec<(String, f64)> = samples
+        .iter()
+        .filter(|(key, _)| key.ends_with(":session"))
+        .cloned()
+        .collect();
     let mut guard = write_snapshot();
     let history =
         guard.get_or_insert_with(|| crate::app_settings::load_history().unwrap_or_default());
     history.fold(&samples, hour);
+    history.fold_quick(&quick, quarter);
     if let Err(error) = crate::app_settings::save_history(history) {
         crate::diagnose::log_error("unable to save usage history", error);
     }
@@ -296,8 +394,8 @@ pub fn binding(provider_key: &str, window: &str) -> Option<String> {
     binding_at(provider_key, window, SystemTime::now())
 }
 
-/// Binding value for the current window, normalized from its reset to its
-/// next reset. `None` when the history, the reset or the duration is missing.
+/// Binding value for the current window, from its start to now. `None` when
+/// the history, the reset or the duration is missing.
 pub fn cycle_binding(
     provider_key: &str,
     window: &str,
@@ -398,7 +496,88 @@ mod tests {
             .expect("cycle binding");
         assert_eq!(
             binding.split(',').collect::<Vec<_>>(),
-            ["0", "10", "30", "", "", ""]
+            ["0", "0", "10", "10", "30", "30"],
+            "the curve fills the elapsed part of the window and stops at now"
+        );
+    }
+
+    #[test]
+    fn session_cycle_prefers_the_fifteen_minute_ring() {
+        let mut history = History::default();
+        // The hourly ring holds the coarse figures, the quick ring the finer
+        // ones; a session chart has to read the finer ones.
+        history.fold(&[sample("claude", 10.0)], 50);
+        history.fold_quick(&[(History::key("claude", "session"), 40.0)], 200);
+        history.fold_quick(&[(History::key("claude", "session"), 55.0)], 201);
+        let reset = UNIX_EPOCH + std::time::Duration::from_secs(55 * 3_600);
+        let now = UNIX_EPOCH + std::time::Duration::from_secs(50 * 3_600 + 900);
+        let binding = history
+            .cycle_binding(
+                &History::key("claude", "session"),
+                now,
+                reset,
+                std::time::Duration::from_secs(5 * 3_600),
+                4,
+            )
+            .expect("cycle binding");
+        assert_eq!(
+            binding.split(',').collect::<Vec<_>>(),
+            ["0", "40", "40", "55"]
+        );
+
+        // Without quick samples the same series falls back to the hourly ring.
+        let mut hourly_only = History::default();
+        hourly_only.fold(&[sample("claude", 10.0)], 50);
+        let binding = hourly_only
+            .cycle_binding(
+                &History::key("claude", "session"),
+                now,
+                reset,
+                std::time::Duration::from_secs(5 * 3_600),
+                4,
+            )
+            .expect("hourly cycle binding");
+        assert_eq!(
+            binding.split(',').collect::<Vec<_>>(),
+            ["0", "10", "10", "10"]
+        );
+    }
+
+    #[test]
+    fn a_young_quick_ring_does_not_hide_the_hourly_history() {
+        let mut history = History::default();
+        history.fold(&[sample("claude", 10.0)], 50);
+        // The fine ring starts three quarters after the window did, so it
+        // cannot speak for the whole session yet; the hourly history must win.
+        history.fold_quick(&[(History::key("claude", "session"), 70.0)], 203);
+        let reset = UNIX_EPOCH + std::time::Duration::from_secs(55 * 3_600);
+        let now = UNIX_EPOCH + std::time::Duration::from_secs(50 * 3_600 + 2_700);
+        let binding = history
+            .cycle_binding(
+                &History::key("claude", "session"),
+                now,
+                reset,
+                std::time::Duration::from_secs(5 * 3_600),
+                4,
+            )
+            .expect("cycle binding");
+        assert_eq!(
+            binding.split(',').collect::<Vec<_>>(),
+            ["0", "10", "10", "10"]
+        );
+    }
+
+    #[test]
+    fn quick_ring_forgets_samples_older_than_a_day() {
+        let mut history = History::default();
+        for quarter in 0..(QUICK_RETENTION_SLOTS + 10) {
+            history.fold_quick(&[sample("claude", (quarter % 100) as f64)], quarter);
+        }
+        let buckets = &history.quick[&History::key("claude", "session")];
+        assert_eq!(buckets.len() as u64, QUICK_RETENTION_SLOTS);
+        assert_eq!(
+            buckets.last().expect("newest").quarter,
+            QUICK_RETENTION_SLOTS + 9
         );
     }
 

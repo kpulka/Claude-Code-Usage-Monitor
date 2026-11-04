@@ -73,6 +73,9 @@ grok_window_title = "Monitor de uso de Grok"
 copilot_window_title = "Monitor de uso de Copilot"
 
 [translations]
+
+"Runs out in" = "Se agota en"
+"Runs out before the reset at the current pace" = "Se agota antes del restablecimiento al ritmo actual"
 "Absolute value" = "Valor absoluto"
 "Action" = "Action"
 "Actions run from top to bottom in one update." = "Las acciones se ejecutan de arriba abajo en una actualización."

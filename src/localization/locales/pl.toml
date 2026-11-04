@@ -73,6 +73,9 @@ grok_window_title = "Monitor zużycia Grok"
 copilot_window_title = "Monitor zużycia Copilot"
 
 [translations]
+
+"Runs out in" = "Wyczerpie się za"
+"Runs out before the reset at the current pace" = "Wyczerpie się przed resetem w obecnym tempie"
 "12-hour time" = "Czas 12-godzinny"
 "12-hour time with seconds" = "Czas 12-godzinny z sekundami"
 "24-hour time" = "Czas 24-godzinny"

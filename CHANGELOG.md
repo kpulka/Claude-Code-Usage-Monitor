@@ -40,12 +40,15 @@ changes grouped into Added, Changed, Fixed, and Removed where applicable.
   providers. The row labels and progress bars use the same three shades, and the coloured 5h/7d/30d labels
   are bold. The window label and reset are packed against the left edge, the percentage sits immediately
   after the gauge, and the chart is 102px wide with a deliberate gap between the value and the chart. A
-  0-100% axis with faint 25/50/75 gridlines frames it. Each curve now runs from its own window's reset to the
-  next reset: x is the window itself, every curve starts at 100% at the reset and stops at the current
-  progress, so 7d/30d no longer collapse into flat 24-hour lines. History keeps 31 days; the 5h chart uses
-  the same hourly samples until a finer bucket lands. The recommendation banner and the dead headline row
-  are gone; the provider with the most room is marked with a halo, and the burn or forecast warning is one
-  marker beside the ETA. A two-pixel border keeps the card's edge visible at 150% DPI.
+  0-100% axis with faint 25/50/75 gridlines frames it. Each curve now runs from its own window's start to
+  now: x is the time already spent in the window, so a fresh five-hour window fills the chart instead of
+  leaving most of it blank, and 7d/30d no longer collapse into flat 24-hour lines. History keeps 31 days,
+  and the five-hour window also gets a fifteen-minute ring for the last day, so its curve shows the shape
+  of a session rather than a handful of hourly steps. The recommendation banner and the dead headline row
+  are gone; the provider with the most room is marked with a halo. A warning is now an `!` on the row of
+  the window it belongs to (amber when it runs out within 45 minutes, red when the current pace exhausts it
+  before the reset), and the hover tooltip names the provider, the window and the reason. A two-pixel
+  border keeps the card's edge visible at 150% DPI.
 
 - Antigravity can show the Gemini and Claude/GPT model groups as extra rows below its weekly window, plus
   an Argon row when the quota summary returns that group. The rows appear when the Gemini pool is enabled
@@ -70,7 +73,12 @@ changes grouped into Added, Changed, Fixed, and Removed where applicable.
   from the same windows the card draws - including an external pool, so a plan whose Claude quota is spent
   cannot win on Gemini's remaining budget alone.
 - `<provider>.forecast.exhausted` marks a provider whose current pace runs out before its window would have
-  reset, with a red dot on the row, so a week that will not survive to Monday is visible at 40% used.
+  reset, so a week that will not survive to Monday is visible at 40% used; the grid card shows it as a red
+  `!` on the window row.
+- Themes can mark an individual window instead of a whole provider: `<provider>.<window>.burn.warning`,
+  `<provider>.<window>.burn.eta.seconds` and `<provider>.<window>.forecast.exhausted` are filled for
+  `session`, `weekly` and `monthly`, plus `antigravity.external.<window>.*` for the Claude/GPT pool. The
+  provider-level bindings stay for older themes.
 - Sound the chime when a quota window that reached the alert threshold (95% by default) resets, so the refilled allowance is noticed without watching the widget. Arming and firing are derived from each provider's own `resets_at`, so Claude's five-hour window, OpenCode Go's rolling/weekly/monthly caps and Antigravity's separate Gemini and external pools all behave alike. Windows without a reset time, failing providers and windows that never approached the threshold stay silent; a burst of resets plays one sound.
 
 - "Grid panel" built-in theme: a 340px desktop card with one block per provider, a name row with the headline figure, and one aligned row per window (label, progress bar, percentage, reset countdown) so figures and times are no longer crammed onto one line.

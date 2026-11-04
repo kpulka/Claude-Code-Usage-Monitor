@@ -75,6 +75,9 @@ grok_window_title = "ตัวติดตามการใช้งาน Grok
 copilot_window_title = "ตัวติดตามการใช้งาน Copilot"
 
 [translations]
+
+"Runs out in" = "จะหมดใน"
+"Runs out before the reset at the current pace" = "จะหมดก่อนรีเซ็ตที่อัตราปัจจุบัน"
 "Absolute value" = "ค่าสัมบูรณ์"
 "Action" = "แอ็กชัน"
 "Actions run from top to bottom in one update." = "แอ็กชันทำงานจากบนลงล่างภายในการอัปเดตครั้งเดียว"

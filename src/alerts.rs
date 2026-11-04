@@ -16,7 +16,7 @@
 //! absent window keeps its previous state instead of arming or firing by
 //! accident.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use serde::{Deserialize, Serialize};
@@ -92,6 +92,12 @@ pub(crate) struct Evaluation {
     pub warning_eta: BTreeMap<ProviderId, u64>,
     /// Providers whose current pace exhausts a window before it resets.
     pub forecast_exhausted: ProviderSet,
+    /// Seconds until one named window runs out, keyed like the alert windows
+    /// (`claude:session`, `antigravity#external:weekly`). Only windows close to
+    /// exhaustion are present.
+    pub window_warnings: BTreeMap<String, u64>,
+    /// Named windows whose current pace exhausts them before their reset.
+    pub window_forecast: BTreeSet<String>,
 }
 
 /// Fold one poll into the persisted state and report what just reset.
@@ -112,6 +118,8 @@ pub(crate) fn evaluate(
     let mut warnings = ProviderSet::empty();
     let mut warning_eta: BTreeMap<ProviderId, u64> = BTreeMap::new();
     let mut forecast_exhausted = ProviderSet::empty();
+    let mut window_warnings: BTreeMap<String, u64> = BTreeMap::new();
+    let mut window_forecast: BTreeSet<String> = BTreeSet::new();
     for provider in providers.iter() {
         let threshold = thresholds(provider).clamp(1.0, 100.0);
         let Some(usage) = data.get(provider) else {
@@ -143,9 +151,14 @@ pub(crate) fn evaluate(
             }
             if outcome.exhausted_before_reset {
                 forecast_exhausted.set(provider, true);
+                window_forecast.insert(key.clone());
             }
-            if let Some(eta) = outcome.eta_seconds.filter(|eta| *eta <= BURN_WARN_SECS) {
+            if let Some(eta) = outcome
+                .eta_seconds
+                .filter(|eta| *eta > 0 && *eta <= BURN_WARN_SECS)
+            {
                 warnings.set(provider, true);
+                window_warnings.insert(key.clone(), eta);
                 // Keep the tightest window per provider: that is the one the
                 // user is about to lose.
                 let entry = warning_eta.entry(provider).or_insert(eta);
@@ -168,6 +181,8 @@ pub(crate) fn evaluate(
         warnings,
         warning_eta,
         forecast_exhausted,
+        window_warnings,
+        window_forecast,
     }
 }
 
@@ -578,6 +593,54 @@ mod tests {
             !evaluation.warnings.contains(ProviderId::Claude),
             "an hour left is not the forty-five minute warning"
         );
+        assert!(
+            evaluation.window_forecast.contains("claude:session"),
+            "the flag must name the five-hour window, not just the provider"
+        );
+        assert!(!evaluation.window_forecast.contains("claude:weekly"));
         assert!(evaluation.events.is_empty(), "nothing has run out yet");
+    }
+
+    #[test]
+    fn a_fully_spent_window_is_not_reported_as_running_out() {
+        let mut state = AlertState::default();
+        let providers = claude_only();
+        let first = data_with(section(60.0, Some(at(9000))), section(5.0, None));
+        evaluate(&mut state, &first, providers, &|_| 95.0, at(1000));
+        // Nothing is left, so there is no "runs out in 0 minutes" warning; the
+        // empty gauge already says it.
+        let spent = data_with(section(100.0, Some(at(9000))), section(5.0, None));
+        let evaluation = evaluate(&mut state, &spent, providers, &|_| 95.0, at(1600));
+        assert!(!evaluation.window_warnings.contains_key("claude:session"));
+        assert!(!evaluation.warnings.contains(ProviderId::Claude));
+        assert!(!evaluation.window_forecast.contains("claude:session"));
+    }
+
+    #[test]
+    fn window_maps_name_the_exact_windows_behind_a_warning() {
+        let mut state = AlertState::default();
+        let providers = claude_only();
+        // 60% then 80% inside ten minutes: ten minutes left, under the warning
+        // horizon. The weekly window stays low and calm.
+        let first = data_with(section(60.0, Some(at(9000))), section(5.0, None));
+        evaluate(&mut state, &first, providers, &|_| 95.0, at(1000));
+        let steep = data_with(section(80.0, Some(at(9000))), section(5.0, None));
+        let evaluation = evaluate(&mut state, &steep, providers, &|_| 95.0, at(1600));
+
+        let eta = evaluation
+            .window_warnings
+            .get("claude:session")
+            .copied()
+            .expect("the five-hour window is named");
+        assert!(eta > 0);
+        assert!(
+            !evaluation.window_warnings.contains_key("claude:weekly"),
+            "a calm window must not be flagged"
+        );
+        assert_eq!(
+            evaluation.warning_eta.get(&ProviderId::Claude),
+            Some(&eta),
+            "the provider rollup keeps the tightest window"
+        );
     }
 }

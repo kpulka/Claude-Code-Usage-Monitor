@@ -75,6 +75,9 @@ grok_window_title = "Grok 使用量監控"
 copilot_window_title = "Copilot 使用量監控"
 
 [translations]
+
+"Runs out in" = "耗盡於"
+"Runs out before the reset at the current pace" = "依目前速度會在重設前耗盡"
 "Absolute value" = "絕對值"
 "Action" = "Action"
 "Actions run from top to bottom in one update." = "動作會在一次更新中由上而下執行。"

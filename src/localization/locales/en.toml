@@ -73,6 +73,9 @@ grok_window_title = "Grok Usage Monitor"
 copilot_window_title = "Copilot Usage Monitor"
 
 [translations]
+
+"Runs out in" = "Runs out in"
+"Runs out before the reset at the current pace" = "Runs out before the reset at the current pace"
 "12-hour time" = "12-hour time"
 "12-hour time with seconds" = "12-hour time with seconds"
 "24-hour time" = "24-hour time"

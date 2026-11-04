@@ -208,75 +208,6 @@
           }
         },
         {
-          "id": "claude-burn-eta",
-          "name": "claude burn eta",
-          "parent": "claude-provider",
-          "render": "claude.burn.warning",
-          "x": "150",
-          "y": "8",
-          "width": "42",
-          "height": "14",
-          "content": {
-            "type": "text",
-            "template": "{claude.burn.eta.seconds:duration}",
-            "font_family": "Segoe UI",
-            "font_size": "9",
-            "weight": "medium",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#F59E0BFF"
-            }
-          }
-        },
-        {
-          "id": "claude-burn-warning",
-          "name": "claude burn warning",
-          "parent": "claude-provider",
-          "render": "claude.burn.warning",
-          "x": "196",
-          "y": "6",
-          "width": "14",
-          "height": "18",
-          "content": {
-            "type": "text",
-            "template": "!",
-            "font_family": "Segoe UI",
-            "font_size": "15",
-            "weight": "bold",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#F59E0BFF"
-            }
-          }
-        },
-        {
-          "id": "claude-forecast-warning",
-          "name": "claude forecast warning",
-          "parent": "claude-provider",
-          "render": "claude.forecast.exhausted && (1 - claude.burn.warning)",
-          "x": "196",
-          "y": "6",
-          "width": "14",
-          "height": "18",
-          "content": {
-            "type": "text",
-            "template": "!",
-            "font_family": "Segoe UI",
-            "font_size": "15",
-            "weight": "bold",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#F87171FF"
-            }
-          }
-        },
-        {
           "id": "claude-recommended-ring",
           "name": "claude recommended",
           "parent": "claude-provider",
@@ -825,75 +756,6 @@
             "invert": "display.countdown",
             "line_width": "1",
             "dashed": "1"
-          }
-        },
-        {
-          "id": "codex-burn-eta",
-          "name": "codex burn eta",
-          "parent": "codex-provider",
-          "render": "codex.burn.warning",
-          "x": "150",
-          "y": "8",
-          "width": "42",
-          "height": "14",
-          "content": {
-            "type": "text",
-            "template": "{codex.burn.eta.seconds:duration}",
-            "font_family": "Segoe UI",
-            "font_size": "9",
-            "weight": "medium",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#F59E0BFF"
-            }
-          }
-        },
-        {
-          "id": "codex-burn-warning",
-          "name": "codex burn warning",
-          "parent": "codex-provider",
-          "render": "codex.burn.warning",
-          "x": "196",
-          "y": "6",
-          "width": "14",
-          "height": "18",
-          "content": {
-            "type": "text",
-            "template": "!",
-            "font_family": "Segoe UI",
-            "font_size": "15",
-            "weight": "bold",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#F59E0BFF"
-            }
-          }
-        },
-        {
-          "id": "codex-forecast-warning",
-          "name": "codex forecast warning",
-          "parent": "codex-provider",
-          "render": "codex.forecast.exhausted && (1 - codex.burn.warning)",
-          "x": "196",
-          "y": "6",
-          "width": "14",
-          "height": "18",
-          "content": {
-            "type": "text",
-            "template": "!",
-            "font_family": "Segoe UI",
-            "font_size": "15",
-            "weight": "bold",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#F87171FF"
-            }
           }
         },
         {
@@ -1727,75 +1589,6 @@
           }
         },
         {
-          "id": "antigravity-burn-eta",
-          "name": "antigravity burn eta",
-          "parent": "antigravity-provider",
-          "render": "antigravity.burn.warning",
-          "x": "150",
-          "y": "8",
-          "width": "42",
-          "height": "14",
-          "content": {
-            "type": "text",
-            "template": "{antigravity.burn.eta.seconds:duration}",
-            "font_family": "Segoe UI",
-            "font_size": "9",
-            "weight": "medium",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#F59E0BFF"
-            }
-          }
-        },
-        {
-          "id": "antigravity-burn-warning",
-          "name": "antigravity burn warning",
-          "parent": "antigravity-provider",
-          "render": "antigravity.burn.warning",
-          "x": "196",
-          "y": "6",
-          "width": "14",
-          "height": "18",
-          "content": {
-            "type": "text",
-            "template": "!",
-            "font_family": "Segoe UI",
-            "font_size": "15",
-            "weight": "bold",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#F59E0BFF"
-            }
-          }
-        },
-        {
-          "id": "antigravity-forecast-warning",
-          "name": "antigravity forecast warning",
-          "parent": "antigravity-provider",
-          "render": "antigravity.forecast.exhausted && (1 - antigravity.burn.warning)",
-          "x": "196",
-          "y": "6",
-          "width": "14",
-          "height": "18",
-          "content": {
-            "type": "text",
-            "template": "!",
-            "font_family": "Segoe UI",
-            "font_size": "15",
-            "weight": "bold",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#F87171FF"
-            }
-          }
-        },
-        {
           "id": "antigravity-recommended-ring",
           "name": "antigravity recommended",
           "parent": "antigravity-provider",
@@ -2367,75 +2160,6 @@
             "invert": "display.countdown",
             "line_width": "1",
             "dashed": "1"
-          }
-        },
-        {
-          "id": "opencode-burn-eta",
-          "name": "opencode burn eta",
-          "parent": "opencode-provider",
-          "render": "opencode.burn.warning",
-          "x": "150",
-          "y": "8",
-          "width": "42",
-          "height": "14",
-          "content": {
-            "type": "text",
-            "template": "{opencode.burn.eta.seconds:duration}",
-            "font_family": "Segoe UI",
-            "font_size": "9",
-            "weight": "medium",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#F59E0BFF"
-            }
-          }
-        },
-        {
-          "id": "opencode-burn-warning",
-          "name": "opencode burn warning",
-          "parent": "opencode-provider",
-          "render": "opencode.burn.warning",
-          "x": "196",
-          "y": "6",
-          "width": "14",
-          "height": "18",
-          "content": {
-            "type": "text",
-            "template": "!",
-            "font_family": "Segoe UI",
-            "font_size": "15",
-            "weight": "bold",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#F59E0BFF"
-            }
-          }
-        },
-        {
-          "id": "opencode-forecast-warning",
-          "name": "opencode forecast warning",
-          "parent": "opencode-provider",
-          "render": "opencode.forecast.exhausted && (1 - opencode.burn.warning)",
-          "x": "196",
-          "y": "6",
-          "width": "14",
-          "height": "18",
-          "content": {
-            "type": "text",
-            "template": "!",
-            "font_family": "Segoe UI",
-            "font_size": "15",
-            "weight": "bold",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#F87171FF"
-            }
           }
         },
         {
@@ -3152,75 +2876,6 @@
           }
         },
         {
-          "id": "cursor-burn-eta",
-          "name": "cursor burn eta",
-          "parent": "cursor-provider",
-          "render": "cursor.burn.warning",
-          "x": "150",
-          "y": "8",
-          "width": "42",
-          "height": "14",
-          "content": {
-            "type": "text",
-            "template": "{cursor.burn.eta.seconds:duration}",
-            "font_family": "Segoe UI",
-            "font_size": "9",
-            "weight": "medium",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#F59E0BFF"
-            }
-          }
-        },
-        {
-          "id": "cursor-burn-warning",
-          "name": "cursor burn warning",
-          "parent": "cursor-provider",
-          "render": "cursor.burn.warning",
-          "x": "196",
-          "y": "6",
-          "width": "14",
-          "height": "18",
-          "content": {
-            "type": "text",
-            "template": "!",
-            "font_family": "Segoe UI",
-            "font_size": "15",
-            "weight": "bold",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#F59E0BFF"
-            }
-          }
-        },
-        {
-          "id": "cursor-forecast-warning",
-          "name": "cursor forecast warning",
-          "parent": "cursor-provider",
-          "render": "cursor.forecast.exhausted && (1 - cursor.burn.warning)",
-          "x": "196",
-          "y": "6",
-          "width": "14",
-          "height": "18",
-          "content": {
-            "type": "text",
-            "template": "!",
-            "font_family": "Segoe UI",
-            "font_size": "15",
-            "weight": "bold",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#F87171FF"
-            }
-          }
-        },
-        {
           "id": "cursor-recommended-ring",
           "name": "cursor recommended",
           "parent": "cursor-provider",
@@ -3772,75 +3427,6 @@
           }
         },
         {
-          "id": "grok-burn-eta",
-          "name": "grok burn eta",
-          "parent": "grok-provider",
-          "render": "grok.burn.warning",
-          "x": "150",
-          "y": "8",
-          "width": "42",
-          "height": "14",
-          "content": {
-            "type": "text",
-            "template": "{grok.burn.eta.seconds:duration}",
-            "font_family": "Segoe UI",
-            "font_size": "9",
-            "weight": "medium",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#F59E0BFF"
-            }
-          }
-        },
-        {
-          "id": "grok-burn-warning",
-          "name": "grok burn warning",
-          "parent": "grok-provider",
-          "render": "grok.burn.warning",
-          "x": "196",
-          "y": "6",
-          "width": "14",
-          "height": "18",
-          "content": {
-            "type": "text",
-            "template": "!",
-            "font_family": "Segoe UI",
-            "font_size": "15",
-            "weight": "bold",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#F59E0BFF"
-            }
-          }
-        },
-        {
-          "id": "grok-forecast-warning",
-          "name": "grok forecast warning",
-          "parent": "grok-provider",
-          "render": "grok.forecast.exhausted && (1 - grok.burn.warning)",
-          "x": "196",
-          "y": "6",
-          "width": "14",
-          "height": "18",
-          "content": {
-            "type": "text",
-            "template": "!",
-            "font_family": "Segoe UI",
-            "font_size": "15",
-            "weight": "bold",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#F87171FF"
-            }
-          }
-        },
-        {
           "id": "grok-recommended-ring",
           "name": "grok recommended",
           "parent": "grok-provider",
@@ -4389,75 +3975,6 @@
             "invert": "display.countdown",
             "line_width": "1",
             "dashed": "1"
-          }
-        },
-        {
-          "id": "copilot-burn-eta",
-          "name": "copilot burn eta",
-          "parent": "copilot-provider",
-          "render": "copilot.burn.warning",
-          "x": "150",
-          "y": "8",
-          "width": "42",
-          "height": "14",
-          "content": {
-            "type": "text",
-            "template": "{copilot.burn.eta.seconds:duration}",
-            "font_family": "Segoe UI",
-            "font_size": "9",
-            "weight": "medium",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#F59E0BFF"
-            }
-          }
-        },
-        {
-          "id": "copilot-burn-warning",
-          "name": "copilot burn warning",
-          "parent": "copilot-provider",
-          "render": "copilot.burn.warning",
-          "x": "196",
-          "y": "6",
-          "width": "14",
-          "height": "18",
-          "content": {
-            "type": "text",
-            "template": "!",
-            "font_family": "Segoe UI",
-            "font_size": "15",
-            "weight": "bold",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#F59E0BFF"
-            }
-          }
-        },
-        {
-          "id": "copilot-forecast-warning",
-          "name": "copilot forecast warning",
-          "parent": "copilot-provider",
-          "render": "copilot.forecast.exhausted && (1 - copilot.burn.warning)",
-          "x": "196",
-          "y": "6",
-          "width": "14",
-          "height": "18",
-          "content": {
-            "type": "text",
-            "template": "!",
-            "font_family": "Segoe UI",
-            "font_size": "15",
-            "weight": "bold",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#F87171FF"
-            }
           }
         },
         {
@@ -5032,75 +4549,6 @@
             "invert": "display.countdown",
             "line_width": "1",
             "dashed": "1"
-          }
-        },
-        {
-          "id": "commandcode-burn-eta",
-          "name": "commandcode burn eta",
-          "parent": "commandcode-provider",
-          "render": "commandcode.burn.warning",
-          "x": "150",
-          "y": "8",
-          "width": "42",
-          "height": "14",
-          "content": {
-            "type": "text",
-            "template": "{commandcode.burn.eta.seconds:duration}",
-            "font_family": "Segoe UI",
-            "font_size": "9",
-            "weight": "medium",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#F59E0BFF"
-            }
-          }
-        },
-        {
-          "id": "commandcode-burn-warning",
-          "name": "commandcode burn warning",
-          "parent": "commandcode-provider",
-          "render": "commandcode.burn.warning",
-          "x": "196",
-          "y": "6",
-          "width": "14",
-          "height": "18",
-          "content": {
-            "type": "text",
-            "template": "!",
-            "font_family": "Segoe UI",
-            "font_size": "15",
-            "weight": "bold",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#F59E0BFF"
-            }
-          }
-        },
-        {
-          "id": "commandcode-forecast-warning",
-          "name": "commandcode forecast warning",
-          "parent": "commandcode-provider",
-          "render": "commandcode.forecast.exhausted && (1 - commandcode.burn.warning)",
-          "x": "196",
-          "y": "6",
-          "width": "14",
-          "height": "18",
-          "content": {
-            "type": "text",
-            "template": "!",
-            "font_family": "Segoe UI",
-            "font_size": "15",
-            "weight": "bold",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#F87171FF"
-            }
           }
         },
         {
@@ -6060,6 +5508,834 @@
             "align": "left",
             "color": {
               "color": "#1A1A1AFF"
+            }
+          }
+        },
+        {
+          "id": "claude-session-burn-marker",
+          "name": "claude session burn marker",
+          "parent": "claude-provider",
+          "render": "claude.session.burn.warning && claude.five_hour.available",
+          "x": "282",
+          "y": "29",
+          "width": "12",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#F59E0BFF"
+            }
+          }
+        },
+        {
+          "id": "claude-session-forecast-marker",
+          "name": "claude session forecast marker",
+          "parent": "claude-provider",
+          "render": "claude.session.forecast.exhausted && (1 - claude.session.burn.warning) && claude.five_hour.available",
+          "x": "282",
+          "y": "29",
+          "width": "12",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#F87171FF"
+            }
+          }
+        },
+        {
+          "id": "claude-weekly-burn-marker",
+          "name": "claude weekly burn marker",
+          "parent": "claude-provider",
+          "render": "claude.weekly.burn.warning && claude.weekly.available",
+          "x": "282",
+          "y": "49",
+          "width": "12",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#F59E0BFF"
+            }
+          }
+        },
+        {
+          "id": "claude-weekly-forecast-marker",
+          "name": "claude weekly forecast marker",
+          "parent": "claude-provider",
+          "render": "claude.weekly.forecast.exhausted && (1 - claude.weekly.burn.warning) && claude.weekly.available",
+          "x": "282",
+          "y": "49",
+          "width": "12",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#F87171FF"
+            }
+          }
+        },
+        {
+          "id": "codex-session-burn-marker",
+          "name": "codex session burn marker",
+          "parent": "codex-provider",
+          "render": "codex.session.burn.warning && codex.five_hour.available",
+          "x": "282",
+          "y": "29",
+          "width": "12",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#F59E0BFF"
+            }
+          }
+        },
+        {
+          "id": "codex-session-forecast-marker",
+          "name": "codex session forecast marker",
+          "parent": "codex-provider",
+          "render": "codex.session.forecast.exhausted && (1 - codex.session.burn.warning) && codex.five_hour.available",
+          "x": "282",
+          "y": "29",
+          "width": "12",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#F87171FF"
+            }
+          }
+        },
+        {
+          "id": "codex-weekly-burn-marker",
+          "name": "codex weekly burn marker",
+          "parent": "codex-provider",
+          "render": "codex.weekly.burn.warning && codex.weekly.available",
+          "x": "282",
+          "y": "49",
+          "width": "12",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#F59E0BFF"
+            }
+          }
+        },
+        {
+          "id": "codex-weekly-forecast-marker",
+          "name": "codex weekly forecast marker",
+          "parent": "codex-provider",
+          "render": "codex.weekly.forecast.exhausted && (1 - codex.weekly.burn.warning) && codex.weekly.available",
+          "x": "282",
+          "y": "49",
+          "width": "12",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#F87171FF"
+            }
+          }
+        },
+        {
+          "id": "antigravity-session-burn-marker",
+          "name": "antigravity session burn marker",
+          "parent": "antigravity-provider",
+          "render": "antigravity.session.burn.warning && antigravity.five_hour.available",
+          "x": "282",
+          "y": "29",
+          "width": "12",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#F59E0BFF"
+            }
+          }
+        },
+        {
+          "id": "antigravity-session-forecast-marker",
+          "name": "antigravity session forecast marker",
+          "parent": "antigravity-provider",
+          "render": "antigravity.session.forecast.exhausted && (1 - antigravity.session.burn.warning) && antigravity.five_hour.available",
+          "x": "282",
+          "y": "29",
+          "width": "12",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#F87171FF"
+            }
+          }
+        },
+        {
+          "id": "antigravity-weekly-burn-marker",
+          "name": "antigravity weekly burn marker",
+          "parent": "antigravity-provider",
+          "render": "antigravity.weekly.burn.warning && antigravity.weekly.available",
+          "x": "282",
+          "y": "49",
+          "width": "12",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#F59E0BFF"
+            }
+          }
+        },
+        {
+          "id": "antigravity-weekly-forecast-marker",
+          "name": "antigravity weekly forecast marker",
+          "parent": "antigravity-provider",
+          "render": "antigravity.weekly.forecast.exhausted && (1 - antigravity.weekly.burn.warning) && antigravity.weekly.available",
+          "x": "282",
+          "y": "49",
+          "width": "12",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#F87171FF"
+            }
+          }
+        },
+        {
+          "id": "opencode-session-burn-marker",
+          "name": "opencode session burn marker",
+          "parent": "opencode-provider",
+          "render": "opencode.session.burn.warning && opencode.five_hour.available",
+          "x": "282",
+          "y": "29",
+          "width": "12",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#F59E0BFF"
+            }
+          }
+        },
+        {
+          "id": "opencode-session-forecast-marker",
+          "name": "opencode session forecast marker",
+          "parent": "opencode-provider",
+          "render": "opencode.session.forecast.exhausted && (1 - opencode.session.burn.warning) && opencode.five_hour.available",
+          "x": "282",
+          "y": "29",
+          "width": "12",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#F87171FF"
+            }
+          }
+        },
+        {
+          "id": "opencode-weekly-burn-marker",
+          "name": "opencode weekly burn marker",
+          "parent": "opencode-provider",
+          "render": "opencode.weekly.burn.warning && opencode.weekly.available",
+          "x": "282",
+          "y": "49",
+          "width": "12",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#F59E0BFF"
+            }
+          }
+        },
+        {
+          "id": "opencode-weekly-forecast-marker",
+          "name": "opencode weekly forecast marker",
+          "parent": "opencode-provider",
+          "render": "opencode.weekly.forecast.exhausted && (1 - opencode.weekly.burn.warning) && opencode.weekly.available",
+          "x": "282",
+          "y": "49",
+          "width": "12",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#F87171FF"
+            }
+          }
+        },
+        {
+          "id": "opencode-monthly-burn-marker",
+          "name": "opencode monthly burn marker",
+          "parent": "opencode-provider",
+          "render": "opencode.monthly.burn.warning && opencode.monthly.available",
+          "x": "282",
+          "y": "69",
+          "width": "12",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#F59E0BFF"
+            }
+          }
+        },
+        {
+          "id": "opencode-monthly-forecast-marker",
+          "name": "opencode monthly forecast marker",
+          "parent": "opencode-provider",
+          "render": "opencode.monthly.forecast.exhausted && (1 - opencode.monthly.burn.warning) && opencode.monthly.available",
+          "x": "282",
+          "y": "69",
+          "width": "12",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#F87171FF"
+            }
+          }
+        },
+        {
+          "id": "cursor-session-burn-marker",
+          "name": "cursor session burn marker",
+          "parent": "cursor-provider",
+          "render": "cursor.session.burn.warning && cursor.five_hour.available",
+          "x": "282",
+          "y": "29",
+          "width": "12",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#F59E0BFF"
+            }
+          }
+        },
+        {
+          "id": "cursor-session-forecast-marker",
+          "name": "cursor session forecast marker",
+          "parent": "cursor-provider",
+          "render": "cursor.session.forecast.exhausted && (1 - cursor.session.burn.warning) && cursor.five_hour.available",
+          "x": "282",
+          "y": "29",
+          "width": "12",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#F87171FF"
+            }
+          }
+        },
+        {
+          "id": "cursor-weekly-burn-marker",
+          "name": "cursor weekly burn marker",
+          "parent": "cursor-provider",
+          "render": "cursor.weekly.burn.warning && cursor.weekly.available",
+          "x": "282",
+          "y": "49",
+          "width": "12",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#F59E0BFF"
+            }
+          }
+        },
+        {
+          "id": "cursor-weekly-forecast-marker",
+          "name": "cursor weekly forecast marker",
+          "parent": "cursor-provider",
+          "render": "cursor.weekly.forecast.exhausted && (1 - cursor.weekly.burn.warning) && cursor.weekly.available",
+          "x": "282",
+          "y": "49",
+          "width": "12",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#F87171FF"
+            }
+          }
+        },
+        {
+          "id": "grok-session-burn-marker",
+          "name": "grok session burn marker",
+          "parent": "grok-provider",
+          "render": "grok.session.burn.warning && grok.five_hour.available",
+          "x": "282",
+          "y": "29",
+          "width": "12",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#F59E0BFF"
+            }
+          }
+        },
+        {
+          "id": "grok-session-forecast-marker",
+          "name": "grok session forecast marker",
+          "parent": "grok-provider",
+          "render": "grok.session.forecast.exhausted && (1 - grok.session.burn.warning) && grok.five_hour.available",
+          "x": "282",
+          "y": "29",
+          "width": "12",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#F87171FF"
+            }
+          }
+        },
+        {
+          "id": "grok-weekly-burn-marker",
+          "name": "grok weekly burn marker",
+          "parent": "grok-provider",
+          "render": "grok.weekly.burn.warning && grok.weekly.available",
+          "x": "282",
+          "y": "49",
+          "width": "12",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#F59E0BFF"
+            }
+          }
+        },
+        {
+          "id": "grok-weekly-forecast-marker",
+          "name": "grok weekly forecast marker",
+          "parent": "grok-provider",
+          "render": "grok.weekly.forecast.exhausted && (1 - grok.weekly.burn.warning) && grok.weekly.available",
+          "x": "282",
+          "y": "49",
+          "width": "12",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#F87171FF"
+            }
+          }
+        },
+        {
+          "id": "copilot-session-burn-marker",
+          "name": "copilot session burn marker",
+          "parent": "copilot-provider",
+          "render": "copilot.session.burn.warning && copilot.five_hour.available",
+          "x": "282",
+          "y": "29",
+          "width": "12",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#F59E0BFF"
+            }
+          }
+        },
+        {
+          "id": "copilot-session-forecast-marker",
+          "name": "copilot session forecast marker",
+          "parent": "copilot-provider",
+          "render": "copilot.session.forecast.exhausted && (1 - copilot.session.burn.warning) && copilot.five_hour.available",
+          "x": "282",
+          "y": "29",
+          "width": "12",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#F87171FF"
+            }
+          }
+        },
+        {
+          "id": "copilot-weekly-burn-marker",
+          "name": "copilot weekly burn marker",
+          "parent": "copilot-provider",
+          "render": "copilot.weekly.burn.warning && copilot.weekly.available",
+          "x": "282",
+          "y": "49",
+          "width": "12",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#F59E0BFF"
+            }
+          }
+        },
+        {
+          "id": "copilot-weekly-forecast-marker",
+          "name": "copilot weekly forecast marker",
+          "parent": "copilot-provider",
+          "render": "copilot.weekly.forecast.exhausted && (1 - copilot.weekly.burn.warning) && copilot.weekly.available",
+          "x": "282",
+          "y": "49",
+          "width": "12",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#F87171FF"
+            }
+          }
+        },
+        {
+          "id": "commandcode-session-burn-marker",
+          "name": "commandcode session burn marker",
+          "parent": "commandcode-provider",
+          "render": "commandcode.session.burn.warning && commandcode.five_hour.available",
+          "x": "282",
+          "y": "29",
+          "width": "12",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#F59E0BFF"
+            }
+          }
+        },
+        {
+          "id": "commandcode-session-forecast-marker",
+          "name": "commandcode session forecast marker",
+          "parent": "commandcode-provider",
+          "render": "commandcode.session.forecast.exhausted && (1 - commandcode.session.burn.warning) && commandcode.five_hour.available",
+          "x": "282",
+          "y": "29",
+          "width": "12",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#F87171FF"
+            }
+          }
+        },
+        {
+          "id": "commandcode-weekly-burn-marker",
+          "name": "commandcode weekly burn marker",
+          "parent": "commandcode-provider",
+          "render": "commandcode.weekly.burn.warning && commandcode.weekly.available",
+          "x": "282",
+          "y": "49",
+          "width": "12",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#F59E0BFF"
+            }
+          }
+        },
+        {
+          "id": "commandcode-weekly-forecast-marker",
+          "name": "commandcode weekly forecast marker",
+          "parent": "commandcode-provider",
+          "render": "commandcode.weekly.forecast.exhausted && (1 - commandcode.weekly.burn.warning) && commandcode.weekly.available",
+          "x": "282",
+          "y": "49",
+          "width": "12",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#F87171FF"
+            }
+          }
+        },
+        {
+          "id": "commandcode-monthly-burn-marker",
+          "name": "commandcode monthly burn marker",
+          "parent": "commandcode-provider",
+          "render": "commandcode.monthly.burn.warning && commandcode.monthly.available",
+          "x": "282",
+          "y": "69",
+          "width": "12",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#F59E0BFF"
+            }
+          }
+        },
+        {
+          "id": "commandcode-monthly-forecast-marker",
+          "name": "commandcode monthly forecast marker",
+          "parent": "commandcode-provider",
+          "render": "commandcode.monthly.forecast.exhausted && (1 - commandcode.monthly.burn.warning) && commandcode.monthly.available",
+          "x": "282",
+          "y": "69",
+          "width": "12",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "13",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#F87171FF"
             }
           }
         }

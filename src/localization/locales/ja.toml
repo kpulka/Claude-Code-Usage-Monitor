@@ -75,6 +75,9 @@ grok_window_title = "Grok 使用量モニター"
 copilot_window_title = "Copilot 使用量モニター"
 
 [translations]
+
+"Runs out in" = "残り"
+"Runs out before the reset at the current pace" = "現在のペースではリセット前に尽きます"
 "Absolute value" = "絶対値"
 "Action" = "Action"
 "Actions run from top to bottom in one update." = "アクションは1回の更新で上から順に実行されます。"

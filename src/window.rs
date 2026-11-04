@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{BTreeMap, BTreeSet, HashMap};
 use std::path::PathBuf;
 use std::sync::atomic::{AtomicBool, AtomicIsize, AtomicU32, Ordering};
 use std::sync::{Mutex, MutexGuard, OnceLock};
@@ -33,8 +33,8 @@ use crate::diagnose;
 use crate::localization::{self, LanguageId, Strings};
 use crate::models::AppUsageData;
 use crate::native_interop::{
-    self, TIMER_CLOCK, TIMER_COUNTDOWN, TIMER_CROSSFADE_SCHEDULE, TIMER_MOUSE_CLICK,
-    TIMER_POLL, TIMER_RESET_POLL, TIMER_TRAY_HOVER, TIMER_TRAY_REPOSITION, TIMER_UPDATE_CHECK,
+    self, TIMER_CLOCK, TIMER_COUNTDOWN, TIMER_CROSSFADE_SCHEDULE, TIMER_MOUSE_CLICK, TIMER_POLL,
+    TIMER_RESET_POLL, TIMER_TRAY_HOVER, TIMER_TRAY_REPOSITION, TIMER_UPDATE_CHECK,
     TIMER_WINDOW_STATE, WM_APP_DISABLE_DIAGNOSTICS, WM_APP_ENABLE_DIAGNOSTICS,
     WM_APP_OPEN_DASHBOARD, WM_APP_QUIT, WM_APP_REFRESH_NOW, WM_APP_SETTINGS_UPDATED,
     WM_APP_TASKBAR_COLLISION, WM_APP_TRAY, WM_APP_USAGE_UPDATED,
@@ -45,6 +45,7 @@ use crate::theme;
 use crate::theme_engine::{
     self, Canvas, DataContext, HorizontalAnchor, MouseActionEffect, MouseActionOverrideKey,
     MouseEventKind, ReferenceRegion, SurfaceNest, ThemeDocument, ThemeRuntime, VerticalAnchor,
+    WindowAlert, WINDOW_ALERT_SLOTS, WINDOW_KINDS,
 };
 use crate::tray_icon;
 use crate::updater::{self, AvailableUpdate, InstallChannel, ReleaseDescriptor, UpdateCheckResult};
@@ -152,6 +153,11 @@ struct AppState {
     notify_limit_reset: bool,
     /// Providers whose pace exhausts a window before its reset.
     forecast_exhausted: crate::providers::ProviderSet,
+    /// Seconds until one named window runs out, keyed like the alert series
+    /// (`claude:session`).
+    window_warnings: BTreeMap<String, u32>,
+    /// Named windows whose pace exhausts them before their reset.
+    window_forecast: BTreeSet<String>,
     active_theme_path: Option<PathBuf>,
     active_theme: Option<ThemeDocument>,
     theme_clock_interval: Option<Duration>,
@@ -794,6 +800,8 @@ fn theme_runtime_from_state(state: &AppState) -> ThemeRuntime {
     let burn_warning = state.burn_warning;
     let burn_eta_seconds = state.burn_eta_seconds;
     let forecast_exhausted = state.forecast_exhausted;
+    let (window_alerts, external_window_alerts) =
+        window_alert_slots(&state.window_warnings, &state.window_forecast);
     let nest = if state.auto_ejected {
         SurfaceNest::Floating
     } else if let Some(ref ov) = state.placement_override {
@@ -820,6 +828,37 @@ fn theme_runtime_from_state(state: &AppState) -> ThemeRuntime {
         .with_burn_warning(burn_warning)
         .with_burn_eta(burn_eta_seconds)
         .with_forecast_exhausted(forecast_exhausted)
+        .with_window_alerts(window_alerts, external_window_alerts)
+}
+
+/// Pack the string-keyed alert maps into the fixed slots a copied
+/// [`ThemeRuntime`] can carry.
+fn window_alert_slots(
+    warnings: &BTreeMap<String, u32>,
+    forecast: &BTreeSet<String>,
+) -> (
+    [WindowAlert; WINDOW_ALERT_SLOTS],
+    [WindowAlert; WINDOW_ALERT_SLOTS],
+) {
+    let mut alerts = [WindowAlert::default(); WINDOW_ALERT_SLOTS];
+    let mut external = [WindowAlert::default(); WINDOW_ALERT_SLOTS];
+    for (provider_index, provider) in ProviderId::ALL.iter().enumerate() {
+        let key = provider.descriptor().key;
+        for (window_index, window) in WINDOW_KINDS.iter().enumerate() {
+            let slot = provider_index * WINDOW_KINDS.len() + window_index;
+            let id = format!("{key}:{window}");
+            alerts[slot] = WindowAlert {
+                eta_seconds: warnings.get(&id).copied().unwrap_or(0),
+                forecast: forecast.contains(&id),
+            };
+            let external_id = format!("{key}#external:{window}");
+            external[slot] = WindowAlert {
+                eta_seconds: warnings.get(&external_id).copied().unwrap_or(0),
+                forecast: forecast.contains(&external_id),
+            };
+        }
+    }
+    (alerts, external)
 }
 
 /// A transient outage can keep presenting the last real reading while its
@@ -1243,6 +1282,82 @@ fn usage_summary_lines(
                     format!("{:.0}%", shown(usage.weekly.percentage))
                 },
             ));
+        }
+    }
+    lines
+}
+
+/// One line per flagged window for the usage tooltip. The row marker only says
+/// *that* something is at risk, so the tooltip names the provider, the window,
+/// and the reason: a burn estimate or a pace that outruns the reset.
+fn alert_lines(
+    warnings: &BTreeMap<String, u32>,
+    forecast: &BTreeSet<String>,
+    data: &AppUsageData,
+    providers: ProviderSet,
+    language: LanguageId,
+    show_antigravity_external: bool,
+) -> Vec<String> {
+    let strings = language.strings();
+    let mut lines = Vec::new();
+    let mut push = |label: String, id: String| {
+        if let Some(eta) = warnings.get(&id).filter(|eta| **eta > 0) {
+            lines.push(format!(
+                "! {label} — {} {}",
+                language.text("Runs out in"),
+                widget_tooltip::countdown_text(u64::from(*eta), &strings)
+            ));
+        } else if forecast.contains(&id) {
+            lines.push(format!(
+                "! {label} — {}",
+                language.text("Runs out before the reset at the current pace")
+            ));
+        }
+    };
+    for provider in providers.iter() {
+        let Some(usage) = data.get(provider) else {
+            continue;
+        };
+        let base = language.text(provider.descriptor().display_name);
+        let key = provider.descriptor().key;
+        let session = usage
+            .session_label
+            .as_deref()
+            .unwrap_or(strings.session_window);
+        let weekly = usage
+            .weekly_label
+            .as_deref()
+            .unwrap_or(strings.weekly_window);
+        push(format!("{base} {session}"), format!("{key}:session"));
+        push(format!("{base} {weekly}"), format!("{key}:weekly"));
+        if usage.monthly.is_some() {
+            push(format!("{base} 30d"), format!("{key}:monthly"));
+        }
+        if let Some(pool) = usage
+            .external_pool
+            .as_deref()
+            .filter(|_| show_antigravity_external)
+        {
+            let external = format!("{base} (Claude/GPT)");
+            let session = pool
+                .session_label
+                .as_deref()
+                .unwrap_or(strings.session_window);
+            let weekly = pool
+                .weekly_label
+                .as_deref()
+                .unwrap_or(strings.weekly_window);
+            push(
+                format!("{external} {session}"),
+                format!("{key}#external:session"),
+            );
+            push(
+                format!("{external} {weekly}"),
+                format!("{key}#external:weekly"),
+            );
+            if pool.monthly.is_some() {
+                push(format!("{external} 30d"), format!("{key}#external:monthly"));
+            }
         }
     }
     lines
@@ -2654,6 +2769,8 @@ pub fn run() {
                 notify_limit_reached: settings.notify_limit_reached,
                 notify_limit_reset: settings.notify_limit_reset,
                 forecast_exhausted: crate::providers::ProviderSet::empty(),
+                window_warnings: BTreeMap::new(),
+                window_forecast: BTreeSet::new(),
                 active_theme_path,
                 active_theme,
                 theme_clock_interval,
@@ -3214,6 +3331,12 @@ fn do_poll_once(hwnd: HWND) {
                     if let Some(state) = lock_state().as_mut() {
                         state.burn_warning = evaluation.warnings;
                         state.forecast_exhausted = evaluation.forecast_exhausted;
+                        state.window_forecast = evaluation.window_forecast;
+                        state.window_warnings = evaluation
+                            .window_warnings
+                            .into_iter()
+                            .map(|(key, seconds)| (key, seconds.min(u32::MAX as u64) as u32))
+                            .collect();
                         let mut eta = [0u32; crate::providers::ProviderId::ALL.len()];
                         for (provider, seconds) in &evaluation.warning_eta {
                             if let Some(index) = crate::providers::ProviderId::ALL
@@ -4191,6 +4314,39 @@ mod tray_usage_summary_tests {
             ),
             ["Claude Code 5h: 5% | 7d: 42%"]
         );
+    }
+
+    #[test]
+    fn warning_lines_name_the_provider_window_and_reason() {
+        let data = [(ProviderId::Claude, usage(4.6, 42.4, None))]
+            .into_iter()
+            .collect();
+        let providers = ProviderSet::from_enabled([ProviderId::Claude]);
+        let warnings = BTreeMap::from([("claude:session".to_string(), 2_400u32)]);
+        let forecast = BTreeSet::from(["claude:weekly".to_string()]);
+        assert_eq!(
+            alert_lines(
+                &warnings,
+                &forecast,
+                &data,
+                providers,
+                LanguageId::English,
+                false
+            ),
+            [
+                "! Claude Code 5h — Runs out in 40m",
+                "! Claude Code 7d — Runs out before the reset at the current pace",
+            ]
+        );
+        assert!(alert_lines(
+            &BTreeMap::new(),
+            &BTreeSet::new(),
+            &data,
+            providers,
+            LanguageId::English,
+            false
+        )
+        .is_empty());
     }
 
     #[test]

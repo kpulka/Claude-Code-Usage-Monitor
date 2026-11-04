@@ -47,7 +47,14 @@ impl Drop for WidgetTooltip {
 }
 
 pub(super) fn reset_countdown(reset: SystemTime, now: SystemTime, strings: &Strings) -> String {
-    let seconds = reset.duration_since(now).unwrap_or_default().as_secs();
+    countdown_text(
+        reset.duration_since(now).unwrap_or_default().as_secs(),
+        strings,
+    )
+}
+
+/// Compact duration used by reset and warning lines.
+pub(super) fn countdown_text(seconds: u64, strings: &Strings) -> String {
     let days = seconds / 86_400;
     let hours = seconds % 86_400 / 3_600;
     let minutes = seconds % 3_600 / 60;
@@ -94,16 +101,29 @@ fn content(owner: HWND) -> Option<(String, bool, HWND)> {
     let text = if !errors.is_empty() {
         errors.join("\n")
     } else if let Some(data) = state.data.as_ref().filter(|_| state.last_poll_ok) {
-        usage_summary_lines(
+        let now = SystemTime::now();
+        let mut lines = usage_summary_lines(
             data,
             state.providers,
             state.language,
             state.usage_countdown,
             state.show_antigravity_gemini,
             state.show_antigravity_external,
-            Some(SystemTime::now()),
-        )
-        .join("\n")
+            Some(now),
+        );
+        let warnings = super::alert_lines(
+            &state.window_warnings,
+            &state.window_forecast,
+            data,
+            state.providers,
+            state.language,
+            state.show_antigravity_external,
+        );
+        if !warnings.is_empty() {
+            lines.push(String::new());
+            lines.extend(warnings);
+        }
+        lines.join("\n")
     } else {
         String::new()
     };

@@ -73,6 +73,9 @@ grok_window_title = "Grok Kullanım İzleyicisi"
 copilot_window_title = "Copilot Kullanım İzleyicisi"
 
 [translations]
+
+"Runs out in" = "Tükenme süresi"
+"Runs out before the reset at the current pace" = "Mevcut hızda sıfırlamadan önce tükenir"
 "Absolute value" = "Mutlak değer"
 "Action" = "Action"
 "Actions run from top to bottom in one update." = "Eylemler tek bir güncellemede yukarıdan aşağıya çalışır."

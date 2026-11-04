@@ -1368,6 +1368,30 @@ pub struct DataContext {
     strings: HashMap<String, String>,
 }
 
+/// The three quota windows a provider can report. The order is the order of
+/// the theme's row slots and of the alert arrays.
+pub const WINDOW_KINDS: [&str; 3] = ["session", "weekly", "monthly"];
+
+/// Number of per-window alert slots carried by [`ThemeRuntime`].
+pub const WINDOW_ALERT_SLOTS: usize = ProviderId::ALL.len() * 3;
+
+/// Per-window alert state a theme can bind to. A window is flagged either
+/// because it runs out soon (`eta_seconds`) or because its pace exhausts it
+/// before the reset (`forecast`).
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub struct WindowAlert {
+    /// Seconds until the window is exhausted at the current pace; 0 when calm.
+    pub eta_seconds: u32,
+    /// The current pace exhausts the window before it resets.
+    pub forecast: bool,
+}
+
+impl WindowAlert {
+    pub fn burning(self) -> bool {
+        self.eta_seconds > 0
+    }
+}
+
 /// Runtime environment used by theme expressions and layout. Provider state is
 /// deliberately independent of polling availability so a temporary provider
 /// error never causes the widget to jump or resize.
@@ -1392,6 +1416,11 @@ pub struct ThemeRuntime {
     pub burn_eta_seconds: [u32; ProviderId::ALL.len()],
     /// Providers whose current pace exhausts a window before it resets.
     pub forecast_exhausted: ProviderSet,
+    /// Per-window alert state, indexed like `ProviderId::ALL` times
+    /// [`WINDOW_KINDS`].
+    pub window_alerts: [WindowAlert; WINDOW_ALERT_SLOTS],
+    /// The same state for Antigravity's external (Claude/GPT) pool.
+    pub external_window_alerts: [WindowAlert; WINDOW_ALERT_SLOTS],
     pub crossfade_opacity: f64,
     host_width: u32,
     host_height: u32,
@@ -1412,6 +1441,8 @@ impl Default for ThemeRuntime {
             burn_warning: ProviderSet::empty(),
             burn_eta_seconds: [0; ProviderId::ALL.len()],
             forecast_exhausted: ProviderSet::empty(),
+            window_alerts: [WindowAlert::default(); WINDOW_ALERT_SLOTS],
+            external_window_alerts: [WindowAlert::default(); WINDOW_ALERT_SLOTS],
             crossfade_opacity: 1.0,
             host_width: default_canvas_width(),
             host_height: default_canvas_height(),
@@ -1449,6 +1480,8 @@ impl ThemeRuntime {
             burn_warning: ProviderSet::empty(),
             burn_eta_seconds: [0; ProviderId::ALL.len()],
             forecast_exhausted: ProviderSet::empty(),
+            window_alerts: [WindowAlert::default(); WINDOW_ALERT_SLOTS],
+            external_window_alerts: [WindowAlert::default(); WINDOW_ALERT_SLOTS],
             crossfade_opacity: 1.0,
             host_width: default_canvas_width(),
             host_height: default_canvas_height(),
@@ -1502,6 +1535,35 @@ impl ThemeRuntime {
     pub fn with_forecast_exhausted(mut self, exhausted: ProviderSet) -> Self {
         self.forecast_exhausted = exhausted;
         self
+    }
+
+    /// Alerts for the individual windows, so a theme can mark the row that is
+    /// actually at risk instead of the provider as a whole.
+    pub fn with_window_alerts(
+        mut self,
+        alerts: [WindowAlert; WINDOW_ALERT_SLOTS],
+        external: [WindowAlert; WINDOW_ALERT_SLOTS],
+    ) -> Self {
+        self.window_alerts = alerts;
+        self.external_window_alerts = external;
+        self
+    }
+
+    fn provider_slot(provider: ProviderId) -> usize {
+        ProviderId::ALL
+            .iter()
+            .position(|candidate| *candidate == provider)
+            .unwrap_or(0)
+    }
+
+    /// Alert for one provider window; `window` indexes [`WINDOW_KINDS`].
+    pub fn window_alert(self, provider: ProviderId, window: usize) -> WindowAlert {
+        self.window_alerts[Self::provider_slot(provider) * WINDOW_KINDS.len() + window]
+    }
+
+    /// Alert for the external pool's window.
+    pub fn external_window_alert(self, provider: ProviderId, window: usize) -> WindowAlert {
+        self.external_window_alerts[Self::provider_slot(provider) * WINDOW_KINDS.len() + window]
     }
 
     pub fn with_countdown(mut self, countdown: bool) -> Self {
@@ -1625,6 +1687,30 @@ impl DataContext {
                 &format!("{}.forecast.exhausted", descriptor.key),
                 runtime.forecast_exhausted.contains(descriptor.id) as u8 as f64,
             );
+            // Per-window state: the row marker names the window that is at risk
+            // instead of lighting up the whole provider.
+            for (index, window) in WINDOW_KINDS.iter().enumerate() {
+                insert_window_alert(
+                    &mut context,
+                    &format!("{}.{window}", descriptor.key),
+                    runtime.window_alert(descriptor.id, index),
+                );
+            }
+            if descriptor.id == ProviderId::Antigravity {
+                for (index, window) in WINDOW_KINDS.iter().enumerate() {
+                    let alert = runtime.window_alert(descriptor.id, index);
+                    insert_window_alert(
+                        &mut context,
+                        &format!("antigravity.gemini.{window}"),
+                        alert,
+                    );
+                    insert_window_alert(
+                        &mut context,
+                        &format!("antigravity.external.{window}"),
+                        runtime.external_window_alert(descriptor.id, index),
+                    );
+                }
+            }
         }
         // Hourly peaks of the last day, one comma-separated binding per window,
         // so themes can draw a sparkline without asking the poller for more.
@@ -3012,6 +3098,22 @@ pub fn validate_template(template: &str, context: &DataContext) -> Vec<String> {
 
 /// Provider with the most headroom on its tightest window, and that headroom in
 /// percentage points. `None` when no enabled provider reported anything.
+/// Expose one window's alert under three bindings a theme can gate on.
+fn insert_window_alert(context: &mut DataContext, prefix: &str, alert: WindowAlert) {
+    context.insert(
+        &format!("{prefix}.burn.warning"),
+        alert.burning() as u8 as f64,
+    );
+    context.insert(
+        &format!("{prefix}.burn.eta.seconds"),
+        f64::from(alert.eta_seconds),
+    );
+    context.insert(
+        &format!("{prefix}.forecast.exhausted"),
+        alert.forecast as u8 as f64,
+    );
+}
+
 /// The provider window whose report this binding describes. A missing label
 /// means the provider's documented default; Cursor's Auto/API windows have no
 /// fixed length and stay on the plain 24-hour sparkline.

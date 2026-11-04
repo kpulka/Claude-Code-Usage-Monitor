@@ -53,6 +53,8 @@ pub(super) fn state_for(theme: ThemeDocument, placement: PlacementOverride) -> A
         notify_limit_reached: true,
         notify_limit_reset: true,
         forecast_exhausted: crate::providers::ProviderSet::empty(),
+        window_warnings: std::collections::BTreeMap::new(),
+        window_forecast: std::collections::BTreeSet::new(),
         active_theme_path: None,
         active_theme: Some(theme),
         theme_clock_interval: None,
