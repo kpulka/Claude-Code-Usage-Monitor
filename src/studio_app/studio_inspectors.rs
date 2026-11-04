@@ -819,6 +819,7 @@ pub(super) fn layer_properties_inspector(
                 source: "claude.session.history".into(),
                 color: Paint::new("#D97757FF"),
                 fill: Paint::new("#D9775726"),
+                invert: 0.0.into(),
             },
             _ => SceneContent::None,
         };
@@ -1082,6 +1083,7 @@ pub(super) fn content_inspector(
             source,
             color,
             fill,
+            ..
         } => {
             labeled(ui, language.text("Series binding"), |ui| {
                 ui.add(

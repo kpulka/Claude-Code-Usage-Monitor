@@ -15,6 +15,8 @@ changes grouped into Added, Changed, Fixed, and Removed where applicable.
   with a toast when a spent window refills instead of only a sound.
 - Polish translations for every string this fork introduced (the catalogue now carries 114 extra keys
   across all 14 locales, so no locale falls back to English for them).
+- Sparkline content takes an `invert` expression, so a chart can draw what is left when the card is
+  counting down instead of up.
 
 ### Changed
 
@@ -29,6 +31,23 @@ changes grouped into Added, Changed, Fixed, and Removed where applicable.
   release is refused unless its asset URL belongs to that repository. The WinGet path is derived from
   the package id and stays disabled here, because `CodeZeno.ClaudeCodeUsageMonitor` belongs to another
   publisher - pressing "Check for updates" can no longer replace this build with upstream.
+
+- "Grid panel" is 412px wide and gives every window its own sparkline in a right-hand column whose height
+  follows the number of rows and starts under the provider name. The recommendation banner and the dead
+  headline row are gone; the provider with the most room is marked with a halo, and the burn or forecast
+  warning is one marker beside the ETA. A two-pixel border keeps the card's edge visible at 150% DPI, and
+  the card's scrim is darker so its text stays readable over a light page.
+- A sparkline bridges an hour without a sample between two known points instead of breaking the trend into
+  disconnected blocks. Gaps before the first and after the last sample still stay empty.
+
+### Fixed
+
+- The grid card no longer draws a sparkline across the five-hour percentage (and through the old dead
+  headline): the chart has its own column and z-order.
+- DeepSeek's wallet ETA no longer renders the light and dark variants at once, which ghosted the text,
+  and its `saldo`/`starczy` labels now come from the locale catalogue.
+- Antigravity no longer leaves an empty "5h now" row when only the long window is reported.
+- Codex's weekly fallback no longer draws the 30d figure under a "5h" label and repeats it on the 7d row.
 
 ### Added
 

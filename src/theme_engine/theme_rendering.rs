@@ -1088,6 +1088,7 @@ pub(super) fn render_object_content(
             source,
             color,
             fill,
+            invert,
         } => {
             // A binding name resolves to the series string; anything else is
             // treated as a template so a theme can inline its own values.
@@ -1095,7 +1096,15 @@ pub(super) fn render_object_content(
                 .get_string(source)
                 .map(str::to_owned)
                 .unwrap_or_else(|| format_template(source, context));
-            let points = parse_sparkline_points(&raw);
+            let mut points = parse_sparkline_points(&raw);
+            // The history records the share already spent, while the card can
+            // be showing what is left. Flipping here keeps a chart on the same
+            // scale as the row beside it.
+            if evaluate(&invert.0, context).unwrap_or(0.0) != 0.0 {
+                for point in points.iter_mut().flatten() {
+                    *point = 100.0 - *point;
+                }
+            }
             let fill = fill.resolve(context);
             draw_sparkline(
                 pixels,
@@ -1164,20 +1173,23 @@ pub(super) fn draw_sparkline(
             continue;
         };
         let current = (x_of(index), y_of(percent));
-        let previous = index.checked_sub(1).and_then(|previous| points[previous]);
-        let next = points.get(index + 1).copied().flatten();
+        let previous = (0..index)
+            .rev()
+            .find_map(|previous| points[previous].map(|value| (previous, value)));
         match previous {
-            // Only join neighbours that both have a sample: a gap stays a gap.
-            Some(previous) => draw_sparkline_segment(
+            // Bridge an hour without a sample: the chart keeps its trend
+            // instead of breaking into disconnected blocks. Leading and
+            // trailing gaps still stay empty.
+            Some((previous_index, previous_percent)) => draw_sparkline_segment(
                 pixels,
                 width,
                 height,
-                (x_of(index - 1), y_of(previous)),
+                (x_of(previous_index), y_of(previous_percent)),
                 current,
                 source,
             ),
             // A sample with no neighbour on either side is still worth a dot.
-            None if next.is_none() => {
+            None if !(index + 1..points.len()).any(|next| points[next].is_some()) => {
                 paint_sparkline_dot(pixels, width, height, current, 1.0, source)
             }
             None => {}
@@ -1185,24 +1197,29 @@ pub(super) fn draw_sparkline(
     }
 }
 
-/// Series value at pixel column `x`, interpolated between neighbouring samples.
+/// Series value at pixel column `x`, interpolated between the nearest samples
+/// on either side. A gap between them is bridged; a gap outside the first and
+/// last sample stays empty.
 fn sparkline_value_at(points: &[Option<f64>], width: u32, x: f64) -> Option<f64> {
+    if points.is_empty() {
+        return None;
+    }
     if points.len() == 1 {
         return points[0];
     }
     let last = points.len() - 1;
     let span = (width as f64 - 1.0).max(1.0);
     let position = (x / span * last as f64).clamp(0.0, last as f64);
-    let left = position.floor() as usize;
-    let right = (left + 1).min(last);
-    let left_value = points[left]?;
-    let right_value = if right == left {
-        left_value
-    } else {
-        points[right]?
-    };
-    let amount = position - left as f64;
-    Some(left_value + (right_value - left_value) * amount)
+    let before = (0..=position.floor() as usize)
+        .rev()
+        .find_map(|index| points[index].map(|value| (index, value)))?;
+    let after = (position.ceil() as usize..=last)
+        .find_map(|index| points[index].map(|value| (index, value)))?;
+    if before.0 == after.0 {
+        return Some(before.1);
+    }
+    let amount = (position - before.0 as f64) / (after.0 - before.0) as f64;
+    Some(before.1 + (after.1 - before.1) * amount)
 }
 
 fn draw_sparkline_segment(

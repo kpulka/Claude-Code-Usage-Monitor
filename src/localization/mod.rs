@@ -175,6 +175,8 @@ pub struct Strings {
     pub exit: &'static str,
     pub session_window: &'static str,
     pub weekly_window: &'static str,
+    pub balance: &'static str,
+    pub lasts: &'static str,
     pub cursor_auto_window: &'static str,
     pub cursor_api_window: &'static str,
     pub now: &'static str,

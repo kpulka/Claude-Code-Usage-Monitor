@@ -1022,6 +1022,174 @@ fn grid_panel_bars_are_ten_segment_gauges() {
 }
 
 #[test]
+fn grid_panel_charts_share_the_group_height_without_touching_text() {
+    let (_, source) = BUILTIN_THEME_SOURCES
+        .iter()
+        .find(|(id, _)| *id == GRID_PANEL_THEME_ID)
+        .expect("grid-panel ships as a built-in theme");
+    let theme: ThemeDocument = serde_json::from_str(source).unwrap();
+    let surface = &theme.surfaces[0];
+
+    let ids = surface
+        .children
+        .iter()
+        .map(|object| object.id.as_str())
+        .collect::<Vec<_>>();
+    assert!(!ids.iter().any(|id| id.contains("-headline-")));
+    assert!(!ids.iter().any(|id| id.ends_with("-forecast-dot")));
+    assert!(!ids.contains(&"recommendation"));
+    assert_eq!(
+        ids.iter().collect::<std::collections::HashSet<_>>().len(),
+        ids.len(),
+        "object ids must stay unique"
+    );
+
+    let window = |percentage: f64| crate::models::UsageSection {
+        available: true,
+        percentage,
+        resets_at: Some(std::time::SystemTime::now() + std::time::Duration::from_secs(3_600)),
+    };
+    let usage = crate::models::AppUsageData::from_iter(ProviderId::ALL.map(|provider| {
+        (
+            provider,
+            crate::models::UsageData {
+                session: window(4.0),
+                weekly: window(30.0),
+                monthly: matches!(provider, ProviderId::OpenCode | ProviderId::CommandCode)
+                    .then(|| window(41.0)),
+                credits: (provider == ProviderId::DeepSeek).then(|| {
+                    crate::models::CreditsSection {
+                        percentage: 15.0,
+                        remaining: 16.45,
+                        total: 19.0,
+                        currency: Some("USD".into()),
+                        eta_seconds: Some(30.0 * 86_400.0),
+                        ..Default::default()
+                    }
+                }),
+                ..Default::default()
+            },
+        )
+    }));
+    let mut canvas = Canvas::default();
+    canvas.width = 412;
+    canvas.height = 734;
+    let runtime = ThemeRuntime::from_providers(ProviderSet::from_enabled(ProviderId::ALL))
+        .with_countdown(true);
+    let context = DataContext::from_usage_with_runtime(Some(&usage), &canvas, runtime);
+    assert_eq!(evaluate(&surface.width.0, &context).unwrap(), 412.0);
+    assert_eq!(evaluate(&surface.height.0, &context).unwrap(), 734.0);
+
+    let rect = |object: &SceneObject| {
+        Some((
+            evaluate(&object.x.0, &context).ok()?,
+            evaluate(&object.y.0, &context).ok()?,
+            evaluate(&object.width.0, &context).ok()?,
+            evaluate(&object.height.0, &context).ok()?,
+        ))
+    };
+    let mut content_height = 10.0;
+    for group in surface
+        .children
+        .iter()
+        .filter(|object| object.id.ends_with("-provider"))
+    {
+        let height = evaluate(&group.height.0, &context).unwrap();
+        content_height += height;
+        let children = surface
+            .children
+            .iter()
+            .filter(|object| object.parent.as_deref() == Some(group.id.as_str()))
+            .collect::<Vec<_>>();
+        let charts = children
+            .iter()
+            .copied()
+            .filter(|object| object.id.contains("-chart-"))
+            .filter(|object| evaluate(&object.render.0, &context).unwrap_or(1.0) != 0.0)
+            .filter_map(|object| rect(object).map(|rect| (object, rect)))
+            .collect::<Vec<_>>();
+        assert!(!charts.is_empty(), "{} has no visible chart", group.id);
+        let top = charts
+            .iter()
+            .map(|(_, rect)| rect.1)
+            .fold(f64::INFINITY, f64::min);
+        assert!(top <= 25.0, "{}: chart starts at {top}", group.id);
+        for (chart_object, chart) in &charts {
+            assert!(
+                chart.1 + chart.3 <= height,
+                "{} overflows its {height}px group: {chart:?}",
+                chart_object.id
+            );
+            for text in children.iter().copied() {
+                if text.id.contains("-chart-")
+                    || evaluate(&text.render.0, &context).unwrap_or(1.0) == 0.0
+                {
+                    continue;
+                }
+                let Some(other) = rect(text) else { continue };
+                let overlap_x = (chart.0 + chart.2).min(other.0 + other.2) - chart.0.max(other.0);
+                let overlap_y = (chart.1 + chart.3).min(other.1 + other.3) - chart.1.max(other.1);
+                assert!(
+                    overlap_x <= 0.0 || overlap_y <= 0.0,
+                    "{} overlaps {}: {chart:?} vs {other:?}",
+                    chart_object.id,
+                    text.id
+                );
+            }
+        }
+    }
+    assert_eq!(content_height, 734.0);
+
+    // A provider that reports one long window stretches its only chart up to
+    // the provider name instead of leaving a ten-pixel strip.
+    let single = crate::models::AppUsageData::from_iter([(
+        ProviderId::Grok,
+        crate::models::UsageData {
+            weekly: window(30.0),
+            ..Default::default()
+        },
+    )]);
+    let context = DataContext::from_usage(Some(&single), &Canvas::default());
+    let weekly = surface
+        .children
+        .iter()
+        .find(|object| object.id == "grok-chart-weekly")
+        .expect("grok keeps a weekly chart");
+    assert_eq!(evaluate(&weekly.y.0, &context).unwrap(), 24.0);
+    assert_eq!(evaluate(&weekly.height.0, &context).unwrap(), 44.0);
+}
+
+#[test]
+fn built_in_themes_keep_dark_and_light_variants_mutually_exclusive() {
+    for (theme_id, source) in BUILTIN_THEME_SOURCES {
+        let theme: ThemeDocument = serde_json::from_str(source).unwrap();
+        let objects = theme.surfaces[0]
+            .children
+            .iter()
+            .map(|object| (object.id.as_str(), object))
+            .collect::<std::collections::HashMap<_, _>>();
+        for (id, object) in &objects {
+            let Some(base) = id.strip_suffix("-dark") else {
+                continue;
+            };
+            let Some(light) = objects.get(format!("{base}-light").as_str()) else {
+                continue;
+            };
+            let dark_render = object.render.0.trim();
+            let light_render = light.render.0.trim();
+            assert_ne!(
+                dark_render, light_render,
+                "{theme_id}: {base} draws both variants at once"
+            );
+            assert!(
+                dark_render.contains("system.dark") && light_render.contains("system.dark"),
+                "{theme_id}: {base} does not switch on the system theme"
+            );
+        }
+    }
+}
+
+#[test]
 fn starter_theme_round_trips_and_validates() {
     let theme = ThemeDocument::starter();
     assert!(theme.validate().is_empty());
@@ -3744,7 +3912,7 @@ fn sparkline_parser_reads_points_and_leaves_gaps() {
     assert_eq!(parse_sparkline_points("NaN,inf"), vec![None, None]);
 }
 
-fn sparkline_pixels(series: &str) -> Vec<u32> {
+fn sparkline_pixels(series: &str, invert: &str) -> Vec<u32> {
     use super::theme_rendering::render_object_content;
 
     let mut object = SceneObject::object("sparkline-test", "Sparkline");
@@ -3760,6 +3928,7 @@ fn sparkline_pixels(series: &str) -> Vec<u32> {
             color: "#D9775726".into(),
             opacity: 1.0.into(),
         },
+        invert: Expression(invert.into()),
     };
     let resolved = ResolvedObject {
         source: &object,
@@ -3785,7 +3954,7 @@ fn sparkline_pixels(series: &str) -> Vec<u32> {
 
 #[test]
 fn sparkline_draws_a_line_for_a_series_and_nothing_for_empty_data() {
-    let painted = sparkline_pixels("10,40,20,80,55");
+    let painted = sparkline_pixels("10,40,20,80,55", "0");
     assert!(
         painted.iter().filter(|pixel| **pixel != 0).count() >= 20,
         "a non-empty series must paint the line"
@@ -3794,7 +3963,7 @@ fn sparkline_draws_a_line_for_a_series_and_nothing_for_empty_data() {
     assert!(painted[0] == 0);
 
     for empty in ["", "   ", ",,,"] {
-        let pixels = sparkline_pixels(empty);
+        let pixels = sparkline_pixels(empty, "0");
         assert!(
             pixels.iter().all(|pixel| *pixel == 0),
             "empty data must draw nothing"
@@ -3802,8 +3971,42 @@ fn sparkline_draws_a_line_for_a_series_and_nothing_for_empty_data() {
     }
 
     // A single hour still leaves a dot behind.
-    let single = sparkline_pixels("42");
+    let single = sparkline_pixels("42", "0");
     assert!(single.iter().any(|pixel| *pixel != 0));
+}
+
+#[test]
+fn sparkline_bridges_a_gap_between_samples() {
+    let painted_column =
+        |pixels: &[u32], column: usize| (0..10).any(|row| pixels[row * 84 + column] != 0);
+    let bridged = sparkline_pixels("10,,90", "0");
+    assert!(
+        painted_column(&bridged, 42),
+        "the hour without a sample must be bridged"
+    );
+    // A gap before the first sample is not invented data.
+    let leading = sparkline_pixels(",10,90", "0");
+    assert!(!painted_column(&leading, 0));
+}
+
+#[test]
+fn sparkline_invert_follows_the_usage_direction() {
+    // The history records spend, so a 10% series sits low in the box; with
+    // invert on, the same sample means 90% left and must sit near the top.
+    let used = sparkline_pixels("10", "0");
+    let remaining = sparkline_pixels("10", "1");
+    let top_row = |pixels: &[u32]| {
+        pixels
+            .iter()
+            .position(|pixel| *pixel != 0)
+            .map(|index| index / 84)
+    };
+    let used_top = top_row(&used).expect("the line paints");
+    let remaining_top = top_row(&remaining).expect("the line paints");
+    assert!(
+        remaining_top < used_top,
+        "inverted series must sit higher: used row {used_top}, remaining row {remaining_top}"
+    );
 }
 
 #[test]

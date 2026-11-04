@@ -20,16 +20,16 @@
         "offset_x": 0,
         "offset_y": 0
       },
-      "width": "340",
-      "height": "30 + providers.count * 76 + 20 * opencode.monthly.available + 20 * commandcode.monthly.available",
+      "width": "412",
+      "height": "10 + providers.count * 76 + 20 * opencode.monthly.available + 20 * commandcode.monthly.available",
       "corner_radius": "14",
       "background": {
         "type": "gradient",
         "start": {
-          "color": "#1A1A206E"
+          "color": "#16161CB4"
         },
         "end": {
-          "color": "#0E0E1360"
+          "color": "#0B0B10A8"
         },
         "angle": "90"
       },
@@ -60,33 +60,54 @@
           "layout": "column"
         },
         {
-          "id": "recommendation",
-          "name": "Recommended plan",
-          "parent": "grid",
-          "render": "summary.recommendation != ''",
-          "width": "canvas.width",
-          "height": "18",
-          "content": {
-            "type": "text",
-            "template": "→ {summary.recommendation}",
-            "font_family": "Segoe UI",
-            "font_size": "11",
-            "weight": "semibold",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "left",
-            "color": {
-              "color": "#8BE9A6FF"
-            }
-          }
-        },
-        {
           "id": "claude-provider",
           "name": "Claude",
           "parent": "grid",
           "render": "providers.claude.enabled",
           "width": "canvas.width",
           "height": "76"
+        },
+        {
+          "id": "claude-chart-session",
+          "name": "claude usage history (5h)",
+          "parent": "claude-provider",
+          "render": "claude.five_hour.available",
+          "x": "334",
+          "y": "24",
+          "width": "64",
+          "height": "22",
+          "content": {
+            "type": "sparkline",
+            "source": "claude.session.history",
+            "color": {
+              "color": "#D97757"
+            },
+            "fill": {
+              "color": "#00000000"
+            },
+            "invert": "display.countdown"
+          }
+        },
+        {
+          "id": "claude-chart-weekly",
+          "name": "claude usage history (7d)",
+          "parent": "claude-provider",
+          "render": "claude.weekly.available",
+          "x": "334",
+          "y": "24 + 22 * claude.five_hour.available",
+          "width": "64",
+          "height": "22 + 22 * (1 - claude.five_hour.available)",
+          "content": {
+            "type": "sparkline",
+            "source": "claude.weekly.history",
+            "color": {
+              "color": "#D97757"
+            },
+            "fill": {
+              "color": "#00000000"
+            },
+            "invert": "display.countdown"
+          }
         },
         {
           "id": "claude-burn-eta",
@@ -112,23 +133,6 @@
           }
         },
         {
-          "id": "claude-forecast-dot",
-          "name": "claude forecast warning",
-          "parent": "claude-provider",
-          "render": "claude.forecast.exhausted",
-          "x": "198",
-          "y": "18",
-          "width": "7",
-          "height": "7",
-          "corner_radius": "3",
-          "background": {
-            "type": "colour",
-            "colour": {
-              "color": "#F87171FF"
-            }
-          }
-        },
-        {
           "id": "claude-burn-warning",
           "name": "claude burn warning",
           "parent": "claude-provider",
@@ -148,6 +152,46 @@
             "align": "right",
             "color": {
               "color": "#F59E0BFF"
+            }
+          }
+        },
+        {
+          "id": "claude-forecast-warning",
+          "name": "claude forecast warning",
+          "parent": "claude-provider",
+          "render": "claude.forecast.exhausted && (1 - claude.burn.warning)",
+          "x": "196",
+          "y": "6",
+          "width": "14",
+          "height": "18",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "15",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#F87171FF"
+            }
+          }
+        },
+        {
+          "id": "claude-recommended-ring",
+          "name": "claude recommended",
+          "parent": "claude-provider",
+          "render": "claude.recommended",
+          "x": "12",
+          "y": "13",
+          "width": "14",
+          "height": "14",
+          "corner_radius": "7",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#D9775755"
             }
           }
         },
@@ -191,33 +235,10 @@
           }
         },
         {
-          "id": "claude-headline-dark",
-          "name": "claude-headline-dark",
-          "parent": "claude-provider",
-          "render": "system.dark",
-          "x": "212",
-          "y": "7",
-          "width": "110",
-          "height": "20",
-          "content": {
-            "type": "text",
-            "template": "{claude.headline.display:usage_line}",
-            "font_family": "Segoe UI",
-            "font_size": "15",
-            "weight": "bold",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#D97757"
-            }
-          }
-        },
-        {
           "id": "claude-session-label-dark",
           "name": "claude-session-label-dark",
           "parent": "claude-provider",
-          "render": "system.dark",
+          "render": "system.dark && claude.five_hour.available",
           "x": "30",
           "y": "31",
           "width": "32",
@@ -232,7 +253,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#9AA0A6FF"
+              "color": "#B6BCC4FF"
             }
           }
         },
@@ -240,14 +261,14 @@
           "id": "claude-session-value-dark",
           "name": "claude-session-value-dark",
           "parent": "claude-provider",
-          "render": "system.dark && claude.session.available",
+          "render": "system.dark && claude.five_hour.available",
           "x": "246",
           "y": "29",
           "width": "80",
           "height": "14",
           "content": {
             "type": "text",
-            "template": "{claude.session.display:0}%",
+            "template": "{claude.five_hour.display:0}%",
             "font_family": "Segoe UI",
             "font_size": "11",
             "weight": "medium",
@@ -263,7 +284,7 @@
           "id": "claude-session-reset-dark",
           "name": "claude-session-reset-dark",
           "parent": "claude-provider",
-          "render": "system.dark && claude.session.reset.unix > 0",
+          "render": "system.dark && claude.five_hour.available && claude.session.reset.unix > 0",
           "x": "64",
           "y": "31",
           "width": "62",
@@ -278,7 +299,7 @@
             "contrast": "1",
             "align": "right",
             "color": {
-              "color": "#9AA0A6FF"
+              "color": "#B6BCC4FF"
             }
           }
         },
@@ -286,7 +307,7 @@
           "id": "claude-weekly-label-dark",
           "name": "claude-weekly-label-dark",
           "parent": "claude-provider",
-          "render": "system.dark",
+          "render": "system.dark && claude.weekly.available",
           "x": "30",
           "y": "51",
           "width": "32",
@@ -301,7 +322,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#9AA0A6FF"
+              "color": "#B6BCC4FF"
             }
           }
         },
@@ -347,7 +368,7 @@
             "contrast": "1",
             "align": "right",
             "color": {
-              "color": "#9AA0A6FF"
+              "color": "#B6BCC4FF"
             }
           }
         },
@@ -375,53 +396,10 @@
           }
         },
         {
-          "id": "claude-headline-light",
-          "name": "claude-headline-light",
-          "parent": "claude-provider",
-          "render": "1 - system.dark",
-          "x": "212",
-          "y": "7",
-          "width": "110",
-          "height": "20",
-          "content": {
-            "type": "text",
-            "template": "{claude.headline.display:usage_line}",
-            "font_family": "Segoe UI",
-            "font_size": "15",
-            "weight": "bold",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#D97757"
-            }
-          }
-        },
-        {
-          "id": "claude-history",
-          "name": "claude usage history",
-          "parent": "claude-provider",
-          "render": "providers.claude.enabled",
-          "x": "232",
-          "y": "26",
-          "width": "84",
-          "height": "10",
-          "content": {
-            "type": "sparkline",
-            "source": "claude.session.history",
-            "color": {
-              "color": "#D97757"
-            },
-            "fill": {
-              "color": "#D9775726"
-            }
-          }
-        },
-        {
           "id": "claude-session-label-light",
           "name": "claude-session-label-light",
           "parent": "claude-provider",
-          "render": "1 - system.dark",
+          "render": "1 - system.dark && claude.five_hour.available",
           "x": "30",
           "y": "31",
           "width": "32",
@@ -436,7 +414,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#5F6368FF"
+              "color": "#4A4F55FF"
             }
           }
         },
@@ -444,14 +422,14 @@
           "id": "claude-session-value-light",
           "name": "claude-session-value-light",
           "parent": "claude-provider",
-          "render": "1 - system.dark && claude.session.available",
+          "render": "1 - system.dark && claude.five_hour.available",
           "x": "246",
           "y": "29",
           "width": "80",
           "height": "14",
           "content": {
             "type": "text",
-            "template": "{claude.session.display:0}%",
+            "template": "{claude.five_hour.display:0}%",
             "font_family": "Segoe UI",
             "font_size": "11",
             "weight": "medium",
@@ -467,7 +445,7 @@
           "id": "claude-session-reset-light",
           "name": "claude-session-reset-light",
           "parent": "claude-provider",
-          "render": "1 - system.dark && claude.session.reset.unix > 0",
+          "render": "1 - system.dark && claude.five_hour.available && claude.session.reset.unix > 0",
           "x": "64",
           "y": "31",
           "width": "62",
@@ -482,7 +460,7 @@
             "contrast": "1",
             "align": "right",
             "color": {
-              "color": "#5F6368FF"
+              "color": "#4A4F55FF"
             }
           }
         },
@@ -490,7 +468,7 @@
           "id": "claude-weekly-label-light",
           "name": "claude-weekly-label-light",
           "parent": "claude-provider",
-          "render": "1 - system.dark",
+          "render": "1 - system.dark && claude.weekly.available",
           "x": "30",
           "y": "51",
           "width": "32",
@@ -505,7 +483,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#5F6368FF"
+              "color": "#4A4F55FF"
             }
           }
         },
@@ -551,7 +529,7 @@
             "contrast": "1",
             "align": "right",
             "color": {
-              "color": "#5F6368FF"
+              "color": "#4A4F55FF"
             }
           }
         },
@@ -559,14 +537,14 @@
           "id": "claude-session-bar",
           "name": "claude-session-bar",
           "parent": "claude-provider",
-          "render": "claude.session.available",
+          "render": "claude.five_hour.available",
           "x": "130",
           "y": "34",
           "width": "106",
           "height": "6",
           "content": {
             "type": "progress",
-            "value": "claude.session.display",
+            "value": "claude.five_hour.display",
             "direction": "left_to_right",
             "fill": {
               "color": "#D97757"
@@ -612,6 +590,48 @@
           "height": "76"
         },
         {
+          "id": "codex-chart-session",
+          "name": "codex usage history (5h)",
+          "parent": "codex-provider",
+          "render": "codex.five_hour.available",
+          "x": "334",
+          "y": "24",
+          "width": "64",
+          "height": "22",
+          "content": {
+            "type": "sparkline",
+            "source": "codex.session.history",
+            "color": {
+              "color": "#10A37F"
+            },
+            "fill": {
+              "color": "#00000000"
+            },
+            "invert": "display.countdown"
+          }
+        },
+        {
+          "id": "codex-chart-weekly",
+          "name": "codex usage history (7d)",
+          "parent": "codex-provider",
+          "render": "codex.weekly.available",
+          "x": "334",
+          "y": "24 + 22 * codex.five_hour.available",
+          "width": "64",
+          "height": "22 + 22 * (1 - codex.five_hour.available)",
+          "content": {
+            "type": "sparkline",
+            "source": "codex.weekly.history",
+            "color": {
+              "color": "#10A37F"
+            },
+            "fill": {
+              "color": "#00000000"
+            },
+            "invert": "display.countdown"
+          }
+        },
+        {
           "id": "codex-burn-eta",
           "name": "codex burn eta",
           "parent": "codex-provider",
@@ -635,23 +655,6 @@
           }
         },
         {
-          "id": "codex-forecast-dot",
-          "name": "codex forecast warning",
-          "parent": "codex-provider",
-          "render": "codex.forecast.exhausted",
-          "x": "198",
-          "y": "18",
-          "width": "7",
-          "height": "7",
-          "corner_radius": "3",
-          "background": {
-            "type": "colour",
-            "colour": {
-              "color": "#F87171FF"
-            }
-          }
-        },
-        {
           "id": "codex-burn-warning",
           "name": "codex burn warning",
           "parent": "codex-provider",
@@ -671,6 +674,46 @@
             "align": "right",
             "color": {
               "color": "#F59E0BFF"
+            }
+          }
+        },
+        {
+          "id": "codex-forecast-warning",
+          "name": "codex forecast warning",
+          "parent": "codex-provider",
+          "render": "codex.forecast.exhausted && (1 - codex.burn.warning)",
+          "x": "196",
+          "y": "6",
+          "width": "14",
+          "height": "18",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "15",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#F87171FF"
+            }
+          }
+        },
+        {
+          "id": "codex-recommended-ring",
+          "name": "codex recommended",
+          "parent": "codex-provider",
+          "render": "codex.recommended",
+          "x": "12",
+          "y": "13",
+          "width": "14",
+          "height": "14",
+          "corner_radius": "7",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#10A37F55"
             }
           }
         },
@@ -714,33 +757,10 @@
           }
         },
         {
-          "id": "codex-headline-dark",
-          "name": "codex-headline-dark",
-          "parent": "codex-provider",
-          "render": "system.dark",
-          "x": "212",
-          "y": "7",
-          "width": "110",
-          "height": "20",
-          "content": {
-            "type": "text",
-            "template": "{codex.headline.display:usage_line}",
-            "font_family": "Segoe UI",
-            "font_size": "15",
-            "weight": "bold",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#10A37F"
-            }
-          }
-        },
-        {
           "id": "codex-session-label-dark",
           "name": "codex-session-label-dark",
           "parent": "codex-provider",
-          "render": "system.dark",
+          "render": "system.dark && codex.five_hour.available",
           "x": "30",
           "y": "31",
           "width": "32",
@@ -755,7 +775,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#9AA0A6FF"
+              "color": "#B6BCC4FF"
             }
           }
         },
@@ -763,14 +783,14 @@
           "id": "codex-session-value-dark",
           "name": "codex-session-value-dark",
           "parent": "codex-provider",
-          "render": "system.dark && codex.session.available",
+          "render": "system.dark && codex.five_hour.available",
           "x": "246",
           "y": "29",
           "width": "80",
           "height": "14",
           "content": {
             "type": "text",
-            "template": "{codex.session.display:0}%",
+            "template": "{codex.five_hour.display:0}%",
             "font_family": "Segoe UI",
             "font_size": "11",
             "weight": "medium",
@@ -786,7 +806,7 @@
           "id": "codex-session-reset-dark",
           "name": "codex-session-reset-dark",
           "parent": "codex-provider",
-          "render": "system.dark && codex.session.reset.unix > 0",
+          "render": "system.dark && codex.five_hour.available && codex.session.reset.unix > 0",
           "x": "64",
           "y": "31",
           "width": "62",
@@ -801,7 +821,7 @@
             "contrast": "1",
             "align": "right",
             "color": {
-              "color": "#9AA0A6FF"
+              "color": "#B6BCC4FF"
             }
           }
         },
@@ -809,7 +829,7 @@
           "id": "codex-weekly-label-dark",
           "name": "codex-weekly-label-dark",
           "parent": "codex-provider",
-          "render": "system.dark",
+          "render": "system.dark && codex.weekly.available",
           "x": "30",
           "y": "51",
           "width": "32",
@@ -824,7 +844,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#9AA0A6FF"
+              "color": "#B6BCC4FF"
             }
           }
         },
@@ -870,7 +890,7 @@
             "contrast": "1",
             "align": "right",
             "color": {
-              "color": "#9AA0A6FF"
+              "color": "#B6BCC4FF"
             }
           }
         },
@@ -898,53 +918,10 @@
           }
         },
         {
-          "id": "codex-headline-light",
-          "name": "codex-headline-light",
-          "parent": "codex-provider",
-          "render": "1 - system.dark",
-          "x": "212",
-          "y": "7",
-          "width": "110",
-          "height": "20",
-          "content": {
-            "type": "text",
-            "template": "{codex.headline.display:usage_line}",
-            "font_family": "Segoe UI",
-            "font_size": "15",
-            "weight": "bold",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#10A37F"
-            }
-          }
-        },
-        {
-          "id": "codex-history",
-          "name": "codex usage history",
-          "parent": "codex-provider",
-          "render": "providers.codex.enabled",
-          "x": "232",
-          "y": "26",
-          "width": "84",
-          "height": "10",
-          "content": {
-            "type": "sparkline",
-            "source": "codex.session.history",
-            "color": {
-              "color": "#10A37F"
-            },
-            "fill": {
-              "color": "#10A37F26"
-            }
-          }
-        },
-        {
           "id": "codex-session-label-light",
           "name": "codex-session-label-light",
           "parent": "codex-provider",
-          "render": "1 - system.dark",
+          "render": "1 - system.dark && codex.five_hour.available",
           "x": "30",
           "y": "31",
           "width": "32",
@@ -959,7 +936,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#5F6368FF"
+              "color": "#4A4F55FF"
             }
           }
         },
@@ -967,14 +944,14 @@
           "id": "codex-session-value-light",
           "name": "codex-session-value-light",
           "parent": "codex-provider",
-          "render": "1 - system.dark && codex.session.available",
+          "render": "1 - system.dark && codex.five_hour.available",
           "x": "246",
           "y": "29",
           "width": "80",
           "height": "14",
           "content": {
             "type": "text",
-            "template": "{codex.session.display:0}%",
+            "template": "{codex.five_hour.display:0}%",
             "font_family": "Segoe UI",
             "font_size": "11",
             "weight": "medium",
@@ -990,7 +967,7 @@
           "id": "codex-session-reset-light",
           "name": "codex-session-reset-light",
           "parent": "codex-provider",
-          "render": "1 - system.dark && codex.session.reset.unix > 0",
+          "render": "1 - system.dark && codex.five_hour.available && codex.session.reset.unix > 0",
           "x": "64",
           "y": "31",
           "width": "62",
@@ -1005,7 +982,7 @@
             "contrast": "1",
             "align": "right",
             "color": {
-              "color": "#5F6368FF"
+              "color": "#4A4F55FF"
             }
           }
         },
@@ -1013,7 +990,7 @@
           "id": "codex-weekly-label-light",
           "name": "codex-weekly-label-light",
           "parent": "codex-provider",
-          "render": "1 - system.dark",
+          "render": "1 - system.dark && codex.weekly.available",
           "x": "30",
           "y": "51",
           "width": "32",
@@ -1028,7 +1005,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#5F6368FF"
+              "color": "#4A4F55FF"
             }
           }
         },
@@ -1074,7 +1051,7 @@
             "contrast": "1",
             "align": "right",
             "color": {
-              "color": "#5F6368FF"
+              "color": "#4A4F55FF"
             }
           }
         },
@@ -1082,14 +1059,14 @@
           "id": "codex-session-bar",
           "name": "codex-session-bar",
           "parent": "codex-provider",
-          "render": "codex.session.available",
+          "render": "codex.five_hour.available",
           "x": "130",
           "y": "34",
           "width": "106",
           "height": "6",
           "content": {
             "type": "progress",
-            "value": "codex.session.display",
+            "value": "codex.five_hour.display",
             "direction": "left_to_right",
             "fill": {
               "color": "#10A37F"
@@ -1135,6 +1112,48 @@
           "height": "76"
         },
         {
+          "id": "antigravity-chart-session",
+          "name": "antigravity usage history (5h)",
+          "parent": "antigravity-provider",
+          "render": "antigravity.five_hour.available",
+          "x": "334",
+          "y": "24",
+          "width": "64",
+          "height": "22",
+          "content": {
+            "type": "sparkline",
+            "source": "antigravity.session.history",
+            "color": {
+              "color": "#4285F4"
+            },
+            "fill": {
+              "color": "#00000000"
+            },
+            "invert": "display.countdown"
+          }
+        },
+        {
+          "id": "antigravity-chart-weekly",
+          "name": "antigravity usage history (7d)",
+          "parent": "antigravity-provider",
+          "render": "antigravity.weekly.available",
+          "x": "334",
+          "y": "24 + 22 * antigravity.five_hour.available",
+          "width": "64",
+          "height": "22 + 22 * (1 - antigravity.five_hour.available)",
+          "content": {
+            "type": "sparkline",
+            "source": "antigravity.weekly.history",
+            "color": {
+              "color": "#4285F4"
+            },
+            "fill": {
+              "color": "#00000000"
+            },
+            "invert": "display.countdown"
+          }
+        },
+        {
           "id": "antigravity-burn-eta",
           "name": "antigravity burn eta",
           "parent": "antigravity-provider",
@@ -1158,23 +1177,6 @@
           }
         },
         {
-          "id": "antigravity-forecast-dot",
-          "name": "antigravity forecast warning",
-          "parent": "antigravity-provider",
-          "render": "antigravity.forecast.exhausted",
-          "x": "198",
-          "y": "18",
-          "width": "7",
-          "height": "7",
-          "corner_radius": "3",
-          "background": {
-            "type": "colour",
-            "colour": {
-              "color": "#F87171FF"
-            }
-          }
-        },
-        {
           "id": "antigravity-burn-warning",
           "name": "antigravity burn warning",
           "parent": "antigravity-provider",
@@ -1194,6 +1196,46 @@
             "align": "right",
             "color": {
               "color": "#F59E0BFF"
+            }
+          }
+        },
+        {
+          "id": "antigravity-forecast-warning",
+          "name": "antigravity forecast warning",
+          "parent": "antigravity-provider",
+          "render": "antigravity.forecast.exhausted && (1 - antigravity.burn.warning)",
+          "x": "196",
+          "y": "6",
+          "width": "14",
+          "height": "18",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "15",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#F87171FF"
+            }
+          }
+        },
+        {
+          "id": "antigravity-recommended-ring",
+          "name": "antigravity recommended",
+          "parent": "antigravity-provider",
+          "render": "antigravity.recommended",
+          "x": "12",
+          "y": "13",
+          "width": "14",
+          "height": "14",
+          "corner_radius": "7",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#4285F455"
             }
           }
         },
@@ -1237,33 +1279,10 @@
           }
         },
         {
-          "id": "antigravity-headline-dark",
-          "name": "antigravity-headline-dark",
-          "parent": "antigravity-provider",
-          "render": "system.dark",
-          "x": "212",
-          "y": "7",
-          "width": "110",
-          "height": "20",
-          "content": {
-            "type": "text",
-            "template": "{antigravity.headline.display:usage_line}",
-            "font_family": "Segoe UI",
-            "font_size": "15",
-            "weight": "bold",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#4285F4"
-            }
-          }
-        },
-        {
           "id": "antigravity-session-label-dark",
           "name": "antigravity-session-label-dark",
           "parent": "antigravity-provider",
-          "render": "system.dark",
+          "render": "system.dark && antigravity.five_hour.available",
           "x": "30",
           "y": "31",
           "width": "32",
@@ -1278,7 +1297,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#9AA0A6FF"
+              "color": "#B6BCC4FF"
             }
           }
         },
@@ -1286,14 +1305,14 @@
           "id": "antigravity-session-value-dark",
           "name": "antigravity-session-value-dark",
           "parent": "antigravity-provider",
-          "render": "system.dark && antigravity.session.available",
+          "render": "system.dark && antigravity.five_hour.available",
           "x": "246",
           "y": "29",
           "width": "80",
           "height": "14",
           "content": {
             "type": "text",
-            "template": "{antigravity.session.display:0}%",
+            "template": "{antigravity.five_hour.display:0}%",
             "font_family": "Segoe UI",
             "font_size": "11",
             "weight": "medium",
@@ -1309,7 +1328,7 @@
           "id": "antigravity-session-reset-dark",
           "name": "antigravity-session-reset-dark",
           "parent": "antigravity-provider",
-          "render": "system.dark",
+          "render": "system.dark && antigravity.five_hour.available && antigravity.session.reset.unix > 0",
           "x": "64",
           "y": "31",
           "width": "62",
@@ -1324,7 +1343,7 @@
             "contrast": "1",
             "align": "right",
             "color": {
-              "color": "#9AA0A6FF"
+              "color": "#B6BCC4FF"
             }
           }
         },
@@ -1332,7 +1351,7 @@
           "id": "antigravity-weekly-label-dark",
           "name": "antigravity-weekly-label-dark",
           "parent": "antigravity-provider",
-          "render": "system.dark",
+          "render": "system.dark && antigravity.weekly.available",
           "x": "30",
           "y": "51",
           "width": "32",
@@ -1347,7 +1366,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#9AA0A6FF"
+              "color": "#B6BCC4FF"
             }
           }
         },
@@ -1393,7 +1412,7 @@
             "contrast": "1",
             "align": "right",
             "color": {
-              "color": "#9AA0A6FF"
+              "color": "#B6BCC4FF"
             }
           }
         },
@@ -1421,53 +1440,10 @@
           }
         },
         {
-          "id": "antigravity-headline-light",
-          "name": "antigravity-headline-light",
-          "parent": "antigravity-provider",
-          "render": "1 - system.dark",
-          "x": "212",
-          "y": "7",
-          "width": "110",
-          "height": "20",
-          "content": {
-            "type": "text",
-            "template": "{antigravity.headline.display:usage_line}",
-            "font_family": "Segoe UI",
-            "font_size": "15",
-            "weight": "bold",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#4285F4"
-            }
-          }
-        },
-        {
-          "id": "antigravity-history",
-          "name": "antigravity usage history",
-          "parent": "antigravity-provider",
-          "render": "providers.antigravity.enabled",
-          "x": "232",
-          "y": "26",
-          "width": "84",
-          "height": "10",
-          "content": {
-            "type": "sparkline",
-            "source": "antigravity.session.history",
-            "color": {
-              "color": "#4285F4"
-            },
-            "fill": {
-              "color": "#4285F426"
-            }
-          }
-        },
-        {
           "id": "antigravity-session-label-light",
           "name": "antigravity-session-label-light",
           "parent": "antigravity-provider",
-          "render": "1 - system.dark",
+          "render": "1 - system.dark && antigravity.five_hour.available",
           "x": "30",
           "y": "31",
           "width": "32",
@@ -1482,7 +1458,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#5F6368FF"
+              "color": "#4A4F55FF"
             }
           }
         },
@@ -1490,14 +1466,14 @@
           "id": "antigravity-session-value-light",
           "name": "antigravity-session-value-light",
           "parent": "antigravity-provider",
-          "render": "1 - system.dark && antigravity.session.available",
+          "render": "1 - system.dark && antigravity.five_hour.available",
           "x": "246",
           "y": "29",
           "width": "80",
           "height": "14",
           "content": {
             "type": "text",
-            "template": "{antigravity.session.display:0}%",
+            "template": "{antigravity.five_hour.display:0}%",
             "font_family": "Segoe UI",
             "font_size": "11",
             "weight": "medium",
@@ -1513,7 +1489,7 @@
           "id": "antigravity-session-reset-light",
           "name": "antigravity-session-reset-light",
           "parent": "antigravity-provider",
-          "render": "1 - system.dark",
+          "render": "1 - system.dark && antigravity.five_hour.available && antigravity.session.reset.unix > 0",
           "x": "64",
           "y": "31",
           "width": "62",
@@ -1528,7 +1504,7 @@
             "contrast": "1",
             "align": "right",
             "color": {
-              "color": "#5F6368FF"
+              "color": "#4A4F55FF"
             }
           }
         },
@@ -1536,7 +1512,7 @@
           "id": "antigravity-weekly-label-light",
           "name": "antigravity-weekly-label-light",
           "parent": "antigravity-provider",
-          "render": "1 - system.dark",
+          "render": "1 - system.dark && antigravity.weekly.available",
           "x": "30",
           "y": "51",
           "width": "32",
@@ -1551,7 +1527,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#5F6368FF"
+              "color": "#4A4F55FF"
             }
           }
         },
@@ -1597,7 +1573,7 @@
             "contrast": "1",
             "align": "right",
             "color": {
-              "color": "#5F6368FF"
+              "color": "#4A4F55FF"
             }
           }
         },
@@ -1605,14 +1581,14 @@
           "id": "antigravity-session-bar",
           "name": "antigravity-session-bar",
           "parent": "antigravity-provider",
-          "render": "antigravity.session.available",
+          "render": "antigravity.five_hour.available",
           "x": "130",
           "y": "34",
           "width": "106",
           "height": "6",
           "content": {
             "type": "progress",
-            "value": "antigravity.session.display",
+            "value": "antigravity.five_hour.display",
             "direction": "left_to_right",
             "fill": {
               "color": "#4285F4"
@@ -1658,6 +1634,69 @@
           "height": "76 + 20 * opencode.monthly.available"
         },
         {
+          "id": "opencode-chart-session",
+          "name": "opencode usage history (5h)",
+          "parent": "opencode-provider",
+          "render": "opencode.five_hour.available",
+          "x": "334",
+          "y": "24",
+          "width": "64",
+          "height": "22",
+          "content": {
+            "type": "sparkline",
+            "source": "opencode.session.history",
+            "color": {
+              "color": "#8B5CF6"
+            },
+            "fill": {
+              "color": "#00000000"
+            },
+            "invert": "display.countdown"
+          }
+        },
+        {
+          "id": "opencode-chart-weekly",
+          "name": "opencode usage history (7d)",
+          "parent": "opencode-provider",
+          "render": "opencode.weekly.available",
+          "x": "334",
+          "y": "24 + 22 * opencode.five_hour.available",
+          "width": "64",
+          "height": "22 + 22 * (1 - opencode.five_hour.available)",
+          "content": {
+            "type": "sparkline",
+            "source": "opencode.weekly.history",
+            "color": {
+              "color": "#8B5CF6"
+            },
+            "fill": {
+              "color": "#00000000"
+            },
+            "invert": "display.countdown"
+          }
+        },
+        {
+          "id": "opencode-chart-monthly",
+          "name": "opencode usage history (30d)",
+          "parent": "opencode-provider",
+          "render": "opencode.monthly.available",
+          "x": "334",
+          "y": "68",
+          "width": "64",
+          "height": "22",
+          "content": {
+            "type": "sparkline",
+            "source": "opencode.monthly.history",
+            "color": {
+              "color": "#8B5CF6"
+            },
+            "fill": {
+              "color": "#00000000"
+            },
+            "invert": "display.countdown"
+          }
+        },
+        {
           "id": "opencode-burn-eta",
           "name": "opencode burn eta",
           "parent": "opencode-provider",
@@ -1681,23 +1720,6 @@
           }
         },
         {
-          "id": "opencode-forecast-dot",
-          "name": "opencode forecast warning",
-          "parent": "opencode-provider",
-          "render": "opencode.forecast.exhausted",
-          "x": "198",
-          "y": "18",
-          "width": "7",
-          "height": "7",
-          "corner_radius": "3",
-          "background": {
-            "type": "colour",
-            "colour": {
-              "color": "#F87171FF"
-            }
-          }
-        },
-        {
           "id": "opencode-burn-warning",
           "name": "opencode burn warning",
           "parent": "opencode-provider",
@@ -1717,6 +1739,46 @@
             "align": "right",
             "color": {
               "color": "#F59E0BFF"
+            }
+          }
+        },
+        {
+          "id": "opencode-forecast-warning",
+          "name": "opencode forecast warning",
+          "parent": "opencode-provider",
+          "render": "opencode.forecast.exhausted && (1 - opencode.burn.warning)",
+          "x": "196",
+          "y": "6",
+          "width": "14",
+          "height": "18",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "15",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#F87171FF"
+            }
+          }
+        },
+        {
+          "id": "opencode-recommended-ring",
+          "name": "opencode recommended",
+          "parent": "opencode-provider",
+          "render": "opencode.recommended",
+          "x": "12",
+          "y": "13",
+          "width": "14",
+          "height": "14",
+          "corner_radius": "7",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#8B5CF655"
             }
           }
         },
@@ -1760,33 +1822,10 @@
           }
         },
         {
-          "id": "opencode-headline-dark",
-          "name": "opencode-headline-dark",
-          "parent": "opencode-provider",
-          "render": "system.dark",
-          "x": "212",
-          "y": "7",
-          "width": "110",
-          "height": "20",
-          "content": {
-            "type": "text",
-            "template": "{opencode.headline.display:usage_line}",
-            "font_family": "Segoe UI",
-            "font_size": "15",
-            "weight": "bold",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#8B5CF6"
-            }
-          }
-        },
-        {
           "id": "opencode-session-label-dark",
           "name": "opencode-session-label-dark",
           "parent": "opencode-provider",
-          "render": "system.dark",
+          "render": "system.dark && opencode.five_hour.available",
           "x": "30",
           "y": "31",
           "width": "32",
@@ -1801,7 +1840,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#9AA0A6FF"
+              "color": "#B6BCC4FF"
             }
           }
         },
@@ -1809,14 +1848,14 @@
           "id": "opencode-session-value-dark",
           "name": "opencode-session-value-dark",
           "parent": "opencode-provider",
-          "render": "system.dark && opencode.session.available",
+          "render": "system.dark && opencode.five_hour.available",
           "x": "246",
           "y": "29",
           "width": "80",
           "height": "14",
           "content": {
             "type": "text",
-            "template": "{opencode.session.display:0}%",
+            "template": "{opencode.five_hour.display:0}%",
             "font_family": "Segoe UI",
             "font_size": "11",
             "weight": "medium",
@@ -1832,7 +1871,7 @@
           "id": "opencode-session-reset-dark",
           "name": "opencode-session-reset-dark",
           "parent": "opencode-provider",
-          "render": "system.dark && opencode.session.reset.unix > 0",
+          "render": "system.dark && opencode.five_hour.available && opencode.session.reset.unix > 0",
           "x": "64",
           "y": "31",
           "width": "62",
@@ -1847,7 +1886,7 @@
             "contrast": "1",
             "align": "right",
             "color": {
-              "color": "#9AA0A6FF"
+              "color": "#B6BCC4FF"
             }
           }
         },
@@ -1855,7 +1894,7 @@
           "id": "opencode-weekly-label-dark",
           "name": "opencode-weekly-label-dark",
           "parent": "opencode-provider",
-          "render": "system.dark",
+          "render": "system.dark && opencode.weekly.available",
           "x": "30",
           "y": "51",
           "width": "32",
@@ -1870,7 +1909,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#9AA0A6FF"
+              "color": "#B6BCC4FF"
             }
           }
         },
@@ -1916,7 +1955,7 @@
             "contrast": "1",
             "align": "right",
             "color": {
-              "color": "#9AA0A6FF"
+              "color": "#B6BCC4FF"
             }
           }
         },
@@ -1944,53 +1983,10 @@
           }
         },
         {
-          "id": "opencode-headline-light",
-          "name": "opencode-headline-light",
-          "parent": "opencode-provider",
-          "render": "1 - system.dark",
-          "x": "212",
-          "y": "7",
-          "width": "110",
-          "height": "20",
-          "content": {
-            "type": "text",
-            "template": "{opencode.headline.display:usage_line}",
-            "font_family": "Segoe UI",
-            "font_size": "15",
-            "weight": "bold",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#8B5CF6"
-            }
-          }
-        },
-        {
-          "id": "opencode-history",
-          "name": "opencode usage history",
-          "parent": "opencode-provider",
-          "render": "providers.opencode.enabled",
-          "x": "232",
-          "y": "26",
-          "width": "84",
-          "height": "10",
-          "content": {
-            "type": "sparkline",
-            "source": "opencode.session.history",
-            "color": {
-              "color": "#8B5CF6"
-            },
-            "fill": {
-              "color": "#8B5CF626"
-            }
-          }
-        },
-        {
           "id": "opencode-session-label-light",
           "name": "opencode-session-label-light",
           "parent": "opencode-provider",
-          "render": "1 - system.dark",
+          "render": "1 - system.dark && opencode.five_hour.available",
           "x": "30",
           "y": "31",
           "width": "32",
@@ -2005,7 +2001,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#5F6368FF"
+              "color": "#4A4F55FF"
             }
           }
         },
@@ -2013,14 +2009,14 @@
           "id": "opencode-session-value-light",
           "name": "opencode-session-value-light",
           "parent": "opencode-provider",
-          "render": "1 - system.dark && opencode.session.available",
+          "render": "1 - system.dark && opencode.five_hour.available",
           "x": "246",
           "y": "29",
           "width": "80",
           "height": "14",
           "content": {
             "type": "text",
-            "template": "{opencode.session.display:0}%",
+            "template": "{opencode.five_hour.display:0}%",
             "font_family": "Segoe UI",
             "font_size": "11",
             "weight": "medium",
@@ -2036,7 +2032,7 @@
           "id": "opencode-session-reset-light",
           "name": "opencode-session-reset-light",
           "parent": "opencode-provider",
-          "render": "1 - system.dark && opencode.session.reset.unix > 0",
+          "render": "1 - system.dark && opencode.five_hour.available && opencode.session.reset.unix > 0",
           "x": "64",
           "y": "31",
           "width": "62",
@@ -2051,7 +2047,7 @@
             "contrast": "1",
             "align": "right",
             "color": {
-              "color": "#5F6368FF"
+              "color": "#4A4F55FF"
             }
           }
         },
@@ -2059,7 +2055,7 @@
           "id": "opencode-weekly-label-light",
           "name": "opencode-weekly-label-light",
           "parent": "opencode-provider",
-          "render": "1 - system.dark",
+          "render": "1 - system.dark && opencode.weekly.available",
           "x": "30",
           "y": "51",
           "width": "32",
@@ -2074,7 +2070,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#5F6368FF"
+              "color": "#4A4F55FF"
             }
           }
         },
@@ -2120,7 +2116,7 @@
             "contrast": "1",
             "align": "right",
             "color": {
-              "color": "#5F6368FF"
+              "color": "#4A4F55FF"
             }
           }
         },
@@ -2128,14 +2124,14 @@
           "id": "opencode-session-bar",
           "name": "opencode-session-bar",
           "parent": "opencode-provider",
-          "render": "opencode.session.available",
+          "render": "opencode.five_hour.available",
           "x": "130",
           "y": "34",
           "width": "106",
           "height": "6",
           "content": {
             "type": "progress",
-            "value": "opencode.session.display",
+            "value": "opencode.five_hour.display",
             "direction": "left_to_right",
             "fill": {
               "color": "#8B5CF6"
@@ -2176,7 +2172,7 @@
           "id": "opencode-monthly-label-dark",
           "name": "opencode-monthly-label-dark",
           "parent": "opencode-provider",
-          "render": "system.dark",
+          "render": "system.dark && opencode.monthly.available",
           "x": "30",
           "y": "71",
           "width": "32",
@@ -2191,7 +2187,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#9AA0A6FF"
+              "color": "#B6BCC4FF"
             }
           }
         },
@@ -2199,7 +2195,7 @@
           "id": "opencode-monthly-label-light",
           "name": "opencode-monthly-label-light",
           "parent": "opencode-provider",
-          "render": "1 - system.dark",
+          "render": "1 - system.dark && opencode.monthly.available",
           "x": "30",
           "y": "71",
           "width": "32",
@@ -2214,7 +2210,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#5F6368FF"
+              "color": "#4A4F55FF"
             }
           }
         },
@@ -2283,7 +2279,7 @@
             "contrast": "1",
             "align": "right",
             "color": {
-              "color": "#9AA0A6FF"
+              "color": "#B6BCC4FF"
             }
           }
         },
@@ -2306,7 +2302,7 @@
             "contrast": "1",
             "align": "right",
             "color": {
-              "color": "#5F6368FF"
+              "color": "#4A4F55FF"
             }
           }
         },
@@ -2343,6 +2339,48 @@
           "height": "76"
         },
         {
+          "id": "cursor-chart-session",
+          "name": "cursor usage history (5h)",
+          "parent": "cursor-provider",
+          "render": "cursor.five_hour.available",
+          "x": "334",
+          "y": "24",
+          "width": "64",
+          "height": "22",
+          "content": {
+            "type": "sparkline",
+            "source": "cursor.session.history",
+            "color": {
+              "color": "#9CA3AF"
+            },
+            "fill": {
+              "color": "#00000000"
+            },
+            "invert": "display.countdown"
+          }
+        },
+        {
+          "id": "cursor-chart-weekly",
+          "name": "cursor usage history (7d)",
+          "parent": "cursor-provider",
+          "render": "cursor.weekly.available",
+          "x": "334",
+          "y": "24 + 22 * cursor.five_hour.available",
+          "width": "64",
+          "height": "22 + 22 * (1 - cursor.five_hour.available)",
+          "content": {
+            "type": "sparkline",
+            "source": "cursor.weekly.history",
+            "color": {
+              "color": "#9CA3AF"
+            },
+            "fill": {
+              "color": "#00000000"
+            },
+            "invert": "display.countdown"
+          }
+        },
+        {
           "id": "cursor-burn-eta",
           "name": "cursor burn eta",
           "parent": "cursor-provider",
@@ -2366,23 +2404,6 @@
           }
         },
         {
-          "id": "cursor-forecast-dot",
-          "name": "cursor forecast warning",
-          "parent": "cursor-provider",
-          "render": "cursor.forecast.exhausted",
-          "x": "198",
-          "y": "18",
-          "width": "7",
-          "height": "7",
-          "corner_radius": "3",
-          "background": {
-            "type": "colour",
-            "colour": {
-              "color": "#F87171FF"
-            }
-          }
-        },
-        {
           "id": "cursor-burn-warning",
           "name": "cursor burn warning",
           "parent": "cursor-provider",
@@ -2402,6 +2423,46 @@
             "align": "right",
             "color": {
               "color": "#F59E0BFF"
+            }
+          }
+        },
+        {
+          "id": "cursor-forecast-warning",
+          "name": "cursor forecast warning",
+          "parent": "cursor-provider",
+          "render": "cursor.forecast.exhausted && (1 - cursor.burn.warning)",
+          "x": "196",
+          "y": "6",
+          "width": "14",
+          "height": "18",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "15",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#F87171FF"
+            }
+          }
+        },
+        {
+          "id": "cursor-recommended-ring",
+          "name": "cursor recommended",
+          "parent": "cursor-provider",
+          "render": "cursor.recommended",
+          "x": "12",
+          "y": "13",
+          "width": "14",
+          "height": "14",
+          "corner_radius": "7",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#9CA3AF55"
             }
           }
         },
@@ -2445,33 +2506,10 @@
           }
         },
         {
-          "id": "cursor-headline-dark",
-          "name": "cursor-headline-dark",
-          "parent": "cursor-provider",
-          "render": "system.dark",
-          "x": "212",
-          "y": "7",
-          "width": "110",
-          "height": "20",
-          "content": {
-            "type": "text",
-            "template": "{cursor.headline.display:usage_line}",
-            "font_family": "Segoe UI",
-            "font_size": "15",
-            "weight": "bold",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#ECECECFF"
-            }
-          }
-        },
-        {
           "id": "cursor-session-label-dark",
           "name": "cursor-session-label-dark",
           "parent": "cursor-provider",
-          "render": "system.dark",
+          "render": "system.dark && cursor.five_hour.available",
           "x": "30",
           "y": "31",
           "width": "32",
@@ -2486,7 +2524,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#9AA0A6FF"
+              "color": "#B6BCC4FF"
             }
           }
         },
@@ -2494,14 +2532,14 @@
           "id": "cursor-session-value-dark",
           "name": "cursor-session-value-dark",
           "parent": "cursor-provider",
-          "render": "system.dark && cursor.session.available",
+          "render": "system.dark && cursor.five_hour.available",
           "x": "246",
           "y": "29",
           "width": "80",
           "height": "14",
           "content": {
             "type": "text",
-            "template": "{cursor.session.display:0}%",
+            "template": "{cursor.five_hour.display:0}%",
             "font_family": "Segoe UI",
             "font_size": "11",
             "weight": "medium",
@@ -2517,7 +2555,7 @@
           "id": "cursor-session-reset-dark",
           "name": "cursor-session-reset-dark",
           "parent": "cursor-provider",
-          "render": "system.dark && cursor.session.reset.unix > 0",
+          "render": "system.dark && cursor.five_hour.available && cursor.session.reset.unix > 0",
           "x": "64",
           "y": "31",
           "width": "62",
@@ -2532,7 +2570,7 @@
             "contrast": "1",
             "align": "right",
             "color": {
-              "color": "#9AA0A6FF"
+              "color": "#B6BCC4FF"
             }
           }
         },
@@ -2540,7 +2578,7 @@
           "id": "cursor-weekly-label-dark",
           "name": "cursor-weekly-label-dark",
           "parent": "cursor-provider",
-          "render": "system.dark",
+          "render": "system.dark && cursor.weekly.available",
           "x": "30",
           "y": "51",
           "width": "32",
@@ -2555,7 +2593,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#9AA0A6FF"
+              "color": "#B6BCC4FF"
             }
           }
         },
@@ -2601,7 +2639,7 @@
             "contrast": "1",
             "align": "right",
             "color": {
-              "color": "#9AA0A6FF"
+              "color": "#B6BCC4FF"
             }
           }
         },
@@ -2629,53 +2667,10 @@
           }
         },
         {
-          "id": "cursor-headline-light",
-          "name": "cursor-headline-light",
-          "parent": "cursor-provider",
-          "render": "1 - system.dark",
-          "x": "212",
-          "y": "7",
-          "width": "110",
-          "height": "20",
-          "content": {
-            "type": "text",
-            "template": "{cursor.headline.display:usage_line}",
-            "font_family": "Segoe UI",
-            "font_size": "15",
-            "weight": "bold",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#1A1A1AFF"
-            }
-          }
-        },
-        {
-          "id": "cursor-history",
-          "name": "cursor usage history",
-          "parent": "cursor-provider",
-          "render": "providers.cursor.enabled",
-          "x": "232",
-          "y": "26",
-          "width": "84",
-          "height": "10",
-          "content": {
-            "type": "sparkline",
-            "source": "cursor.session.history",
-            "color": {
-              "color": "#9CA3AF"
-            },
-            "fill": {
-              "color": "#9CA3AF26"
-            }
-          }
-        },
-        {
           "id": "cursor-session-label-light",
           "name": "cursor-session-label-light",
           "parent": "cursor-provider",
-          "render": "1 - system.dark",
+          "render": "1 - system.dark && cursor.five_hour.available",
           "x": "30",
           "y": "31",
           "width": "32",
@@ -2690,7 +2685,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#5F6368FF"
+              "color": "#4A4F55FF"
             }
           }
         },
@@ -2698,14 +2693,14 @@
           "id": "cursor-session-value-light",
           "name": "cursor-session-value-light",
           "parent": "cursor-provider",
-          "render": "1 - system.dark && cursor.session.available",
+          "render": "1 - system.dark && cursor.five_hour.available",
           "x": "246",
           "y": "29",
           "width": "80",
           "height": "14",
           "content": {
             "type": "text",
-            "template": "{cursor.session.display:0}%",
+            "template": "{cursor.five_hour.display:0}%",
             "font_family": "Segoe UI",
             "font_size": "11",
             "weight": "medium",
@@ -2721,7 +2716,7 @@
           "id": "cursor-session-reset-light",
           "name": "cursor-session-reset-light",
           "parent": "cursor-provider",
-          "render": "1 - system.dark && cursor.session.reset.unix > 0",
+          "render": "1 - system.dark && cursor.five_hour.available && cursor.session.reset.unix > 0",
           "x": "64",
           "y": "31",
           "width": "62",
@@ -2736,7 +2731,7 @@
             "contrast": "1",
             "align": "right",
             "color": {
-              "color": "#5F6368FF"
+              "color": "#4A4F55FF"
             }
           }
         },
@@ -2744,7 +2739,7 @@
           "id": "cursor-weekly-label-light",
           "name": "cursor-weekly-label-light",
           "parent": "cursor-provider",
-          "render": "1 - system.dark",
+          "render": "1 - system.dark && cursor.weekly.available",
           "x": "30",
           "y": "51",
           "width": "32",
@@ -2759,7 +2754,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#5F6368FF"
+              "color": "#4A4F55FF"
             }
           }
         },
@@ -2805,7 +2800,7 @@
             "contrast": "1",
             "align": "right",
             "color": {
-              "color": "#5F6368FF"
+              "color": "#4A4F55FF"
             }
           }
         },
@@ -2813,14 +2808,14 @@
           "id": "cursor-session-bar",
           "name": "cursor-session-bar",
           "parent": "cursor-provider",
-          "render": "cursor.session.available",
+          "render": "cursor.five_hour.available",
           "x": "130",
           "y": "34",
           "width": "106",
           "height": "6",
           "content": {
             "type": "progress",
-            "value": "cursor.session.display",
+            "value": "cursor.five_hour.display",
             "direction": "left_to_right",
             "fill": {
               "color": "#9CA3AF"
@@ -2866,6 +2861,48 @@
           "height": "76"
         },
         {
+          "id": "grok-chart-session",
+          "name": "grok usage history (5h)",
+          "parent": "grok-provider",
+          "render": "grok.five_hour.available",
+          "x": "334",
+          "y": "24",
+          "width": "64",
+          "height": "22",
+          "content": {
+            "type": "sparkline",
+            "source": "grok.session.history",
+            "color": {
+              "color": "#E5E7EB"
+            },
+            "fill": {
+              "color": "#00000000"
+            },
+            "invert": "display.countdown"
+          }
+        },
+        {
+          "id": "grok-chart-weekly",
+          "name": "grok usage history (7d)",
+          "parent": "grok-provider",
+          "render": "grok.weekly.available",
+          "x": "334",
+          "y": "24 + 22 * grok.five_hour.available",
+          "width": "64",
+          "height": "22 + 22 * (1 - grok.five_hour.available)",
+          "content": {
+            "type": "sparkline",
+            "source": "grok.weekly.history",
+            "color": {
+              "color": "#E5E7EB"
+            },
+            "fill": {
+              "color": "#00000000"
+            },
+            "invert": "display.countdown"
+          }
+        },
+        {
           "id": "grok-burn-eta",
           "name": "grok burn eta",
           "parent": "grok-provider",
@@ -2889,23 +2926,6 @@
           }
         },
         {
-          "id": "grok-forecast-dot",
-          "name": "grok forecast warning",
-          "parent": "grok-provider",
-          "render": "grok.forecast.exhausted",
-          "x": "198",
-          "y": "18",
-          "width": "7",
-          "height": "7",
-          "corner_radius": "3",
-          "background": {
-            "type": "colour",
-            "colour": {
-              "color": "#F87171FF"
-            }
-          }
-        },
-        {
           "id": "grok-burn-warning",
           "name": "grok burn warning",
           "parent": "grok-provider",
@@ -2925,6 +2945,46 @@
             "align": "right",
             "color": {
               "color": "#F59E0BFF"
+            }
+          }
+        },
+        {
+          "id": "grok-forecast-warning",
+          "name": "grok forecast warning",
+          "parent": "grok-provider",
+          "render": "grok.forecast.exhausted && (1 - grok.burn.warning)",
+          "x": "196",
+          "y": "6",
+          "width": "14",
+          "height": "18",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "15",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#F87171FF"
+            }
+          }
+        },
+        {
+          "id": "grok-recommended-ring",
+          "name": "grok recommended",
+          "parent": "grok-provider",
+          "render": "grok.recommended",
+          "x": "12",
+          "y": "13",
+          "width": "14",
+          "height": "14",
+          "corner_radius": "7",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#E5E7EB55"
             }
           }
         },
@@ -2968,33 +3028,10 @@
           }
         },
         {
-          "id": "grok-headline-dark",
-          "name": "grok-headline-dark",
-          "parent": "grok-provider",
-          "render": "system.dark",
-          "x": "212",
-          "y": "7",
-          "width": "110",
-          "height": "20",
-          "content": {
-            "type": "text",
-            "template": "{grok.headline.display:usage_line}",
-            "font_family": "Segoe UI",
-            "font_size": "15",
-            "weight": "bold",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#E5E7EB"
-            }
-          }
-        },
-        {
           "id": "grok-session-label-dark",
           "name": "grok-session-label-dark",
           "parent": "grok-provider",
-          "render": "system.dark",
+          "render": "system.dark && grok.five_hour.available",
           "x": "30",
           "y": "31",
           "width": "32",
@@ -3009,7 +3046,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#9AA0A6FF"
+              "color": "#B6BCC4FF"
             }
           }
         },
@@ -3017,14 +3054,14 @@
           "id": "grok-session-value-dark",
           "name": "grok-session-value-dark",
           "parent": "grok-provider",
-          "render": "system.dark && grok.session.available",
+          "render": "system.dark && grok.five_hour.available",
           "x": "246",
           "y": "29",
           "width": "80",
           "height": "14",
           "content": {
             "type": "text",
-            "template": "{grok.session.display:0}%",
+            "template": "{grok.five_hour.display:0}%",
             "font_family": "Segoe UI",
             "font_size": "11",
             "weight": "medium",
@@ -3040,7 +3077,7 @@
           "id": "grok-session-reset-dark",
           "name": "grok-session-reset-dark",
           "parent": "grok-provider",
-          "render": "system.dark && grok.session.reset.unix > 0",
+          "render": "system.dark && grok.five_hour.available && grok.session.reset.unix > 0",
           "x": "64",
           "y": "31",
           "width": "62",
@@ -3055,7 +3092,7 @@
             "contrast": "1",
             "align": "right",
             "color": {
-              "color": "#9AA0A6FF"
+              "color": "#B6BCC4FF"
             }
           }
         },
@@ -3063,7 +3100,7 @@
           "id": "grok-weekly-label-dark",
           "name": "grok-weekly-label-dark",
           "parent": "grok-provider",
-          "render": "system.dark",
+          "render": "system.dark && grok.weekly.available",
           "x": "30",
           "y": "51",
           "width": "32",
@@ -3078,7 +3115,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#9AA0A6FF"
+              "color": "#B6BCC4FF"
             }
           }
         },
@@ -3124,7 +3161,7 @@
             "contrast": "1",
             "align": "right",
             "color": {
-              "color": "#9AA0A6FF"
+              "color": "#B6BCC4FF"
             }
           }
         },
@@ -3152,53 +3189,10 @@
           }
         },
         {
-          "id": "grok-headline-light",
-          "name": "grok-headline-light",
-          "parent": "grok-provider",
-          "render": "1 - system.dark",
-          "x": "212",
-          "y": "7",
-          "width": "110",
-          "height": "20",
-          "content": {
-            "type": "text",
-            "template": "{grok.headline.display:usage_line}",
-            "font_family": "Segoe UI",
-            "font_size": "15",
-            "weight": "bold",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#E5E7EB"
-            }
-          }
-        },
-        {
-          "id": "grok-history",
-          "name": "grok usage history",
-          "parent": "grok-provider",
-          "render": "providers.grok.enabled",
-          "x": "232",
-          "y": "26",
-          "width": "84",
-          "height": "10",
-          "content": {
-            "type": "sparkline",
-            "source": "grok.session.history",
-            "color": {
-              "color": "#E5E7EB"
-            },
-            "fill": {
-              "color": "#E5E7EB26"
-            }
-          }
-        },
-        {
           "id": "grok-session-label-light",
           "name": "grok-session-label-light",
           "parent": "grok-provider",
-          "render": "1 - system.dark",
+          "render": "1 - system.dark && grok.five_hour.available",
           "x": "30",
           "y": "31",
           "width": "32",
@@ -3213,7 +3207,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#5F6368FF"
+              "color": "#4A4F55FF"
             }
           }
         },
@@ -3221,14 +3215,14 @@
           "id": "grok-session-value-light",
           "name": "grok-session-value-light",
           "parent": "grok-provider",
-          "render": "1 - system.dark && grok.session.available",
+          "render": "1 - system.dark && grok.five_hour.available",
           "x": "246",
           "y": "29",
           "width": "80",
           "height": "14",
           "content": {
             "type": "text",
-            "template": "{grok.session.display:0}%",
+            "template": "{grok.five_hour.display:0}%",
             "font_family": "Segoe UI",
             "font_size": "11",
             "weight": "medium",
@@ -3244,7 +3238,7 @@
           "id": "grok-session-reset-light",
           "name": "grok-session-reset-light",
           "parent": "grok-provider",
-          "render": "1 - system.dark && grok.session.reset.unix > 0",
+          "render": "1 - system.dark && grok.five_hour.available && grok.session.reset.unix > 0",
           "x": "64",
           "y": "31",
           "width": "62",
@@ -3259,7 +3253,7 @@
             "contrast": "1",
             "align": "right",
             "color": {
-              "color": "#5F6368FF"
+              "color": "#4A4F55FF"
             }
           }
         },
@@ -3267,7 +3261,7 @@
           "id": "grok-weekly-label-light",
           "name": "grok-weekly-label-light",
           "parent": "grok-provider",
-          "render": "1 - system.dark",
+          "render": "1 - system.dark && grok.weekly.available",
           "x": "30",
           "y": "51",
           "width": "32",
@@ -3282,7 +3276,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#5F6368FF"
+              "color": "#4A4F55FF"
             }
           }
         },
@@ -3328,7 +3322,7 @@
             "contrast": "1",
             "align": "right",
             "color": {
-              "color": "#5F6368FF"
+              "color": "#4A4F55FF"
             }
           }
         },
@@ -3336,14 +3330,14 @@
           "id": "grok-session-bar",
           "name": "grok-session-bar",
           "parent": "grok-provider",
-          "render": "grok.session.available",
+          "render": "grok.five_hour.available",
           "x": "130",
           "y": "34",
           "width": "106",
           "height": "6",
           "content": {
             "type": "progress",
-            "value": "grok.session.display",
+            "value": "grok.five_hour.display",
             "direction": "left_to_right",
             "fill": {
               "color": "#E5E7EB"
@@ -3389,6 +3383,48 @@
           "height": "76"
         },
         {
+          "id": "copilot-chart-session",
+          "name": "copilot usage history (5h)",
+          "parent": "copilot-provider",
+          "render": "copilot.five_hour.available",
+          "x": "334",
+          "y": "24",
+          "width": "64",
+          "height": "22",
+          "content": {
+            "type": "sparkline",
+            "source": "copilot.session.history",
+            "color": {
+              "color": "#6E7681"
+            },
+            "fill": {
+              "color": "#00000000"
+            },
+            "invert": "display.countdown"
+          }
+        },
+        {
+          "id": "copilot-chart-weekly",
+          "name": "copilot usage history (7d)",
+          "parent": "copilot-provider",
+          "render": "copilot.weekly.available",
+          "x": "334",
+          "y": "24 + 22 * copilot.five_hour.available",
+          "width": "64",
+          "height": "22 + 22 * (1 - copilot.five_hour.available)",
+          "content": {
+            "type": "sparkline",
+            "source": "copilot.weekly.history",
+            "color": {
+              "color": "#6E7681"
+            },
+            "fill": {
+              "color": "#00000000"
+            },
+            "invert": "display.countdown"
+          }
+        },
+        {
           "id": "copilot-burn-eta",
           "name": "copilot burn eta",
           "parent": "copilot-provider",
@@ -3412,23 +3448,6 @@
           }
         },
         {
-          "id": "copilot-forecast-dot",
-          "name": "copilot forecast warning",
-          "parent": "copilot-provider",
-          "render": "copilot.forecast.exhausted",
-          "x": "198",
-          "y": "18",
-          "width": "7",
-          "height": "7",
-          "corner_radius": "3",
-          "background": {
-            "type": "colour",
-            "colour": {
-              "color": "#F87171FF"
-            }
-          }
-        },
-        {
           "id": "copilot-burn-warning",
           "name": "copilot burn warning",
           "parent": "copilot-provider",
@@ -3448,6 +3467,46 @@
             "align": "right",
             "color": {
               "color": "#F59E0BFF"
+            }
+          }
+        },
+        {
+          "id": "copilot-forecast-warning",
+          "name": "copilot forecast warning",
+          "parent": "copilot-provider",
+          "render": "copilot.forecast.exhausted && (1 - copilot.burn.warning)",
+          "x": "196",
+          "y": "6",
+          "width": "14",
+          "height": "18",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "15",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#F87171FF"
+            }
+          }
+        },
+        {
+          "id": "copilot-recommended-ring",
+          "name": "copilot recommended",
+          "parent": "copilot-provider",
+          "render": "copilot.recommended",
+          "x": "12",
+          "y": "13",
+          "width": "14",
+          "height": "14",
+          "corner_radius": "7",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#6E768155"
             }
           }
         },
@@ -3491,33 +3550,10 @@
           }
         },
         {
-          "id": "copilot-headline-dark",
-          "name": "copilot-headline-dark",
-          "parent": "copilot-provider",
-          "render": "system.dark",
-          "x": "212",
-          "y": "7",
-          "width": "110",
-          "height": "20",
-          "content": {
-            "type": "text",
-            "template": "{copilot.headline.display:usage_line}",
-            "font_family": "Segoe UI",
-            "font_size": "15",
-            "weight": "bold",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#6E7681"
-            }
-          }
-        },
-        {
           "id": "copilot-session-label-dark",
           "name": "copilot-session-label-dark",
           "parent": "copilot-provider",
-          "render": "system.dark",
+          "render": "system.dark && copilot.five_hour.available",
           "x": "30",
           "y": "31",
           "width": "32",
@@ -3532,7 +3568,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#9AA0A6FF"
+              "color": "#B6BCC4FF"
             }
           }
         },
@@ -3540,14 +3576,14 @@
           "id": "copilot-session-value-dark",
           "name": "copilot-session-value-dark",
           "parent": "copilot-provider",
-          "render": "system.dark && copilot.session.available",
+          "render": "system.dark && copilot.five_hour.available",
           "x": "246",
           "y": "29",
           "width": "80",
           "height": "14",
           "content": {
             "type": "text",
-            "template": "{copilot.session.display:0}%",
+            "template": "{copilot.five_hour.display:0}%",
             "font_family": "Segoe UI",
             "font_size": "11",
             "weight": "medium",
@@ -3563,7 +3599,7 @@
           "id": "copilot-session-reset-dark",
           "name": "copilot-session-reset-dark",
           "parent": "copilot-provider",
-          "render": "system.dark && copilot.session.reset.unix > 0",
+          "render": "system.dark && copilot.five_hour.available && copilot.session.reset.unix > 0",
           "x": "64",
           "y": "31",
           "width": "62",
@@ -3578,7 +3614,7 @@
             "contrast": "1",
             "align": "right",
             "color": {
-              "color": "#9AA0A6FF"
+              "color": "#B6BCC4FF"
             }
           }
         },
@@ -3586,7 +3622,7 @@
           "id": "copilot-weekly-label-dark",
           "name": "copilot-weekly-label-dark",
           "parent": "copilot-provider",
-          "render": "system.dark",
+          "render": "system.dark && copilot.weekly.available",
           "x": "30",
           "y": "51",
           "width": "32",
@@ -3601,7 +3637,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#9AA0A6FF"
+              "color": "#B6BCC4FF"
             }
           }
         },
@@ -3647,7 +3683,7 @@
             "contrast": "1",
             "align": "right",
             "color": {
-              "color": "#9AA0A6FF"
+              "color": "#B6BCC4FF"
             }
           }
         },
@@ -3675,53 +3711,10 @@
           }
         },
         {
-          "id": "copilot-headline-light",
-          "name": "copilot-headline-light",
-          "parent": "copilot-provider",
-          "render": "1 - system.dark",
-          "x": "212",
-          "y": "7",
-          "width": "110",
-          "height": "20",
-          "content": {
-            "type": "text",
-            "template": "{copilot.headline.display:usage_line}",
-            "font_family": "Segoe UI",
-            "font_size": "15",
-            "weight": "bold",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#6E7681"
-            }
-          }
-        },
-        {
-          "id": "copilot-history",
-          "name": "copilot usage history",
-          "parent": "copilot-provider",
-          "render": "providers.copilot.enabled",
-          "x": "232",
-          "y": "26",
-          "width": "84",
-          "height": "10",
-          "content": {
-            "type": "sparkline",
-            "source": "copilot.session.history",
-            "color": {
-              "color": "#6E7681"
-            },
-            "fill": {
-              "color": "#6E768126"
-            }
-          }
-        },
-        {
           "id": "copilot-session-label-light",
           "name": "copilot-session-label-light",
           "parent": "copilot-provider",
-          "render": "1 - system.dark",
+          "render": "1 - system.dark && copilot.five_hour.available",
           "x": "30",
           "y": "31",
           "width": "32",
@@ -3736,7 +3729,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#5F6368FF"
+              "color": "#4A4F55FF"
             }
           }
         },
@@ -3744,14 +3737,14 @@
           "id": "copilot-session-value-light",
           "name": "copilot-session-value-light",
           "parent": "copilot-provider",
-          "render": "1 - system.dark && copilot.session.available",
+          "render": "1 - system.dark && copilot.five_hour.available",
           "x": "246",
           "y": "29",
           "width": "80",
           "height": "14",
           "content": {
             "type": "text",
-            "template": "{copilot.session.display:0}%",
+            "template": "{copilot.five_hour.display:0}%",
             "font_family": "Segoe UI",
             "font_size": "11",
             "weight": "medium",
@@ -3767,7 +3760,7 @@
           "id": "copilot-session-reset-light",
           "name": "copilot-session-reset-light",
           "parent": "copilot-provider",
-          "render": "1 - system.dark && copilot.session.reset.unix > 0",
+          "render": "1 - system.dark && copilot.five_hour.available && copilot.session.reset.unix > 0",
           "x": "64",
           "y": "31",
           "width": "62",
@@ -3782,7 +3775,7 @@
             "contrast": "1",
             "align": "right",
             "color": {
-              "color": "#5F6368FF"
+              "color": "#4A4F55FF"
             }
           }
         },
@@ -3790,7 +3783,7 @@
           "id": "copilot-weekly-label-light",
           "name": "copilot-weekly-label-light",
           "parent": "copilot-provider",
-          "render": "1 - system.dark",
+          "render": "1 - system.dark && copilot.weekly.available",
           "x": "30",
           "y": "51",
           "width": "32",
@@ -3805,7 +3798,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#5F6368FF"
+              "color": "#4A4F55FF"
             }
           }
         },
@@ -3851,7 +3844,7 @@
             "contrast": "1",
             "align": "right",
             "color": {
-              "color": "#5F6368FF"
+              "color": "#4A4F55FF"
             }
           }
         },
@@ -3859,14 +3852,14 @@
           "id": "copilot-session-bar",
           "name": "copilot-session-bar",
           "parent": "copilot-provider",
-          "render": "copilot.session.available",
+          "render": "copilot.five_hour.available",
           "x": "130",
           "y": "34",
           "width": "106",
           "height": "6",
           "content": {
             "type": "progress",
-            "value": "copilot.session.display",
+            "value": "copilot.five_hour.display",
             "direction": "left_to_right",
             "fill": {
               "color": "#6E7681"
@@ -3912,6 +3905,69 @@
           "height": "76 + 20 * commandcode.monthly.available"
         },
         {
+          "id": "commandcode-chart-session",
+          "name": "commandcode usage history (5h)",
+          "parent": "commandcode-provider",
+          "render": "commandcode.five_hour.available",
+          "x": "334",
+          "y": "24",
+          "width": "64",
+          "height": "22",
+          "content": {
+            "type": "sparkline",
+            "source": "commandcode.session.history",
+            "color": {
+              "color": "#E0A458"
+            },
+            "fill": {
+              "color": "#00000000"
+            },
+            "invert": "display.countdown"
+          }
+        },
+        {
+          "id": "commandcode-chart-weekly",
+          "name": "commandcode usage history (7d)",
+          "parent": "commandcode-provider",
+          "render": "commandcode.weekly.available",
+          "x": "334",
+          "y": "24 + 22 * commandcode.five_hour.available",
+          "width": "64",
+          "height": "22 + 22 * (1 - commandcode.five_hour.available)",
+          "content": {
+            "type": "sparkline",
+            "source": "commandcode.weekly.history",
+            "color": {
+              "color": "#E0A458"
+            },
+            "fill": {
+              "color": "#00000000"
+            },
+            "invert": "display.countdown"
+          }
+        },
+        {
+          "id": "commandcode-chart-monthly",
+          "name": "commandcode usage history (30d)",
+          "parent": "commandcode-provider",
+          "render": "commandcode.monthly.available",
+          "x": "334",
+          "y": "68",
+          "width": "64",
+          "height": "22",
+          "content": {
+            "type": "sparkline",
+            "source": "commandcode.monthly.history",
+            "color": {
+              "color": "#E0A458"
+            },
+            "fill": {
+              "color": "#00000000"
+            },
+            "invert": "display.countdown"
+          }
+        },
+        {
           "id": "commandcode-burn-eta",
           "name": "commandcode burn eta",
           "parent": "commandcode-provider",
@@ -3935,23 +3991,6 @@
           }
         },
         {
-          "id": "commandcode-forecast-dot",
-          "name": "commandcode forecast warning",
-          "parent": "commandcode-provider",
-          "render": "commandcode.forecast.exhausted",
-          "x": "198",
-          "y": "18",
-          "width": "7",
-          "height": "7",
-          "corner_radius": "3",
-          "background": {
-            "type": "colour",
-            "colour": {
-              "color": "#F87171FF"
-            }
-          }
-        },
-        {
           "id": "commandcode-burn-warning",
           "name": "commandcode burn warning",
           "parent": "commandcode-provider",
@@ -3971,6 +4010,46 @@
             "align": "right",
             "color": {
               "color": "#F59E0BFF"
+            }
+          }
+        },
+        {
+          "id": "commandcode-forecast-warning",
+          "name": "commandcode forecast warning",
+          "parent": "commandcode-provider",
+          "render": "commandcode.forecast.exhausted && (1 - commandcode.burn.warning)",
+          "x": "196",
+          "y": "6",
+          "width": "14",
+          "height": "18",
+          "content": {
+            "type": "text",
+            "template": "!",
+            "font_family": "Segoe UI",
+            "font_size": "15",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#F87171FF"
+            }
+          }
+        },
+        {
+          "id": "commandcode-recommended-ring",
+          "name": "commandcode recommended",
+          "parent": "commandcode-provider",
+          "render": "commandcode.recommended",
+          "x": "12",
+          "y": "13",
+          "width": "14",
+          "height": "14",
+          "corner_radius": "7",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#E0A45855"
             }
           }
         },
@@ -4014,33 +4093,10 @@
           }
         },
         {
-          "id": "commandcode-headline-dark",
-          "name": "commandcode-headline-dark",
-          "parent": "commandcode-provider",
-          "render": "system.dark",
-          "x": "212",
-          "y": "7",
-          "width": "110",
-          "height": "20",
-          "content": {
-            "type": "text",
-            "template": "{commandcode.headline.display:usage_line}",
-            "font_family": "Segoe UI",
-            "font_size": "15",
-            "weight": "bold",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#E0A458"
-            }
-          }
-        },
-        {
           "id": "commandcode-session-label-dark",
           "name": "commandcode-session-label-dark",
           "parent": "commandcode-provider",
-          "render": "system.dark",
+          "render": "system.dark && commandcode.five_hour.available",
           "x": "30",
           "y": "31",
           "width": "32",
@@ -4055,7 +4111,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#9AA0A6FF"
+              "color": "#B6BCC4FF"
             }
           }
         },
@@ -4063,14 +4119,14 @@
           "id": "commandcode-session-value-dark",
           "name": "commandcode-session-value-dark",
           "parent": "commandcode-provider",
-          "render": "system.dark && commandcode.session.available",
+          "render": "system.dark && commandcode.five_hour.available",
           "x": "246",
           "y": "29",
           "width": "80",
           "height": "14",
           "content": {
             "type": "text",
-            "template": "{commandcode.session.display:0}%",
+            "template": "{commandcode.five_hour.display:0}%",
             "font_family": "Segoe UI",
             "font_size": "11",
             "weight": "medium",
@@ -4086,7 +4142,7 @@
           "id": "commandcode-session-reset-dark",
           "name": "commandcode-session-reset-dark",
           "parent": "commandcode-provider",
-          "render": "system.dark && commandcode.session.reset.unix > 0",
+          "render": "system.dark && commandcode.five_hour.available && commandcode.session.reset.unix > 0",
           "x": "64",
           "y": "31",
           "width": "62",
@@ -4101,7 +4157,7 @@
             "contrast": "1",
             "align": "right",
             "color": {
-              "color": "#9AA0A6FF"
+              "color": "#B6BCC4FF"
             }
           }
         },
@@ -4109,7 +4165,7 @@
           "id": "commandcode-weekly-label-dark",
           "name": "commandcode-weekly-label-dark",
           "parent": "commandcode-provider",
-          "render": "system.dark",
+          "render": "system.dark && commandcode.weekly.available",
           "x": "30",
           "y": "51",
           "width": "32",
@@ -4124,7 +4180,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#9AA0A6FF"
+              "color": "#B6BCC4FF"
             }
           }
         },
@@ -4170,7 +4226,7 @@
             "contrast": "1",
             "align": "right",
             "color": {
-              "color": "#9AA0A6FF"
+              "color": "#B6BCC4FF"
             }
           }
         },
@@ -4198,53 +4254,10 @@
           }
         },
         {
-          "id": "commandcode-headline-light",
-          "name": "commandcode-headline-light",
-          "parent": "commandcode-provider",
-          "render": "1 - system.dark",
-          "x": "212",
-          "y": "7",
-          "width": "110",
-          "height": "20",
-          "content": {
-            "type": "text",
-            "template": "{commandcode.headline.display:usage_line}",
-            "font_family": "Segoe UI",
-            "font_size": "15",
-            "weight": "bold",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#E0A458"
-            }
-          }
-        },
-        {
-          "id": "commandcode-history",
-          "name": "commandcode usage history",
-          "parent": "commandcode-provider",
-          "render": "providers.commandcode.enabled",
-          "x": "232",
-          "y": "26",
-          "width": "84",
-          "height": "10",
-          "content": {
-            "type": "sparkline",
-            "source": "commandcode.session.history",
-            "color": {
-              "color": "#E0A458"
-            },
-            "fill": {
-              "color": "#E0A45826"
-            }
-          }
-        },
-        {
           "id": "commandcode-session-label-light",
           "name": "commandcode-session-label-light",
           "parent": "commandcode-provider",
-          "render": "1 - system.dark",
+          "render": "1 - system.dark && commandcode.five_hour.available",
           "x": "30",
           "y": "31",
           "width": "32",
@@ -4259,7 +4272,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#5F6368FF"
+              "color": "#4A4F55FF"
             }
           }
         },
@@ -4267,14 +4280,14 @@
           "id": "commandcode-session-value-light",
           "name": "commandcode-session-value-light",
           "parent": "commandcode-provider",
-          "render": "1 - system.dark && commandcode.session.available",
+          "render": "1 - system.dark && commandcode.five_hour.available",
           "x": "246",
           "y": "29",
           "width": "80",
           "height": "14",
           "content": {
             "type": "text",
-            "template": "{commandcode.session.display:0}%",
+            "template": "{commandcode.five_hour.display:0}%",
             "font_family": "Segoe UI",
             "font_size": "11",
             "weight": "medium",
@@ -4290,7 +4303,7 @@
           "id": "commandcode-session-reset-light",
           "name": "commandcode-session-reset-light",
           "parent": "commandcode-provider",
-          "render": "1 - system.dark && commandcode.session.reset.unix > 0",
+          "render": "1 - system.dark && commandcode.five_hour.available && commandcode.session.reset.unix > 0",
           "x": "64",
           "y": "31",
           "width": "62",
@@ -4305,7 +4318,7 @@
             "contrast": "1",
             "align": "right",
             "color": {
-              "color": "#5F6368FF"
+              "color": "#4A4F55FF"
             }
           }
         },
@@ -4313,7 +4326,7 @@
           "id": "commandcode-weekly-label-light",
           "name": "commandcode-weekly-label-light",
           "parent": "commandcode-provider",
-          "render": "1 - system.dark",
+          "render": "1 - system.dark && commandcode.weekly.available",
           "x": "30",
           "y": "51",
           "width": "32",
@@ -4328,7 +4341,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#5F6368FF"
+              "color": "#4A4F55FF"
             }
           }
         },
@@ -4374,7 +4387,7 @@
             "contrast": "1",
             "align": "right",
             "color": {
-              "color": "#5F6368FF"
+              "color": "#4A4F55FF"
             }
           }
         },
@@ -4382,14 +4395,14 @@
           "id": "commandcode-session-bar",
           "name": "commandcode-session-bar",
           "parent": "commandcode-provider",
-          "render": "commandcode.session.available",
+          "render": "commandcode.five_hour.available",
           "x": "130",
           "y": "34",
           "width": "106",
           "height": "6",
           "content": {
             "type": "progress",
-            "value": "commandcode.session.display",
+            "value": "commandcode.five_hour.display",
             "direction": "left_to_right",
             "fill": {
               "color": "#E0A458"
@@ -4430,7 +4443,7 @@
           "id": "commandcode-monthly-label-dark",
           "name": "commandcode-monthly-label-dark",
           "parent": "commandcode-provider",
-          "render": "system.dark",
+          "render": "system.dark && commandcode.monthly.available",
           "x": "30",
           "y": "71",
           "width": "32",
@@ -4445,7 +4458,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#9AA0A6FF"
+              "color": "#B6BCC4FF"
             }
           }
         },
@@ -4453,7 +4466,7 @@
           "id": "commandcode-monthly-label-light",
           "name": "commandcode-monthly-label-light",
           "parent": "commandcode-provider",
-          "render": "1 - system.dark",
+          "render": "1 - system.dark && commandcode.monthly.available",
           "x": "30",
           "y": "71",
           "width": "32",
@@ -4468,7 +4481,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#5F6368FF"
+              "color": "#4A4F55FF"
             }
           }
         },
@@ -4537,7 +4550,7 @@
             "contrast": "1",
             "align": "right",
             "color": {
-              "color": "#9AA0A6FF"
+              "color": "#B6BCC4FF"
             }
           }
         },
@@ -4560,7 +4573,7 @@
             "contrast": "1",
             "align": "right",
             "color": {
-              "color": "#5F6368FF"
+              "color": "#4A4F55FF"
             }
           }
         },
@@ -4595,6 +4608,27 @@
           "render": "providers.deepseek.enabled",
           "width": "canvas.width",
           "height": "76"
+        },
+        {
+          "id": "deepseek-chart-credits",
+          "name": "deepseek usage history (balance)",
+          "parent": "deepseek-provider",
+          "render": "deepseek.credits.available",
+          "x": "334",
+          "y": "24",
+          "width": "64",
+          "height": "44",
+          "content": {
+            "type": "sparkline",
+            "source": "deepseek.credits.history",
+            "color": {
+              "color": "#4D6BFE"
+            },
+            "fill": {
+              "color": "#00000000"
+            },
+            "invert": "display.countdown"
+          }
         },
         {
           "id": "deepseek-badge",
@@ -4659,83 +4693,17 @@
           }
         },
         {
-          "id": "deepseek-headline-dark",
-          "name": "deepseek-headline-dark",
-          "parent": "deepseek-provider",
-          "render": "system.dark",
-          "x": "212",
-          "y": "7",
-          "width": "110",
-          "height": "20",
-          "content": {
-            "type": "text",
-            "template": "{deepseek.headline.display:usage_line}",
-            "font_family": "Segoe UI",
-            "font_size": "15",
-            "weight": "bold",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#9DB2FF"
-            }
-          }
-        },
-        {
-          "id": "deepseek-headline-light",
-          "name": "deepseek-headline-light",
-          "parent": "deepseek-provider",
-          "render": "1 - system.dark",
-          "x": "212",
-          "y": "7",
-          "width": "110",
-          "height": "20",
-          "content": {
-            "type": "text",
-            "template": "{deepseek.headline.display:usage_line}",
-            "font_family": "Segoe UI",
-            "font_size": "15",
-            "weight": "bold",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#1F3AE0"
-            }
-          }
-        },
-        {
-          "id": "deepseek-history",
-          "name": "deepseek wallet burn-down",
-          "parent": "deepseek-provider",
-          "render": "providers.deepseek.enabled",
-          "x": "232",
-          "y": "26",
-          "width": "84",
-          "height": "10",
-          "content": {
-            "type": "sparkline",
-            "source": "deepseek.credits.history",
-            "color": {
-              "color": "#4D6BFE"
-            },
-            "fill": {
-              "color": "#4D6BFE26"
-            }
-          }
-        },
-        {
           "id": "deepseek-balance-label-dark",
           "name": "deepseek-balance-label-dark",
           "parent": "deepseek-provider",
-          "render": "system.dark",
+          "render": "system.dark && deepseek.credits.available",
           "x": "30",
           "y": "31",
-          "width": "32",
+          "width": "60",
           "height": "12",
           "content": {
             "type": "text",
-            "template": "saldo",
+            "template": "{i18n.balance}",
             "font_family": "Segoe UI",
             "font_size": "10",
             "weight": "medium",
@@ -4743,7 +4711,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#9AA0A6FF"
+              "color": "#B6BCC4FF"
             }
           }
         },
@@ -4751,14 +4719,14 @@
           "id": "deepseek-balance-label-light",
           "name": "deepseek-balance-label-light",
           "parent": "deepseek-provider",
-          "render": "1 - system.dark",
+          "render": "1 - system.dark && deepseek.credits.available",
           "x": "30",
           "y": "31",
-          "width": "32",
+          "width": "60",
           "height": "12",
           "content": {
             "type": "text",
-            "template": "saldo",
+            "template": "{i18n.balance}",
             "font_family": "Segoe UI",
             "font_size": "10",
             "weight": "medium",
@@ -4766,7 +4734,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#5F6368FF"
+              "color": "#4A4F55FF"
             }
           }
         },
@@ -4774,7 +4742,7 @@
           "id": "deepseek-balance-value-dark",
           "name": "deepseek-balance-value-dark",
           "parent": "deepseek-provider",
-          "render": "system.dark",
+          "render": "system.dark && deepseek.credits.available",
           "x": "246",
           "y": "29",
           "width": "80",
@@ -4797,7 +4765,7 @@
           "id": "deepseek-balance-value-light",
           "name": "deepseek-balance-value-light",
           "parent": "deepseek-provider",
-          "render": "1 - system.dark",
+          "render": "1 - system.dark && deepseek.credits.available",
           "x": "246",
           "y": "29",
           "width": "80",
@@ -4844,14 +4812,14 @@
           "id": "deepseek-eta-label-dark",
           "name": "deepseek-eta-label-dark",
           "parent": "deepseek-provider",
-          "render": "deepseek.credits.available && deepseek.credits.eta.seconds > 0",
+          "render": "system.dark && deepseek.credits.available && deepseek.credits.eta.seconds > 0",
           "x": "30",
           "y": "51",
-          "width": "32",
+          "width": "60",
           "height": "12",
           "content": {
             "type": "text",
-            "template": "starczy",
+            "template": "{i18n.lasts}",
             "font_family": "Segoe UI",
             "font_size": "10",
             "weight": "medium",
@@ -4859,7 +4827,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#9AA0A6FF"
+              "color": "#B6BCC4FF"
             }
           }
         },
@@ -4867,7 +4835,7 @@
           "id": "deepseek-eta-value-dark",
           "name": "deepseek-eta-value-dark",
           "parent": "deepseek-provider",
-          "render": "deepseek.credits.available && deepseek.credits.eta.seconds > 0",
+          "render": "system.dark && deepseek.credits.available && deepseek.credits.eta.seconds > 0",
           "x": "246",
           "y": "49",
           "width": "80",
@@ -4890,14 +4858,14 @@
           "id": "deepseek-eta-label-light",
           "name": "deepseek-eta-label-light",
           "parent": "deepseek-provider",
-          "render": "deepseek.credits.available && deepseek.credits.eta.seconds > 0",
+          "render": "1 - system.dark && deepseek.credits.available && deepseek.credits.eta.seconds > 0",
           "x": "30",
           "y": "51",
-          "width": "32",
+          "width": "60",
           "height": "12",
           "content": {
             "type": "text",
-            "template": "starczy",
+            "template": "{i18n.lasts}",
             "font_family": "Segoe UI",
             "font_size": "10",
             "weight": "medium",
@@ -4905,7 +4873,7 @@
             "contrast": "1",
             "align": "left",
             "color": {
-              "color": "#5F6368FF"
+              "color": "#4A4F55FF"
             }
           }
         },
@@ -4913,7 +4881,7 @@
           "id": "deepseek-eta-value-light",
           "name": "deepseek-eta-value-light",
           "parent": "deepseek-provider",
-          "render": "deepseek.credits.available && deepseek.credits.eta.seconds > 0",
+          "render": "1 - system.dark && deepseek.credits.available && deepseek.credits.eta.seconds > 0",
           "x": "246",
           "y": "49",
           "width": "80",
@@ -4937,7 +4905,7 @@
         "color": {
           "color": "#FFFFFF30"
         },
-        "width": "1"
+        "width": "2"
       }
     }
   ]
