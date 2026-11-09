@@ -6,6 +6,7 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use serde::Deserialize;
 
 use super::{build_agent, parse_iso8601, PollError};
+use crate::accounts::{AccountProfile, ProviderAccounts};
 use crate::diagnose;
 use crate::models::{UsageData, UsageSection};
 
@@ -110,15 +111,164 @@ struct Subscription {
 }
 
 pub(super) fn poll_command_code() -> Result<UsageData, PollError> {
-    poll_sources(
-        read_api_key_credentials().as_ref(),
-        CREDITS_URL,
-        SUBSCRIPTIONS_URL,
-    )
+    poll_sources_multi(&configured_credentials(), CREDITS_URL, SUBSCRIPTIONS_URL)
 }
 
 pub(super) fn credential_watch_snapshot(_all_sources: bool) -> Vec<String> {
     vec![credential_watch_signature()]
+}
+
+/// Every key to poll, in display order, with the profile name that owns it.
+///
+/// The first entry feeds the provider's own figures; the second is exposed as
+/// the external pool so both subscriptions stay visible side by side. Any
+/// further keys are logged and dropped: a theme has room for two.
+fn configured_credentials() -> Vec<(Option<String>, ApiKeyCredentials)> {
+    credentials_from_settings(
+        &command_code_accounts(),
+        read_api_key_credentials,
+        &|name| non_empty_environment(name),
+    )
+}
+
+fn command_code_accounts() -> ProviderAccounts {
+    crate::app_settings::load_settings().accounts.commandcode
+}
+
+fn credentials_from_settings(
+    accounts: &ProviderAccounts,
+    fallback: impl FnOnce() -> Option<ApiKeyCredentials>,
+    environment: &dyn Fn(&str) -> Option<String>,
+) -> Vec<(Option<String>, ApiKeyCredentials)> {
+    let profiles = accounts
+        .profiles
+        .iter()
+        .filter(|profile| profile.enabled)
+        .collect::<Vec<_>>();
+    // No profiles configured: keep the historical single-credential behaviour.
+    if profiles.is_empty() {
+        return fallback().map(|credentials| (None, credentials)).into_iter().collect();
+    }
+
+    let mut resolved: Vec<(Option<String>, ApiKeyCredentials)> = Vec::new();
+    for profile in profiles {
+        let Some(credentials) = resolve_profile_credentials(profile, environment) else {
+            diagnose::log(format!(
+                "Command Code account '{}' has no usable API key; skipping it",
+                profile.name
+            ));
+            continue;
+        };
+        // Two profiles pointing at one key would draw the same numbers twice.
+        if resolved
+            .iter()
+            .any(|(_, known)| known.api_key == credentials.api_key)
+        {
+            diagnose::log(format!(
+                "Command Code account '{}' reuses another account's API key; skipping it",
+                profile.name
+            ));
+            continue;
+        }
+        resolved.push((Some(profile.name.clone()), credentials));
+    }
+    resolved
+}
+
+/// The key named by `api_key_env`, from the process environment first and then
+/// from the `KEY=VALUE` file in `credentials_path`. A profile that names no
+/// variable, or whose variable is nowhere to be found, resolves to nothing.
+fn resolve_profile_credentials(
+    profile: &AccountProfile,
+    environment: &dyn Fn(&str) -> Option<String>,
+) -> Option<ApiKeyCredentials> {
+    let variable = profile.api_key_env.trim();
+    if variable.is_empty() {
+        diagnose::log(format!(
+            "Command Code account '{}' does not name an API key variable",
+            profile.name
+        ));
+        return None;
+    }
+    if let Some(api_key) = environment(variable).filter(|value| valid_api_key(value)) {
+        return Some(ApiKeyCredentials {
+            api_key,
+            source: format!("environment {variable}"),
+        });
+    }
+    let path = crate::accounts::expand_path(Path::new(profile.credentials_path.trim()))?;
+    let api_key = read_env_file_value(&path, variable)?;
+    valid_api_key(&api_key).then(|| ApiKeyCredentials {
+        api_key,
+        source: path.display().to_string(),
+    })
+}
+
+/// Read one `KEY=VALUE` entry from a dotenv-style file. Blank lines and
+/// comments are ignored and surrounding quotes are stripped.
+fn read_env_file_value(path: &Path, variable: &str) -> Option<String> {
+    let content = std::fs::read_to_string(path).ok()?;
+    content.lines().find_map(|line| {
+        let line = line.trim();
+        if line.is_empty() || line.starts_with('#') {
+            return None;
+        }
+        let (key, value) = line.split_once('=')?;
+        if key.trim() != variable {
+            return None;
+        }
+        let value = value.trim();
+        let value = value
+            .strip_prefix('"')
+            .and_then(|value| value.strip_suffix('"'))
+            .or_else(|| {
+                value
+                    .strip_prefix('\'')
+                    .and_then(|value| value.strip_suffix('\''))
+            })
+            .unwrap_or(value)
+            .trim();
+        (!value.is_empty()).then(|| value.to_string())
+    })
+}
+
+/// Poll every configured key. The first result is the provider's own reading,
+/// the second becomes the external pool, and the rest are ignored.
+fn poll_sources_multi(
+    credentials: &[(Option<String>, ApiKeyCredentials)],
+    credits_url: &str,
+    subscriptions_url: &str,
+) -> Result<UsageData, PollError> {
+    let Some((first_label, first)) = credentials.first() else {
+        diagnose::log("Command Code usage poll failed: no API key found");
+        return Err(PollError::NoCredentials);
+    };
+    let mut usage = poll_sources(Some(first), credits_url, subscriptions_url)?;
+    usage.account_label = first_label.clone();
+
+    if let Some((second_label, second)) = credentials.get(1) {
+        match poll_sources(Some(second), credits_url, subscriptions_url) {
+            Ok(mut pool) => {
+                pool.account_label = second_label.clone();
+                usage.external_pool = Some(Box::new(pool));
+            }
+            Err(error) => {
+                // The primary subscription stays useful on its own.
+                diagnose::log(format!(
+                    "Command Code second account poll failed via {}: {error:?}",
+                    second.source
+                ));
+                usage.external_pool = None;
+            }
+        }
+    }
+    if credentials.len() > 2 {
+        diagnose::log(format!(
+            "Command Code has {} configured accounts; only the first two are shown",
+            credentials.len()
+        ));
+    }
+    Ok(usage)
 }
 
 /// Command Code has a single credential: one API key. Without it there is
@@ -412,18 +562,33 @@ fn valid_api_key(value: &str) -> bool {
 
 fn credential_watch_signature() -> String {
     let mut parts = Vec::new();
-    match read_api_key_credentials() {
-        Some(credentials) => {
-            let mut hasher = DefaultHasher::new();
-            credentials.api_key.hash(&mut hasher);
-            parts.push(format!(
-                "api_key|present|{}|{:x}|{}",
-                credentials.api_key.len(),
-                hasher.finish(),
-                credentials.source
-            ));
+    let accounts = command_code_accounts();
+    let credentials = credentials_from_settings(
+        &accounts,
+        read_api_key_credentials,
+        &|name| non_empty_environment(name),
+    );
+    if credentials.is_empty() {
+        parts.push("api_key|missing".to_string());
+    }
+    for (label, credentials) in &credentials {
+        let mut hasher = DefaultHasher::new();
+        credentials.api_key.hash(&mut hasher);
+        parts.push(format!(
+            "api_key|present|{}|{}|{:x}|{}",
+            label.as_deref().unwrap_or(""),
+            credentials.api_key.len(),
+            hasher.finish(),
+            credentials.source
+        ));
+    }
+    for profile in accounts.profiles.iter().filter(|profile| profile.enabled) {
+        // A profile's key may live in a KEY=VALUE file, so watch that too.
+        if let Some(path) =
+            crate::accounts::expand_path(Path::new(profile.credentials_path.trim()))
+        {
+            parts.push(path_signature(&path));
         }
-        None => parts.push("api_key|missing".to_string()),
     }
     for path in auth_file_paths() {
         parts.push(path_signature(&path));
@@ -859,6 +1024,254 @@ mod tests {
         assert!(!valid_api_key(""));
         assert!(!valid_api_key("cc key with spaces"));
         assert!(valid_api_key(&["cc", "file", "key"].join("_")));
+    }
+
+    /// Serves canned responses in request order, so two accounts hitting the
+    /// same URLs can return different figures.
+    fn ordered_mock_server(
+        responses: Vec<(u16, String)>,
+    ) -> (String, std::thread::JoinHandle<Vec<String>>) {
+        use std::io::{Read, Write};
+        use std::net::TcpListener;
+        use std::time::Duration;
+
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        let base = format!("http://{}", listener.local_addr().unwrap());
+        let handle = std::thread::spawn(move || {
+            let mut seen = Vec::new();
+            for (status, body) in responses {
+                let (mut stream, _) = listener.accept().unwrap();
+                stream
+                    .set_read_timeout(Some(Duration::from_secs(5)))
+                    .unwrap();
+                stream
+                    .set_write_timeout(Some(Duration::from_secs(5)))
+                    .unwrap();
+                let mut request = Vec::new();
+                let mut buffer = [0; 1024];
+                while !request.windows(4).any(|bytes| bytes == b"\r\n\r\n") {
+                    let count = stream.read(&mut buffer).unwrap();
+                    assert_ne!(count, 0);
+                    request.extend_from_slice(&buffer[..count]);
+                }
+                let text = String::from_utf8(request).unwrap();
+                let response = format!(
+                    "HTTP/1.1 {status} Test\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}",
+                    body.len()
+                );
+                stream.write_all(response.as_bytes()).unwrap();
+                seen.push(text);
+            }
+            seen
+        });
+        (base, handle)
+    }
+
+    // A second subscription with room left in both windows.
+    const SECOND_CREDITS_JSON: &str = r#"{
+        "credits": {
+            "belowThreshold": false,
+            "creditThreshold": 0,
+            "monthlyCredits": 69.93,
+            "purchasedCredits": 0,
+            "freeCredits": 0
+        },
+        "windowLimits": {
+            "limited": true,
+            "exceeded": null,
+            "fiveHour": {"used": 1, "cap": 10, "exceeded": false, "resetAt": 0},
+            "weekly": {"used": 3, "cap": 30, "exceeded": false, "resetAt": 1793747161060}
+        },
+        "sandboxAccess": true
+    }"#;
+
+    fn profile(name: &str, variable: &str, env_file: &Path) -> AccountProfile {
+        AccountProfile {
+            id: name.to_ascii_lowercase().replace(' ', "_"),
+            name: name.into(),
+            credentials_path: env_file.display().to_string(),
+            api_key_env: variable.into(),
+            enabled: true,
+            ..Default::default()
+        }
+    }
+
+    fn goat_file() -> (tempfile::TempDir, PathBuf) {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join(".env");
+        std::fs::write(
+            &path,
+            concat!(
+                "# two subscriptions\n",
+                "CC_GOAT_1=\"cc-goat-one\"\n",
+                "\n",
+                "CC_GOAT_2='cc-goat-two'\n",
+                "OTHER=ignored\n",
+            ),
+        )
+        .unwrap();
+        (dir, path)
+    }
+
+    #[test]
+    fn two_profiles_resolve_from_one_env_file_and_fill_both_pools() {
+        let (_dir, path) = goat_file();
+        let profiles = [
+            profile("Goat 1", "CC_GOAT_1", &path),
+            profile("Goat 2", "CC_GOAT_2", &path),
+        ];
+        let accounts = ProviderAccounts {
+            profiles: profiles.to_vec(),
+            selected: "goat_1".into(),
+            ..Default::default()
+        };
+        let credentials = credentials_from_settings(&accounts, || None, &|_| None);
+        assert_eq!(credentials.len(), 2, "both profiles must resolve");
+        assert_eq!(credentials[0].1.api_key, "cc-goat-one");
+        assert_eq!(credentials[1].1.api_key, "cc-goat-two");
+        assert_eq!(credentials[1].0.as_deref(), Some("Goat 2"));
+
+        let (base, requests) = ordered_mock_server(vec![
+            (200, CREDITS_JSON.to_string()),
+            (200, SUBSCRIPTIONS_JSON.to_string()),
+            (200, SECOND_CREDITS_JSON.to_string()),
+            (200, SUBSCRIPTIONS_JSON.to_string()),
+        ]);
+        let (credits_url, subscriptions_url) = billing_urls(&base);
+        let usage = poll_sources_multi(&credentials, &credits_url, &subscriptions_url).unwrap();
+
+        // First profile keeps the provider's own rows.
+        assert_eq!(usage.account_label.as_deref(), Some("Goat 1"));
+        assert_eq!(usage.weekly.percentage, 100.0);
+        let pool = usage.external_pool.as_deref().expect("second pool");
+        assert_eq!(pool.account_label.as_deref(), Some("Goat 2"));
+        assert_eq!(pool.session.percentage, 10.0);
+        assert_eq!(pool.weekly.percentage, 10.0);
+        let monthly = pool.monthly.as_ref().expect("second monthly window");
+        assert!((monthly.percentage - (70.0 - 69.93) / 70.0 * 100.0).abs() < 1e-9);
+        assert!(pool.external_pool.is_none());
+
+        let requests = requests.join().unwrap();
+        assert_eq!(requests.len(), 4);
+        for (request, key) in [
+            (&requests[0], "cc-goat-one"),
+            (&requests[1], "cc-goat-one"),
+            (&requests[2], "cc-goat-two"),
+            (&requests[3], "cc-goat-two"),
+        ] {
+            assert!(request
+                .to_ascii_lowercase()
+                .contains(&format!("authorization: bearer {key}")));
+        }
+    }
+
+    #[test]
+    fn a_failing_second_account_keeps_the_primary_and_drops_the_pool() {
+        let (_dir, path) = goat_file();
+        let accounts = ProviderAccounts {
+            profiles: vec![
+                profile("Goat 1", "CC_GOAT_1", &path),
+                profile("Goat 2", "CC_GOAT_2", &path),
+            ],
+            ..Default::default()
+        };
+        let credentials = credentials_from_settings(&accounts, || None, &|_| None);
+        let (base, requests) = ordered_mock_server(vec![
+            (200, CREDITS_JSON.to_string()),
+            (200, SUBSCRIPTIONS_JSON.to_string()),
+            (401, "{}".to_string()),
+        ]);
+        let (credits_url, subscriptions_url) = billing_urls(&base);
+        let usage = poll_sources_multi(&credentials, &credits_url, &subscriptions_url).unwrap();
+        assert_eq!(usage.account_label.as_deref(), Some("Goat 1"));
+        assert_eq!(usage.weekly.percentage, 100.0);
+        assert!(usage.external_pool.is_none());
+        assert_eq!(requests.join().unwrap().len(), 3);
+    }
+
+    #[test]
+    fn profiles_without_a_resolvable_key_are_skipped_instead_of_failing() {
+        let (_dir, path) = goat_file();
+        let accounts = ProviderAccounts {
+            profiles: vec![
+                profile("No variable", "", &path),
+                AccountProfile {
+                    id: "missing".into(),
+                    name: "Missing".into(),
+                    credentials_path: path.display().to_string(),
+                    api_key_env: "CC_NOT_IN_FILE".into(),
+                    ..Default::default()
+                },
+                profile("Goat 1", "CC_GOAT_1", &path),
+            ],
+            ..Default::default()
+        };
+        let credentials = credentials_from_settings(&accounts, || None, &|_| None);
+        assert_eq!(credentials.len(), 1);
+        assert_eq!(credentials[0].0.as_deref(), Some("Goat 1"));
+
+        let (base, requests) = ordered_mock_server(vec![
+            (200, CREDITS_JSON.to_string()),
+            (200, SUBSCRIPTIONS_JSON.to_string()),
+        ]);
+        let (credits_url, subscriptions_url) = billing_urls(&base);
+        let usage = poll_sources_multi(&credentials, &credits_url, &subscriptions_url).unwrap();
+        assert_eq!(usage.account_label.as_deref(), Some("Goat 1"));
+        assert!(usage.external_pool.is_none());
+        assert_eq!(requests.join().unwrap().len(), 2);
+    }
+
+    #[test]
+    fn the_environment_beats_the_env_file_and_no_profiles_keep_the_single_key_fallback() {
+        let (_dir, path) = goat_file();
+        let goat = profile("Goat 1", "CC_GOAT_1", &path);
+        let from_env =
+            resolve_profile_credentials(&goat, &|name| Some(format!("{name}-value"))).unwrap();
+        assert_eq!(from_env.api_key, "CC_GOAT_1-value");
+        assert!(from_env.source.starts_with("environment"));
+
+        // No configured profiles: the historical single credential is used.
+        let fallback = credentials_from_settings(
+            &empty_accounts(),
+            || Some(api_key_credentials()),
+            &|_| None,
+        );
+        assert_eq!(fallback.len(), 1);
+        assert_eq!(fallback[0].0, None);
+        assert_eq!(fallback[0].1.api_key, api_key_credentials().api_key);
+
+        // With a profile configured the fallback must never be consulted.
+        let configured = ProviderAccounts {
+            profiles: vec![goat],
+            ..Default::default()
+        };
+        let resolved = credentials_from_settings(
+            &configured,
+            || panic!("the env file fallback must not run when profiles exist"),
+            &|_| None,
+        );
+        assert_eq!(resolved.len(), 1);
+        assert_eq!(resolved[0].0.as_deref(), Some("Goat 1"));
+    }
+
+    fn empty_accounts() -> ProviderAccounts {
+        crate::accounts::empty_provider_accounts()
+    }
+
+    #[test]
+    fn env_file_parsing_ignores_comments_blanks_and_strips_quotes() {
+        let (_dir, path) = goat_file();
+        assert_eq!(
+            read_env_file_value(&path, "CC_GOAT_1").as_deref(),
+            Some("cc-goat-one")
+        );
+        assert_eq!(
+            read_env_file_value(&path, "CC_GOAT_2").as_deref(),
+            Some("cc-goat-two")
+        );
+        assert_eq!(read_env_file_value(&path, "OTHER").as_deref(), Some("ignored"));
+        assert_eq!(read_env_file_value(&path, "MISSING"), None);
+        assert_eq!(read_env_file_value(&path.join("absent"), "CC_GOAT_1"), None);
     }
 
     /// Live check against the real endpoints and the real on-disk key.

@@ -103,6 +103,10 @@ pub struct UsageData {
     /// Secondary quota pool for providers with multiple distinct allowances (e.g. Antigravity External Models).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub external_pool: Option<Box<UsageData>>,
+    /// Human name of the account these figures came from, when a provider can
+    /// be polled for more than one subscription (e.g. two Command Code plans).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub account_label: Option<String>,
     /// True when this reading was carried over from an earlier poll because
     /// the provider failed this cycle. The figures are real, just not current.
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
@@ -733,6 +737,42 @@ mod tests {
         );
         let decoded: UsageSection = serde_json::from_value(json).unwrap();
         assert_eq!(decoded, section);
+    }
+
+    #[test]
+    fn account_labels_round_trip_and_older_caches_still_load() {
+        let mut data = AppUsageData::default();
+        data.insert(
+            ProviderId::CommandCode,
+            UsageData {
+                account_label: Some("Goat 1".into()),
+                external_pool: Some(Box::new(UsageData {
+                    account_label: Some("Goat 2".into()),
+                    ..Default::default()
+                })),
+                ..Default::default()
+            },
+        );
+        let json = serde_json::to_string(&data).unwrap();
+        assert!(json.contains("\"account_label\":\"Goat 1\""));
+        assert!(json.contains("\"account_label\":\"Goat 2\""));
+        let decoded: AppUsageData = serde_json::from_str(&json).unwrap();
+        let usage = decoded.get(ProviderId::CommandCode).unwrap();
+        assert_eq!(usage.account_label.as_deref(), Some("Goat 1"));
+        assert_eq!(
+            usage.external_pool.as_deref().unwrap().account_label.as_deref(),
+            Some("Goat 2")
+        );
+
+        // A cache written before labels existed has no key and must load.
+        let old: UsageData = serde_json::from_str(
+            r#"{"session":{"available":true,"percentage":12.0,"resets_at":null},"weekly":{"available":false,"percentage":null,"resets_at":null}}"#,
+        )
+        .unwrap();
+        assert!(old.account_label.is_none());
+        // A usage with no label omits the key entirely rather than writing null.
+        let unlabelled = serde_json::to_string(&UsageData::default()).unwrap();
+        assert!(!unlabelled.contains("account_label"));
     }
 }
 

@@ -3860,6 +3860,137 @@ fn missing_antigravity_external_pool_draws_an_empty_gauge() {
 }
 
 #[test]
+fn a_second_pool_is_exposed_under_provider_external_bindings() {
+    use crate::models::{UsageData, UsageSection};
+    use std::time::{Duration, SystemTime};
+
+    let section = |percentage: f64| UsageSection {
+        available: true,
+        percentage,
+        resets_at: Some(SystemTime::now() + Duration::from_secs(3_600)),
+    };
+    let mut usage = AppUsageData::default();
+    usage.insert(
+        ProviderId::CommandCode,
+        UsageData {
+            session: section(11.0),
+            weekly: section(22.0),
+            monthly: Some(section(33.0)),
+            account_label: Some("Goat 1".into()),
+            external_pool: Some(Box::new(UsageData {
+                session: section(44.0),
+                weekly: section(55.0),
+                monthly: Some(section(66.0)),
+                account_label: Some("Goat 2".into()),
+                ..Default::default()
+            })),
+            ..Default::default()
+        },
+    );
+    let runtime = ThemeRuntime::from_providers(ProviderSet::from_enabled([
+        ProviderId::CommandCode,
+        ProviderId::Antigravity,
+    ]))
+    .with_countdown(false);
+    let context = DataContext::from_usage_with_runtime(Some(&usage), &Canvas::default(), runtime);
+
+    assert_eq!(
+        evaluate("commandcode.external.enabled", &context).unwrap(),
+        1.0
+    );
+    assert_eq!(
+        evaluate("commandcode.external.session.display", &context).unwrap(),
+        44.0
+    );
+    assert_eq!(
+        evaluate("commandcode.external.weekly.percentage", &context).unwrap(),
+        55.0
+    );
+    assert_eq!(
+        evaluate("commandcode.external.monthly.available", &context).unwrap(),
+        1.0
+    );
+    assert_eq!(
+        context.get_string("commandcode.external.account.name"),
+        Some("Goat 2")
+    );
+    // The primary rows and their name keep their own slot.
+    assert_eq!(
+        evaluate("commandcode.session.display", &context).unwrap(),
+        11.0
+    );
+    assert_eq!(
+        context.get_string("commandcode.account.name"),
+        Some("Goat 1")
+    );
+    assert!(context
+        .get_string("commandcode.external.session.history")
+        .is_some());
+
+    // Without a second subscription the pool reads as absent, never as the
+    // primary's figures.
+    let single = AppUsageData::from_iter([(
+        ProviderId::CommandCode,
+        UsageData {
+            session: section(11.0),
+            weekly: section(22.0),
+            ..Default::default()
+        },
+    )]);
+    let context = DataContext::from_usage(Some(&single), &Canvas::default());
+    assert_eq!(
+        evaluate("commandcode.external.enabled", &context).unwrap(),
+        0.0
+    );
+    assert_eq!(
+        evaluate("commandcode.external.session.display", &context).unwrap(),
+        0.0
+    );
+    assert_eq!(
+        context.get_string("commandcode.external.account.name"),
+        Some("")
+    );
+
+    // Antigravity's own pool must resolve exactly as before.
+    let mut agy = AppUsageData::default();
+    agy.insert(
+        ProviderId::Antigravity,
+        UsageData {
+            session: section(30.0),
+            weekly: section(30.0),
+            external_pool: Some(Box::new(UsageData {
+                session: section(70.0),
+                weekly: section(70.0),
+                ..Default::default()
+            })),
+            ..Default::default()
+        },
+    );
+    let runtime =
+        ThemeRuntime::from_providers(ProviderSet::from_enabled([ProviderId::Antigravity]))
+            .with_antigravity_pools(true, true, 1.0)
+            .with_countdown(false);
+    let context = DataContext::from_usage_with_runtime(Some(&agy), &Canvas::default(), runtime);
+    assert_eq!(
+        evaluate("antigravity.external.enabled", &context).unwrap(),
+        1.0
+    );
+    assert_eq!(evaluate("antigravity.dual_mode", &context).unwrap(), 1.0);
+    assert_eq!(
+        evaluate("antigravity.gemini.session.display", &context).unwrap(),
+        30.0
+    );
+    assert_eq!(
+        evaluate("antigravity.external.session.display", &context).unwrap(),
+        70.0
+    );
+    assert_eq!(
+        evaluate("antigravity.external.weekly.display", &context).unwrap(),
+        70.0
+    );
+}
+
+#[test]
 fn floating_card_paints_a_translucent_body_inside_its_rounded_outline() {
     // The blur itself is DWM's plate window (`crate::frost`); the renderer only
     // owes the card a translucent body whose corners are cut, so the plate

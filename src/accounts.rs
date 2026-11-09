@@ -54,6 +54,12 @@ pub struct AccountProfile {
     pub name: String,
     pub config_dir: String,
     pub credentials_path: String,
+    /// Name of the environment variable that holds this profile's API key.
+    ///
+    /// Key-based providers (Command Code) use this to pick one key per profile.
+    /// When the variable is not set in the process environment, the key is
+    /// read from the `KEY=VALUE` file named by `credentials_path`.
+    pub api_key_env: String,
     pub enabled: bool,
 }
 
@@ -64,6 +70,7 @@ impl Default for AccountProfile {
             name: "Default".into(),
             config_dir: String::new(),
             credentials_path: String::new(),
+            api_key_env: String::new(),
             enabled: true,
         }
     }
@@ -164,15 +171,42 @@ impl ProviderAccounts {
     }
 }
 
-#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct AccountSettings {
     pub claude: ProviderAccounts,
     pub codex: ProviderAccounts,
+    /// Key-based Command Code accounts. Unlike Claude and Codex there is no
+    /// implicit "default" profile: Command Code already has an environment and
+    /// `auth.json` fallback outside this list, and a phantom profile here would
+    /// hide it.
+    #[serde(default = "empty_provider_accounts")]
+    pub commandcode: ProviderAccounts,
+}
+
+/// A provider account list with nothing configured.
+pub fn empty_provider_accounts() -> ProviderAccounts {
+    ProviderAccounts {
+        profiles: Vec::new(),
+        selected: String::new(),
+        used_ids: std::collections::BTreeSet::new(),
+    }
+}
+
+impl Default for AccountSettings {
+    fn default() -> Self {
+        Self {
+            claude: ProviderAccounts::default(),
+            codex: ProviderAccounts::default(),
+            commandcode: empty_provider_accounts(),
+        }
+    }
 }
 
 impl AccountSettings {
     pub fn get(&self, provider: ProviderId) -> Option<&ProviderAccounts> {
+        // Command Code profiles are read by its own poller, which merges the
+        // keys into one provider reading instead of separate account rows.
         match provider {
             ProviderId::Claude => Some(&self.claude),
             ProviderId::Codex => Some(&self.codex),
@@ -218,6 +252,7 @@ impl AccountProfile {
         self.id == other.id
             && self.config_dir == other.config_dir
             && self.credentials_path == other.credentials_path
+            && self.api_key_env == other.api_key_env
     }
 
     pub fn credential_path(&self, provider: ProviderId) -> Result<Option<PathBuf>, String> {

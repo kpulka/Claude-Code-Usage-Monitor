@@ -113,6 +113,17 @@ impl DataContext {
             ("antigravity.external", field)
         } else {
             let (owner, field) = name.split_once('.')?;
+            // `<key>.external.…` names a second quota pool, which carries the
+            // same window fields as a provider.
+            if let Some(field) = field.strip_prefix("external.") {
+                if !PROVIDER_DESCRIPTORS
+                    .iter()
+                    .any(|descriptor| descriptor.key == owner)
+                {
+                    return None;
+                }
+                return Some((&name[..owner.len() + ".external".len()], field));
+            }
             if !matches!(
                 owner,
                 "claude"

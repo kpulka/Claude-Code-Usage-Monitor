@@ -1746,6 +1746,20 @@ impl DataContext {
                 crate::history::binding("antigravity#external", window).unwrap_or_default(),
             );
         }
+        // The second pool of any other provider is its own history series,
+        // recorded under `<provider>#external` by the history sampler.
+        for descriptor in PROVIDER_DESCRIPTORS
+            .iter()
+            .filter(|descriptor| descriptor.id != ProviderId::Antigravity)
+        {
+            for window in HISTORY_WINDOWS {
+                context.insert_string(
+                    &format!("{}.external.{window}.history", descriptor.key),
+                    crate::history::binding(&format!("{}#external", descriptor.key), window)
+                        .unwrap_or_default(),
+                );
+            }
+        }
         context.insert("display.countdown", runtime.countdown as u8 as f64);
         context.insert(
             "antigravity.gemini.enabled",
@@ -1816,7 +1830,10 @@ impl DataContext {
                 }
                 context.insert_string(
                     &format!("{}.account.name", descriptor.key),
-                    data.selected_account_name(descriptor.id).unwrap_or(""),
+                    data.get(descriptor.id)
+                        .and_then(|usage| usage.account_label.as_deref())
+                        .or_else(|| data.selected_account_name(descriptor.id))
+                        .unwrap_or(""),
                 );
                 context.insert_provider(
                     descriptor.key,
@@ -1824,6 +1841,15 @@ impl DataContext {
                     descriptor.id == ProviderId::Codex,
                     runtime.countdown,
                 );
+                if descriptor.id != ProviderId::Antigravity {
+                    expose_external_pool(
+                        &mut context,
+                        descriptor,
+                        data.get(descriptor.id)
+                            .and_then(|usage| usage.external_pool.as_deref()),
+                        runtime,
+                    );
+                }
             }
             if let Some(agy) = data.get(ProviderId::Antigravity) {
                 // Antigravity answered this poll; pool-level gaps are "no limit
@@ -1858,6 +1884,9 @@ impl DataContext {
                     descriptor.id == ProviderId::Codex,
                     runtime.countdown,
                 );
+                if descriptor.id != ProviderId::Antigravity {
+                    expose_external_pool(&mut context, descriptor, None, runtime);
+                }
             }
             context.insert_provider("antigravity.gemini", None, false, runtime.countdown);
             context.insert_provider("antigravity.external", None, false, runtime.countdown);
@@ -3111,6 +3140,29 @@ fn insert_window_alert(context: &mut DataContext, prefix: &str, alert: WindowAle
     context.insert(
         &format!("{prefix}.forecast.exhausted"),
         alert.forecast as u8 as f64,
+    );
+}
+
+/// Expose a provider's second quota pool under `<provider>.external`, the same
+/// shape Antigravity already uses, so a theme can draw both accounts at once.
+/// Antigravity is skipped because its pool predates this path and its own
+/// bindings must keep resolving identically.
+fn expose_external_pool(
+    context: &mut DataContext,
+    descriptor: crate::providers::ProviderDescriptor,
+    pool: Option<&crate::models::UsageData>,
+    runtime: ThemeRuntime,
+) {
+    let name = format!("{}.external", descriptor.key);
+    context.insert_provider(&name, pool, false, runtime.countdown);
+    context.insert(
+        &format!("{name}.enabled"),
+        (pool.is_some() && runtime.provider_enabled(descriptor.id)) as u8 as f64,
+    );
+    context.insert_string(
+        &format!("{name}.account.name"),
+        pool.and_then(|pool| pool.account_label.as_deref())
+            .unwrap_or(""),
     );
 }
 

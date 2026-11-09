@@ -510,7 +510,17 @@ pub(super) fn format_usage_line(base: &str, context: &DataContext) -> Option<Str
                 && !id.is_empty()
                 && id.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'_')
         });
+    // Any provider's second quota pool is addressable as `<key>.external`.
+    let external_pool = provider
+        .split_once('.')
+        .is_some_and(|(key, pool)| {
+            pool == "external"
+                && PROVIDER_DESCRIPTORS
+                    .iter()
+                    .any(|descriptor| descriptor.key == key)
+        });
     if (!named_account
+        && !external_pool
         && !matches!(
             provider,
             "active"
