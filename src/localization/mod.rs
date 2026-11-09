@@ -177,6 +177,9 @@ pub struct Strings {
     pub weekly_window: &'static str,
     pub balance: &'static str,
     pub lasts: &'static str,
+    /// Label for the second account of a provider that can poll more than one
+    /// subscription (e.g. two Command Code plans on the same card).
+    pub account_2: &'static str,
     pub cursor_auto_window: &'static str,
     pub cursor_api_window: &'static str,
     pub now: &'static str,

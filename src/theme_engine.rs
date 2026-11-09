@@ -1633,6 +1633,7 @@ impl DataContext {
         context.insert_string("i18n.weekly_window", strings.weekly_window);
         context.insert_string("i18n.balance", strings.balance);
         context.insert_string("i18n.lasts", strings.lasts);
+        context.insert_string("i18n.account_2", strings.account_2);
         context.insert_string("i18n.cursor_auto_window", strings.cursor_auto_window);
         context.insert_string("i18n.cursor_api_window", strings.cursor_api_window);
         context.insert_string("i18n.now", strings.now);

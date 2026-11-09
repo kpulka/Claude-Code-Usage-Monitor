@@ -5116,539 +5116,6 @@
             "segment_gap": "1"
           }
         },
-
-        {
-          "id": "commandcode-external-caption-dark",
-          "name": "commandcode-external-caption-dark",
-          "parent": "commandcode-provider",
-          "render": "system.dark && commandcode.external.enabled",
-          "x": "30",
-          "y": "79",
-          "width": "200",
-          "height": "14",
-          "content": {
-            "type": "text",
-            "template": "konto 2 · {commandcode.external.account.name}",
-            "font_family": "Segoe UI",
-            "font_size": "9",
-            "weight": "regular",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "left",
-            "color": {
-              "color": "#B6BCC4FF"
-            }
-          }
-        },
-        {
-          "id": "commandcode-external-session-label-dark",
-          "name": "commandcode-external-session-label-dark",
-          "parent": "commandcode-provider",
-          "render": "system.dark && commandcode.external.session.available",
-          "x": "30",
-          "y": "101",
-          "width": "32",
-          "height": "12",
-          "content": {
-            "type": "text",
-            "template": "{commandcode.external.session.label}",
-            "font_family": "Segoe UI",
-            "font_size": "11",
-            "weight": "bold",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#E0A458"
-            }
-          }
-        },
-        {
-          "id": "commandcode-external-session-reset-dark",
-          "name": "commandcode-external-session-reset-dark",
-          "parent": "commandcode-provider",
-          "render": "system.dark && commandcode.external.session.available && commandcode.external.session.reset.unix > 0",
-          "x": "64",
-          "y": "101",
-          "width": "62",
-          "height": "12",
-          "content": {
-            "type": "text",
-            "template": "{commandcode.external.session.reset.seconds:duration}",
-            "font_family": "Segoe UI",
-            "font_size": "9",
-            "weight": "regular",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#B6BCC4FF"
-            }
-          }
-        },
-        {
-          "id": "commandcode-external-session-bar",
-          "name": "commandcode-external-session-bar",
-          "parent": "commandcode-provider",
-          "render": "commandcode.external.session.available",
-          "x": "130",
-          "y": "104",
-          "width": "106",
-          "height": "6",
-          "content": {
-            "type": "progress",
-            "value": "commandcode.external.session.display",
-            "direction": "left_to_right",
-            "fill": {
-              "color": "#E0A458"
-            },
-            "track": {
-              "color": "#FFFFFF1A"
-            },
-            "corner_radius": "3",
-            "segments": 10,
-            "segment_gap": "1"
-          }
-        },
-        {
-          "id": "commandcode-external-session-value-dark",
-          "name": "commandcode-external-session-value-dark",
-          "parent": "commandcode-provider",
-          "render": "system.dark && commandcode.external.session.available",
-          "x": "246",
-          "y": "99",
-          "width": "80",
-          "height": "14",
-          "content": {
-            "type": "text",
-            "template": "{commandcode.external.session.display:0}%",
-            "font_family": "Segoe UI",
-            "font_size": "11",
-            "weight": "medium",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "left",
-            "color": {
-              "color": "#ECECECFF"
-            }
-          }
-        },
-        {
-          "id": "commandcode-external-weekly-label-dark",
-          "name": "commandcode-external-weekly-label-dark",
-          "parent": "commandcode-provider",
-          "render": "system.dark && commandcode.external.weekly.available",
-          "x": "30",
-          "y": "121",
-          "width": "32",
-          "height": "12",
-          "content": {
-            "type": "text",
-            "template": "{commandcode.external.weekly.label}",
-            "font_family": "Segoe UI",
-            "font_size": "11",
-            "weight": "bold",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#D29C33"
-            }
-          }
-        },
-        {
-          "id": "commandcode-external-weekly-reset-dark",
-          "name": "commandcode-external-weekly-reset-dark",
-          "parent": "commandcode-provider",
-          "render": "system.dark && commandcode.external.weekly.available && commandcode.external.weekly.reset.unix > 0",
-          "x": "64",
-          "y": "121",
-          "width": "62",
-          "height": "12",
-          "content": {
-            "type": "text",
-            "template": "{commandcode.external.weekly.reset.seconds:duration}",
-            "font_family": "Segoe UI",
-            "font_size": "9",
-            "weight": "regular",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#B6BCC4FF"
-            }
-          }
-        },
-        {
-          "id": "commandcode-external-weekly-bar",
-          "name": "commandcode-external-weekly-bar",
-          "parent": "commandcode-provider",
-          "render": "commandcode.external.weekly.available",
-          "x": "130",
-          "y": "124",
-          "width": "106",
-          "height": "6",
-          "content": {
-            "type": "progress",
-            "value": "commandcode.external.weekly.display",
-            "direction": "left_to_right",
-            "fill": {
-              "color": "#D29C33"
-            },
-            "track": {
-              "color": "#FFFFFF1A"
-            },
-            "corner_radius": "3",
-            "segments": 10,
-            "segment_gap": "1"
-          }
-        },
-        {
-          "id": "commandcode-external-weekly-value-dark",
-          "name": "commandcode-external-weekly-value-dark",
-          "parent": "commandcode-provider",
-          "render": "system.dark && commandcode.external.weekly.available",
-          "x": "246",
-          "y": "119",
-          "width": "80",
-          "height": "14",
-          "content": {
-            "type": "text",
-            "template": "{commandcode.external.weekly.display:0}%",
-            "font_family": "Segoe UI",
-            "font_size": "11",
-            "weight": "medium",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "left",
-            "color": {
-              "color": "#ECECECFF"
-            }
-          }
-        },
-        {
-          "id": "commandcode-external-monthly-label-dark",
-          "name": "commandcode-external-monthly-label-dark",
-          "parent": "commandcode-provider",
-          "render": "system.dark && commandcode.external.monthly.available",
-          "x": "30",
-          "y": "141",
-          "width": "32",
-          "height": "12",
-          "content": {
-            "type": "text",
-            "template": "{commandcode.external.monthly.label}",
-            "font_family": "Segoe UI",
-            "font_size": "11",
-            "weight": "bold",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#A7642B"
-            }
-          }
-        },
-        {
-          "id": "commandcode-external-monthly-reset-dark",
-          "name": "commandcode-external-monthly-reset-dark",
-          "parent": "commandcode-provider",
-          "render": "system.dark && commandcode.external.monthly.available && commandcode.external.monthly.reset.unix > 0",
-          "x": "64",
-          "y": "141",
-          "width": "62",
-          "height": "12",
-          "content": {
-            "type": "text",
-            "template": "{commandcode.external.monthly.reset.seconds:duration}",
-            "font_family": "Segoe UI",
-            "font_size": "9",
-            "weight": "regular",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#B6BCC4FF"
-            }
-          }
-        },
-        {
-          "id": "commandcode-external-monthly-bar",
-          "name": "commandcode-external-monthly-bar",
-          "parent": "commandcode-provider",
-          "render": "commandcode.external.monthly.available",
-          "x": "130",
-          "y": "144",
-          "width": "106",
-          "height": "6",
-          "content": {
-            "type": "progress",
-            "value": "commandcode.external.monthly.display",
-            "direction": "left_to_right",
-            "fill": {
-              "color": "#A7642B"
-            },
-            "track": {
-              "color": "#FFFFFF1A"
-            },
-            "corner_radius": "3",
-            "segments": 10,
-            "segment_gap": "1"
-          }
-        },
-        {
-          "id": "commandcode-external-monthly-value-dark",
-          "name": "commandcode-external-monthly-value-dark",
-          "parent": "commandcode-provider",
-          "render": "system.dark && commandcode.external.monthly.available",
-          "x": "246",
-          "y": "139",
-          "width": "80",
-          "height": "14",
-          "content": {
-            "type": "text",
-            "template": "{commandcode.external.monthly.display:0}%",
-            "font_family": "Segoe UI",
-            "font_size": "11",
-            "weight": "medium",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "left",
-            "color": {
-              "color": "#ECECECFF"
-            }
-          }
-        },
-        {
-          "id": "commandcode-external-caption-light",
-          "name": "commandcode-external-caption-light",
-          "parent": "commandcode-provider",
-          "render": "(1 - system.dark) && commandcode.external.enabled",
-          "x": "30",
-          "y": "79",
-          "width": "200",
-          "height": "14",
-          "content": {
-            "type": "text",
-            "template": "konto 2 · {commandcode.external.account.name}",
-            "font_family": "Segoe UI",
-            "font_size": "9",
-            "weight": "regular",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "left",
-            "color": {
-              "color": "#4A4F55FF"
-            }
-          }
-        },
-        {
-          "id": "commandcode-external-session-label-light",
-          "name": "commandcode-external-session-label-light",
-          "parent": "commandcode-provider",
-          "render": "(1 - system.dark) && commandcode.external.session.available",
-          "x": "30",
-          "y": "101",
-          "width": "32",
-          "height": "12",
-          "content": {
-            "type": "text",
-            "template": "{commandcode.external.session.label}",
-            "font_family": "Segoe UI",
-            "font_size": "11",
-            "weight": "bold",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#E0A458"
-            }
-          }
-        },
-        {
-          "id": "commandcode-external-session-reset-light",
-          "name": "commandcode-external-session-reset-light",
-          "parent": "commandcode-provider",
-          "render": "(1 - system.dark) && commandcode.external.session.available && commandcode.external.session.reset.unix > 0",
-          "x": "64",
-          "y": "101",
-          "width": "62",
-          "height": "12",
-          "content": {
-            "type": "text",
-            "template": "{commandcode.external.session.reset.seconds:duration}",
-            "font_family": "Segoe UI",
-            "font_size": "9",
-            "weight": "regular",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#4A4F55FF"
-            }
-          }
-        },
-        {
-          "id": "commandcode-external-session-value-light",
-          "name": "commandcode-external-session-value-light",
-          "parent": "commandcode-provider",
-          "render": "(1 - system.dark) && commandcode.external.session.available",
-          "x": "246",
-          "y": "99",
-          "width": "80",
-          "height": "14",
-          "content": {
-            "type": "text",
-            "template": "{commandcode.external.session.display:0}%",
-            "font_family": "Segoe UI",
-            "font_size": "11",
-            "weight": "medium",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "left",
-            "color": {
-              "color": "#1A1A1AFF"
-            }
-          }
-        },
-        {
-          "id": "commandcode-external-weekly-label-light",
-          "name": "commandcode-external-weekly-label-light",
-          "parent": "commandcode-provider",
-          "render": "(1 - system.dark) && commandcode.external.weekly.available",
-          "x": "30",
-          "y": "121",
-          "width": "32",
-          "height": "12",
-          "content": {
-            "type": "text",
-            "template": "{commandcode.external.weekly.label}",
-            "font_family": "Segoe UI",
-            "font_size": "11",
-            "weight": "bold",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#AC802A"
-            }
-          }
-        },
-        {
-          "id": "commandcode-external-weekly-reset-light",
-          "name": "commandcode-external-weekly-reset-light",
-          "parent": "commandcode-provider",
-          "render": "(1 - system.dark) && commandcode.external.weekly.available && commandcode.external.weekly.reset.unix > 0",
-          "x": "64",
-          "y": "121",
-          "width": "62",
-          "height": "12",
-          "content": {
-            "type": "text",
-            "template": "{commandcode.external.weekly.reset.seconds:duration}",
-            "font_family": "Segoe UI",
-            "font_size": "9",
-            "weight": "regular",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#4A4F55FF"
-            }
-          }
-        },
-        {
-          "id": "commandcode-external-weekly-value-light",
-          "name": "commandcode-external-weekly-value-light",
-          "parent": "commandcode-provider",
-          "render": "(1 - system.dark) && commandcode.external.weekly.available",
-          "x": "246",
-          "y": "119",
-          "width": "80",
-          "height": "14",
-          "content": {
-            "type": "text",
-            "template": "{commandcode.external.weekly.display:0}%",
-            "font_family": "Segoe UI",
-            "font_size": "11",
-            "weight": "medium",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "left",
-            "color": {
-              "color": "#1A1A1AFF"
-            }
-          }
-        },
-        {
-          "id": "commandcode-external-monthly-label-light",
-          "name": "commandcode-external-monthly-label-light",
-          "parent": "commandcode-provider",
-          "render": "(1 - system.dark) && commandcode.external.monthly.available",
-          "x": "30",
-          "y": "141",
-          "width": "32",
-          "height": "12",
-          "content": {
-            "type": "text",
-            "template": "{commandcode.external.monthly.label}",
-            "font_family": "Segoe UI",
-            "font_size": "11",
-            "weight": "bold",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#895223"
-            }
-          }
-        },
-        {
-          "id": "commandcode-external-monthly-reset-light",
-          "name": "commandcode-external-monthly-reset-light",
-          "parent": "commandcode-provider",
-          "render": "(1 - system.dark) && commandcode.external.monthly.available && commandcode.external.monthly.reset.unix > 0",
-          "x": "64",
-          "y": "141",
-          "width": "62",
-          "height": "12",
-          "content": {
-            "type": "text",
-            "template": "{commandcode.external.monthly.reset.seconds:duration}",
-            "font_family": "Segoe UI",
-            "font_size": "9",
-            "weight": "regular",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "right",
-            "color": {
-              "color": "#4A4F55FF"
-            }
-          }
-        },
-        {
-          "id": "commandcode-external-monthly-value-light",
-          "name": "commandcode-external-monthly-value-light",
-          "parent": "commandcode-provider",
-          "render": "(1 - system.dark) && commandcode.external.monthly.available",
-          "x": "246",
-          "y": "139",
-          "width": "80",
-          "height": "14",
-          "content": {
-            "type": "text",
-            "template": "{commandcode.external.monthly.display:0}%",
-            "font_family": "Segoe UI",
-            "font_size": "11",
-            "weight": "medium",
-            "rendering": "clear_type",
-            "contrast": "1",
-            "align": "left",
-            "color": {
-              "color": "#1A1A1AFF"
-            }
-          }
-        },
         {
           "id": "deepseek-provider",
           "name": "DeepSeek",
@@ -6869,6 +6336,701 @@
             "align": "left",
             "color": {
               "color": "#F87171FF"
+            }
+          }
+        },
+        {
+          "id": "commandcode-external-session-label-dark",
+          "name": "commandcode external-session-label-dark",
+          "parent": "commandcode-provider",
+          "render": "system.dark && commandcode.external.five_hour.available",
+          "x": "30",
+          "y": "111",
+          "width": "26",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{commandcode.external.session.label}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#E0A458"
+            }
+          }
+        },
+        {
+          "id": "commandcode-external-session-label-light",
+          "name": "commandcode external-session-label-light",
+          "parent": "commandcode-provider",
+          "render": "1 - system.dark && commandcode.external.five_hour.available",
+          "x": "30",
+          "y": "111",
+          "width": "26",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{commandcode.external.session.label}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#E0A458"
+            }
+          }
+        },
+        {
+          "id": "commandcode-external-session-reset-dark",
+          "name": "commandcode external-session-reset-dark",
+          "parent": "commandcode-provider",
+          "render": "system.dark && commandcode.external.five_hour.available && commandcode.external.session.reset.unix > 0",
+          "x": "58",
+          "y": "111",
+          "width": "44",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{commandcode.external.session.reset.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "regular",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#B6BCC4FF"
+            }
+          }
+        },
+        {
+          "id": "commandcode-external-session-reset-light",
+          "name": "commandcode external-session-reset-light",
+          "parent": "commandcode-provider",
+          "render": "1 - system.dark && commandcode.external.five_hour.available && commandcode.external.session.reset.unix > 0",
+          "x": "58",
+          "y": "111",
+          "width": "44",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{commandcode.external.session.reset.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "regular",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#4A4F55FF"
+            }
+          }
+        },
+        {
+          "id": "commandcode-external-session-value-dark",
+          "name": "commandcode external-session-value-dark",
+          "parent": "commandcode-provider",
+          "render": "system.dark && commandcode.external.five_hour.available",
+          "x": "216",
+          "y": "109",
+          "width": "64",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{commandcode.external.five_hour.display:0}%",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#ECECECFF"
+            }
+          }
+        },
+        {
+          "id": "commandcode-external-session-value-light",
+          "name": "commandcode external-session-value-light",
+          "parent": "commandcode-provider",
+          "render": "1 - system.dark && commandcode.external.five_hour.available",
+          "x": "216",
+          "y": "109",
+          "width": "64",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{commandcode.external.five_hour.display:0}%",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#1A1A1AFF"
+            }
+          }
+        },
+        {
+          "id": "commandcode-external-weekly-label-dark",
+          "name": "commandcode external-weekly-label-dark",
+          "parent": "commandcode-provider",
+          "render": "system.dark && commandcode.external.weekly.available",
+          "x": "30",
+          "y": "131",
+          "width": "26",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{commandcode.external.weekly.label}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#D29C33"
+            }
+          }
+        },
+        {
+          "id": "commandcode-external-weekly-label-light",
+          "name": "commandcode external-weekly-label-light",
+          "parent": "commandcode-provider",
+          "render": "1 - system.dark && commandcode.external.weekly.available",
+          "x": "30",
+          "y": "131",
+          "width": "26",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{commandcode.external.weekly.label}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#AC802A"
+            }
+          }
+        },
+        {
+          "id": "commandcode-external-weekly-reset-dark",
+          "name": "commandcode external-weekly-reset-dark",
+          "parent": "commandcode-provider",
+          "render": "system.dark && commandcode.external.weekly.reset.unix > 0",
+          "x": "58",
+          "y": "131",
+          "width": "44",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{commandcode.external.weekly.reset.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "regular",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#B6BCC4FF"
+            }
+          }
+        },
+        {
+          "id": "commandcode-external-weekly-reset-light",
+          "name": "commandcode external-weekly-reset-light",
+          "parent": "commandcode-provider",
+          "render": "1 - system.dark && commandcode.external.weekly.reset.unix > 0",
+          "x": "58",
+          "y": "131",
+          "width": "44",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{commandcode.external.weekly.reset.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "regular",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#4A4F55FF"
+            }
+          }
+        },
+        {
+          "id": "commandcode-external-weekly-value-dark",
+          "name": "commandcode external-weekly-value-dark",
+          "parent": "commandcode-provider",
+          "render": "system.dark && commandcode.external.weekly.available",
+          "x": "216",
+          "y": "129",
+          "width": "64",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{commandcode.external.weekly.display:0}%",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#ECECECFF"
+            }
+          }
+        },
+        {
+          "id": "commandcode-external-weekly-value-light",
+          "name": "commandcode external-weekly-value-light",
+          "parent": "commandcode-provider",
+          "render": "1 - system.dark && commandcode.external.weekly.available",
+          "x": "216",
+          "y": "129",
+          "width": "64",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{commandcode.external.weekly.display:0}%",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#1A1A1AFF"
+            }
+          }
+        },
+        {
+          "id": "commandcode-external-monthly-label-dark",
+          "name": "commandcode external-monthly-label-dark",
+          "parent": "commandcode-provider",
+          "render": "system.dark && commandcode.external.monthly.available",
+          "x": "30",
+          "y": "151",
+          "width": "26",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{commandcode.external.monthly.label}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#A7642B"
+            }
+          }
+        },
+        {
+          "id": "commandcode-external-monthly-label-light",
+          "name": "commandcode external-monthly-label-light",
+          "parent": "commandcode-provider",
+          "render": "1 - system.dark && commandcode.external.monthly.available",
+          "x": "30",
+          "y": "151",
+          "width": "26",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{commandcode.external.monthly.label}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#895223"
+            }
+          }
+        },
+        {
+          "id": "commandcode-external-monthly-reset-dark",
+          "name": "commandcode external-monthly-reset-dark",
+          "parent": "commandcode-provider",
+          "render": "system.dark && commandcode.external.monthly.reset.unix > 0",
+          "x": "58",
+          "y": "151",
+          "width": "44",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{commandcode.external.monthly.reset.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "regular",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#B6BCC4FF"
+            }
+          }
+        },
+        {
+          "id": "commandcode-external-monthly-reset-light",
+          "name": "commandcode external-monthly-reset-light",
+          "parent": "commandcode-provider",
+          "render": "1 - system.dark && commandcode.external.monthly.reset.unix > 0",
+          "x": "58",
+          "y": "151",
+          "width": "44",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{commandcode.external.monthly.reset.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "regular",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#4A4F55FF"
+            }
+          }
+        },
+        {
+          "id": "commandcode-external-monthly-value-dark",
+          "name": "commandcode external-monthly-value-dark",
+          "parent": "commandcode-provider",
+          "render": "system.dark && commandcode.external.monthly.available",
+          "x": "216",
+          "y": "149",
+          "width": "64",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{commandcode.external.monthly.display:0}%",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#ECECECFF"
+            }
+          }
+        },
+        {
+          "id": "commandcode-external-monthly-value-light",
+          "name": "commandcode external-monthly-value-light",
+          "parent": "commandcode-provider",
+          "render": "1 - system.dark && commandcode.external.monthly.available",
+          "x": "216",
+          "y": "149",
+          "width": "64",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{commandcode.external.monthly.display:0}%",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#1A1A1AFF"
+            }
+          }
+        },
+        {
+          "id": "commandcode-external-session-bar",
+          "name": "commandcode external-session-bar",
+          "parent": "commandcode-provider",
+          "render": "commandcode.external.five_hour.available",
+          "x": "106",
+          "y": "114",
+          "width": "106",
+          "height": "6",
+          "content": {
+            "type": "progress",
+            "value": "commandcode.external.five_hour.display",
+            "direction": "left_to_right",
+            "fill": {
+              "color": "#E0A458"
+            },
+            "track": {
+              "color": "#FFFFFF1A"
+            },
+            "corner_radius": "3",
+            "segments": 10,
+            "segment_gap": "1"
+          }
+        },
+        {
+          "id": "commandcode-external-weekly-bar",
+          "name": "commandcode external-weekly-bar",
+          "parent": "commandcode-provider",
+          "render": "commandcode.external.weekly.available",
+          "x": "106",
+          "y": "134",
+          "width": "106",
+          "height": "6",
+          "content": {
+            "type": "progress",
+            "value": "commandcode.external.weekly.display",
+            "direction": "left_to_right",
+            "fill": {
+              "color": "#D29C33"
+            },
+            "track": {
+              "color": "#FFFFFF1A"
+            },
+            "corner_radius": "3",
+            "segments": 10,
+            "segment_gap": "1"
+          }
+        },
+        {
+          "id": "commandcode-external-monthly-bar",
+          "name": "commandcode external-monthly-bar",
+          "parent": "commandcode-provider",
+          "render": "commandcode.external.monthly.available",
+          "x": "106",
+          "y": "154",
+          "width": "106",
+          "height": "6",
+          "content": {
+            "type": "progress",
+            "value": "commandcode.external.monthly.display",
+            "direction": "left_to_right",
+            "fill": {
+              "color": "#A7642B"
+            },
+            "track": {
+              "color": "#FFFFFF1A"
+            },
+            "corner_radius": "3",
+            "segments": 10,
+            "segment_gap": "1"
+          }
+        },
+        {
+          "id": "commandcode-external-chart-session",
+          "name": "commandcode external usage history (5h)",
+          "parent": "commandcode-provider",
+          "render": "commandcode.external.five_hour.available",
+          "x": "296",
+          "y": "104",
+          "width": "102",
+          "height": "44 + 20 * commandcode.external.monthly.available",
+          "content": {
+            "type": "sparkline",
+            "source": "commandcode.external.session.history.cycle",
+            "color": {
+              "color": "#E0A458"
+            },
+            "fill": {
+              "color": "#00000000"
+            },
+            "invert": "display.countdown",
+            "line_width": "1",
+            "dashed": "1"
+          }
+        },
+        {
+          "id": "commandcode-external-chart-weekly",
+          "name": "commandcode external usage history (7d)",
+          "parent": "commandcode-provider",
+          "render": "commandcode.external.weekly.available",
+          "x": "296",
+          "y": "104",
+          "width": "102",
+          "height": "44 + 20 * commandcode.external.monthly.available",
+          "content": {
+            "type": "sparkline",
+            "source": "commandcode.external.weekly.history.cycle",
+            "color": {
+              "color": "#D29C33"
+            },
+            "fill": {
+              "color": "#00000000"
+            },
+            "invert": "display.countdown",
+            "line_width": "1.4 + 0.4 * (1 - commandcode.five_hour.available)",
+            "dashed": "0"
+          }
+        },
+        {
+          "id": "commandcode-external-chart-monthly",
+          "name": "commandcode external usage history (30d)",
+          "parent": "commandcode-provider",
+          "render": "commandcode.external.monthly.available",
+          "x": "296",
+          "y": "104",
+          "width": "102",
+          "height": "44 + 20 * commandcode.external.monthly.available",
+          "content": {
+            "type": "sparkline",
+            "source": "commandcode.external.monthly.history.cycle",
+            "color": {
+              "color": "#A7642B"
+            },
+            "fill": {
+              "color": "#00000000"
+            },
+            "invert": "display.countdown",
+            "line_width": "2 + 0.2 * (1 - commandcode.five_hour.available) * (1 - commandcode.weekly.available)",
+            "dashed": "0"
+          }
+        },
+        {
+          "id": "commandcode-external-axis-100",
+          "name": "commandcode external chart 100",
+          "parent": "commandcode-provider",
+          "render": "commandcode.available",
+          "x": "296",
+          "y": "90",
+          "width": "102",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "100%",
+            "font_family": "Segoe UI",
+            "font_size": "7",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "commandcode-external-axis-0",
+          "name": "commandcode external chart 0",
+          "parent": "commandcode-provider",
+          "render": "commandcode.available",
+          "x": "296",
+          "y": "149 + 20 * commandcode.external.monthly.available",
+          "width": "102",
+          "height": "7",
+          "content": {
+            "type": "text",
+            "template": "0%",
+            "font_family": "Segoe UI",
+            "font_size": "7",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "commandcode-external-grid-25",
+          "name": "commandcode external chart grid 25",
+          "parent": "commandcode-provider",
+          "render": "commandcode.available",
+          "x": "296",
+          "y": "115 + 5 * commandcode.external.monthly.available",
+          "width": "102",
+          "height": "1",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#9AA0A624"
+            }
+          }
+        },
+        {
+          "id": "commandcode-external-grid-50",
+          "name": "commandcode external chart grid 50",
+          "parent": "commandcode-provider",
+          "render": "commandcode.available",
+          "x": "296",
+          "y": "126 + 10 * commandcode.external.monthly.available",
+          "width": "102",
+          "height": "1",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#9AA0A624"
+            }
+          }
+        },
+        {
+          "id": "commandcode-external-grid-75",
+          "name": "commandcode external chart grid 75",
+          "parent": "commandcode-provider",
+          "render": "commandcode.available",
+          "x": "296",
+          "y": "137 + 15 * commandcode.external.monthly.available",
+          "width": "102",
+          "height": "1",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#9AA0A624"
+            }
+          }
+        },
+        {
+          "id": "commandcode-external-caption-dark",
+          "name": "commandcode external caption dark",
+          "parent": "commandcode-provider",
+          "render": "system.dark && commandcode.external.enabled",
+          "x": "30",
+          "y": "95",
+          "width": "200",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{i18n.account_2} · {commandcode.external.account.name}",
+            "font_family": "Segoe UI",
+            "font_size": "10",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#B6BCC4FF"
+            }
+          }
+        },
+        {
+          "id": "commandcode-external-caption-light",
+          "name": "commandcode external caption light",
+          "parent": "commandcode-provider",
+          "render": "1 - system.dark && commandcode.external.enabled",
+          "x": "30",
+          "y": "95",
+          "width": "200",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{i18n.account_2} · {commandcode.external.account.name}",
+            "font_family": "Segoe UI",
+            "font_size": "10",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#4A4F55FF"
             }
           }
         }

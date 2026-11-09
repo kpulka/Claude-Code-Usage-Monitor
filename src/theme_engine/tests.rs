@@ -997,6 +997,60 @@ fn horizontal_fable_columns_follow_claude_visibility_and_usage_direction() {
 }
 
 #[test]
+fn grid_panel_second_account_mirrors_the_first_columns() {
+    // Two Command Code plans share one block: the second account must sit in
+    // exactly the same columns as the first (label, reset, bar, value) and only
+    // move down, or the two halves look like different tables.
+    let (_, source) = BUILTIN_THEME_SOURCES
+        .iter()
+        .find(|(id, _)| *id == GRID_PANEL_THEME_ID)
+        .expect("grid-panel ships as a built-in theme");
+    let theme: ThemeDocument = serde_json::from_str(source).unwrap();
+    let surface = &theme.surfaces[0];
+    let mut canvas = Canvas::default();
+    canvas.width = 412;
+    canvas.height = 790;
+    let runtime = ThemeRuntime::from_providers(ProviderSet::from_enabled([ProviderId::CommandCode]));
+    let context = DataContext::from_usage_with_runtime(None, &canvas, runtime);
+
+    let rect = |id: &str| -> (f64, f64, f64, f64) {
+        let object = surface
+            .children
+            .iter()
+            .find(|object| object.id == id)
+            .unwrap_or_else(|| panic!("{id} is missing from grid-panel"));
+        (
+            evaluate(&object.x.0, &context).unwrap(),
+            evaluate(&object.y.0, &context).unwrap(),
+            evaluate(&object.width.0, &context).unwrap(),
+            evaluate(&object.height.0, &context).unwrap(),
+        )
+    };
+
+    for window in ["session", "weekly", "monthly"] {
+        for kind in ["label", "value", "reset"] {
+            let first = rect(&format!("commandcode-{window}-{kind}-dark"));
+            let second = rect(&format!("commandcode-external-{window}-{kind}-dark"));
+            assert_eq!(first.0, second.0, "{window} {kind}: left edge");
+            assert_eq!(first.2, second.2, "{window} {kind}: width");
+            assert!(second.1 > first.1, "{window} {kind}: second account sits lower");
+        }
+        let first = rect(&format!("commandcode-{window}-bar"));
+        let second = rect(&format!("commandcode-external-{window}-bar"));
+        assert_eq!(first.0, second.0, "{window} bar: left edge");
+        assert_eq!(first.2, second.2, "{window} bar: width");
+        assert!(second.1 > first.1, "{window} bar: second account sits lower");
+    }
+
+    // The second account gets its own chart column, aligned with the first one.
+    let first_chart = rect("commandcode-chart-session");
+    let second_chart = rect("commandcode-external-chart-session");
+    assert_eq!(first_chart.0, second_chart.0, "chart column");
+    assert_eq!(first_chart.2, second_chart.2, "chart width");
+    assert!(second_chart.1 > first_chart.1, "chart rows do not overlap");
+}
+
+#[test]
 fn grid_panel_bars_are_ten_segment_gauges() {
     // The compact grid draws continuous bars, which read as a smooth swipe and
     // hide how much of each window is left. Ten marks put a 10% step on every
