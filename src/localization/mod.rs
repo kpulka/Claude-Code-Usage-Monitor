@@ -177,6 +177,9 @@ pub struct Strings {
     pub weekly_window: &'static str,
     pub balance: &'static str,
     pub lasts: &'static str,
+    /// Label for the first account of a provider that can poll more than one
+    /// subscription, so both halves of the card name the plan they belong to.
+    pub account_1: &'static str,
     /// Label for the second account of a provider that can poll more than one
     /// subscription (e.g. two Command Code plans on the same card).
     pub account_2: &'static str,

@@ -4591,7 +4591,7 @@
           "render": "system.dark",
           "x": "30",
           "y": "9",
-          "width": "200",
+          "width": "104",
           "height": "16",
           "content": {
             "type": "text",
@@ -4752,7 +4752,7 @@
           "render": "1 - system.dark",
           "x": "30",
           "y": "9",
-          "width": "200",
+          "width": "104",
           "height": "16",
           "content": {
             "type": "text",
@@ -7023,6 +7023,52 @@
           "content": {
             "type": "text",
             "template": "{i18n.account_2} · {commandcode.external.account.name}",
+            "font_family": "Segoe UI",
+            "font_size": "10",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#4A4F55FF"
+            }
+          }
+        },
+        {
+          "id": "commandcode-caption-1-dark",
+          "name": "commandcode caption 1 dark",
+          "parent": "commandcode-provider",
+          "render": "system.dark && commandcode.external.enabled",
+          "x": "140",
+          "y": "11",
+          "width": "160",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{i18n.account_1} · {commandcode.account.name}",
+            "font_family": "Segoe UI",
+            "font_size": "10",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#B6BCC4FF"
+            }
+          }
+        },
+        {
+          "id": "commandcode-caption-1-light",
+          "name": "commandcode caption 1 light",
+          "parent": "commandcode-provider",
+          "render": "1 - system.dark && commandcode.external.enabled",
+          "x": "140",
+          "y": "11",
+          "width": "160",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{i18n.account_1} · {commandcode.account.name}",
             "font_family": "Segoe UI",
             "font_size": "10",
             "weight": "medium",
