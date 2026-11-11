@@ -244,11 +244,31 @@ pub struct ResolvedApiKey {
     pub source: String,
 }
 
-/// Resolve a key-based profile: the variable named by `api_key_env` from the
-/// process environment first, then from the `KEY=VALUE` file in
-/// `credentials_path`. A profile that names no variable, or whose variable is
-/// nowhere to be found, resolves to nothing.
-pub fn resolve_profile_api_key(profile: &AccountProfile) -> Option<ResolvedApiKey> {
+/// Vault target for one account of a key-based provider, e.g.
+/// `ClaudeCodeUsageMonitor/opencode/go_plus`. The dashboard stores a key typed
+/// by the user here, so a second subscription needs no `.env` edit.
+pub fn account_credential_target(provider_key: &str, profile_id: &str) -> String {
+    format!("{provider_key}/{profile_id}")
+}
+
+/// Resolve a key-based profile, most specific source first: the key typed into
+/// the dashboard (Windows Credential Manager), then the variable named by
+/// `api_key_env` in the process environment, then that same variable in the
+/// `KEY=VALUE` file at `credentials_path`. A profile whose key is nowhere to be
+/// found resolves to nothing.
+pub fn resolve_profile_api_key(
+    provider_key: &str,
+    profile: &AccountProfile,
+) -> Option<ResolvedApiKey> {
+    let from_vault = crate::credentials::load(&account_credential_target(provider_key, &profile.id))
+        .filter(|value| valid_api_key(value));
+    if from_vault.is_some() {
+        return from_vault.map(|api_key| ResolvedApiKey {
+            api_key,
+            source: "Windows Credential Manager".to_string(),
+        });
+    }
+
     let variable = profile.api_key_env.trim();
     if variable.is_empty() {
         return None;

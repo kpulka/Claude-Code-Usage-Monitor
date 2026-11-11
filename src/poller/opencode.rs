@@ -195,7 +195,7 @@ fn credentials_from_profiles(
 ) -> Vec<(String, ApiKeyCredentials)> {
     let mut resolved: Vec<(String, ApiKeyCredentials)> = Vec::new();
     for profile in accounts.profiles.iter().filter(|profile| profile.enabled) {
-        let Some(key) = crate::accounts::resolve_profile_api_key(profile) else {
+        let Some(key) = crate::accounts::resolve_profile_api_key("opencode", profile) else {
             diagnose::log(format!(
                 "OpenCode account '{}' has no usable API key; skipping it",
                 profile.name
@@ -671,7 +671,7 @@ fn credential_watch_signature() -> String {
         .iter()
         .filter(|profile| profile.enabled)
     {
-        match crate::accounts::resolve_profile_api_key(profile) {
+        match crate::accounts::resolve_profile_api_key("opencode", profile) {
             Some(key) => {
                 let mut hasher = DefaultHasher::new();
                 key.api_key.hash(&mut hasher);
