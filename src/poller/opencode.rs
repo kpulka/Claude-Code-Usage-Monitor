@@ -134,12 +134,93 @@ struct GoMeter {
 }
 
 pub(super) fn poll_opencode() -> Result<UsageData, PollError> {
+    // Configured accounts win: they merge two subscriptions into one block.
+    // Without any usable profile the discovery path below keeps working for
+    // people who never opened the account editor.
+    if let Some(result) = poll_configured_accounts() {
+        return result;
+    }
     poll_sources(
         read_api_key_credentials().as_ref(),
         read_dashboard_credentials().as_ref(),
         GO_USAGE_URL,
         GO_STATUS_URL,
     )
+}
+
+/// Poll the accounts from settings. The first key is the card's OpenCode block,
+/// the second becomes its external pool, and the rest are ignored.
+fn poll_configured_accounts() -> Option<Result<UsageData, PollError>> {
+    let accounts = crate::app_settings::load_settings().accounts.opencode;
+    let credentials = credentials_from_profiles(&accounts);
+    let (first_label, first) = credentials.first()?;
+
+    let mut usage = match poll_sources(Some(first), None, GO_USAGE_URL, GO_STATUS_URL) {
+        Ok(usage) => usage,
+        // A configured key that fails is a real error, not a reason to fall
+        // back to whichever key the CLI happens to hold.
+        Err(error) => return Some(Err(error)),
+    };
+    usage.account_label = Some(first_label.clone());
+
+    if let Some((second_label, second)) = credentials.get(1) {
+        match poll_sources(Some(second), None, GO_USAGE_URL, GO_STATUS_URL) {
+            Ok(mut pool) => {
+                pool.account_label = Some(second_label.clone());
+                usage.external_pool = Some(Box::new(pool));
+            }
+            Err(error) => {
+                // The first subscription stays useful on its own.
+                diagnose::log(format!(
+                    "OpenCode second account poll failed via {}: {error:?}",
+                    second.source
+                ));
+                usage.external_pool = None;
+            }
+        }
+    }
+    if credentials.len() > 2 {
+        diagnose::log(format!(
+            "OpenCode has {} configured accounts; only the first two are shown",
+            credentials.len()
+        ));
+    }
+    Some(Ok(usage))
+}
+
+/// Resolve every enabled profile, skipping keys that are missing or shared:
+/// two profiles pointing at one key would draw the same numbers twice.
+fn credentials_from_profiles(
+    accounts: &crate::accounts::ProviderAccounts,
+) -> Vec<(String, ApiKeyCredentials)> {
+    let mut resolved: Vec<(String, ApiKeyCredentials)> = Vec::new();
+    for profile in accounts.profiles.iter().filter(|profile| profile.enabled) {
+        let Some(key) = crate::accounts::resolve_profile_api_key(profile) else {
+            diagnose::log(format!(
+                "OpenCode account '{}' has no usable API key; skipping it",
+                profile.name
+            ));
+            continue;
+        };
+        if resolved
+            .iter()
+            .any(|(_, known)| known.api_key == key.api_key)
+        {
+            diagnose::log(format!(
+                "OpenCode account '{}' reuses another account's API key; skipping it",
+                profile.name
+            ));
+            continue;
+        }
+        resolved.push((
+            profile.name.clone(),
+            ApiKeyCredentials {
+                api_key: key.api_key,
+                source: key.source,
+            },
+        ));
+    }
+    resolved
 }
 
 pub(super) fn credential_watch_snapshot(_all_sources: bool) -> Vec<String> {
@@ -581,6 +662,30 @@ fn valid_api_key(value: &str) -> bool {
 
 fn credential_watch_signature() -> String {
     let mut parts = Vec::new();
+    // Configured accounts are what the poller actually reads, so their key
+    // material has to be part of the signature or an edited key goes unnoticed.
+    for profile in crate::app_settings::load_settings()
+        .accounts
+        .opencode
+        .profiles
+        .iter()
+        .filter(|profile| profile.enabled)
+    {
+        match crate::accounts::resolve_profile_api_key(profile) {
+            Some(key) => {
+                let mut hasher = DefaultHasher::new();
+                key.api_key.hash(&mut hasher);
+                parts.push(format!(
+                    "profile|{}|present|{}|{:x}|{}",
+                    profile.name,
+                    key.api_key.len(),
+                    hasher.finish(),
+                    key.source
+                ));
+            }
+            None => parts.push(format!("profile|{}|missing", profile.name)),
+        }
+    }
     match read_api_key_credentials() {
         Some(credentials) => {
             let mut hasher = DefaultHasher::new();
@@ -1174,6 +1279,53 @@ mod tests {
         assert!(!valid_api_key(""));
         assert!(valid_api_key("sk-abc_123-XYZ"));
     }
+    /// Two profiles become one block: the first is the provider reading, the
+    /// second its external pool, and a shared key never shows twice.
+    #[test]
+    fn configured_accounts_resolve_in_order_and_skip_shared_keys() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join(".env");
+        std::fs::write(
+            &path,
+            concat!(
+                "# two Go subscriptions\n",
+                "GO_PLUS=\"oc_sk_plus\"\n",
+                "\n",
+                "GO_BASE='oc_sk_base'\n",
+                "GO_ALIAS=oc_sk_plus\n",
+            ),
+        )
+        .unwrap();
+
+        let profile = |name: &str, variable: &str| crate::accounts::AccountProfile {
+            id: name.to_ascii_lowercase().replace(' ', "_"),
+            name: name.into(),
+            credentials_path: path.display().to_string(),
+            api_key_env: variable.into(),
+            enabled: true,
+            ..Default::default()
+        };
+
+        let mut accounts = crate::accounts::empty_provider_accounts();
+        accounts.profiles = vec![
+            profile("Go Plus", "GO_PLUS"),
+            profile("Go", "GO_BASE"),
+            profile("Go duplicate", "GO_ALIAS"),
+            profile("Broken", "GO_MISSING"),
+        ];
+        let resolved = credentials_from_profiles(&accounts);
+        let labels: Vec<&str> = resolved.iter().map(|(label, _)| label.as_str()).collect();
+        assert_eq!(labels, ["Go Plus", "Go"]);
+        assert_eq!(resolved[0].1.api_key, "oc_sk_plus");
+        assert_eq!(resolved[1].1.api_key, "oc_sk_base");
+
+        // A disabled profile is not polled at all.
+        let mut disabled = crate::accounts::empty_provider_accounts();
+        disabled.profiles = vec![profile("Off", "GO_BASE")];
+        disabled.profiles[0].enabled = false;
+        assert!(credentials_from_profiles(&disabled).is_empty());
+    }
+
     /// Live check against the real endpoint and the real on-disk key.
     /// Run with `cargo test live_opencode_api_key -- --ignored --nocapture`.
     #[test]

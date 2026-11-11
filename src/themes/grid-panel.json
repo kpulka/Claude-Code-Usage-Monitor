@@ -21,7 +21,7 @@
         "offset_y": 0
       },
       "width": "412",
-      "height": "10 + providers.count * 76 + 20 * opencode.monthly.available + 20 * commandcode.monthly.available + 94 * commandcode.external.enabled + 20 * antigravity.gemini.enabled * antigravity.gemini.limits.count",
+      "height": "10 + providers.count * 76 + 20 * opencode.monthly.available + 20 * commandcode.monthly.available + 94 * commandcode.external.enabled + 20 * antigravity.gemini.enabled * antigravity.gemini.limits.count + 94 * opencode.external.enabled",
       "corner_radius": "14",
       "background": {
         "type": "gradient",
@@ -1997,7 +1997,7 @@
           "parent": "grid",
           "render": "providers.opencode.enabled",
           "width": "canvas.width",
-          "height": "76 + 20 * opencode.monthly.available"
+          "height": "76 + 20 * opencode.monthly.available + 94 * opencode.external.enabled"
         },
         {
           "id": "opencode-axis-100",
@@ -2005,7 +2005,7 @@
           "parent": "opencode-provider",
           "render": "opencode.available",
           "x": "296",
-          "y": "10",
+          "y": "10 + 14 * opencode.external.enabled",
           "width": "102",
           "height": "12",
           "content": {
@@ -2028,7 +2028,7 @@
           "parent": "opencode-provider",
           "render": "opencode.available",
           "x": "296",
-          "y": "35 + 5 * opencode.monthly.available",
+          "y": "35 + 5 * opencode.monthly.available + 14 * opencode.external.enabled",
           "width": "102",
           "height": "1",
           "background": {
@@ -2044,7 +2044,7 @@
           "parent": "opencode-provider",
           "render": "opencode.available",
           "x": "296",
-          "y": "46 + 10 * opencode.monthly.available",
+          "y": "46 + 10 * opencode.monthly.available + 14 * opencode.external.enabled",
           "width": "102",
           "height": "1",
           "background": {
@@ -2060,7 +2060,7 @@
           "parent": "opencode-provider",
           "render": "opencode.available",
           "x": "296",
-          "y": "57 + 15 * opencode.monthly.available",
+          "y": "57 + 15 * opencode.monthly.available + 14 * opencode.external.enabled",
           "width": "102",
           "height": "1",
           "background": {
@@ -2076,7 +2076,7 @@
           "parent": "opencode-provider",
           "render": "opencode.available",
           "x": "296",
-          "y": "69 + 20 * opencode.monthly.available",
+          "y": "69 + 20 * opencode.monthly.available + 14 * opencode.external.enabled",
           "width": "102",
           "height": "7",
           "content": {
@@ -2099,7 +2099,7 @@
           "parent": "opencode-provider",
           "render": "opencode.monthly.available",
           "x": "296",
-          "y": "24",
+          "y": "24 + 14 * opencode.external.enabled",
           "width": "102",
           "height": "44 + 20 * opencode.monthly.available",
           "content": {
@@ -2122,7 +2122,7 @@
           "parent": "opencode-provider",
           "render": "opencode.weekly.available",
           "x": "296",
-          "y": "24",
+          "y": "24 + 14 * opencode.external.enabled",
           "width": "102",
           "height": "44 + 20 * opencode.monthly.available",
           "content": {
@@ -2145,7 +2145,7 @@
           "parent": "opencode-provider",
           "render": "opencode.five_hour.available",
           "x": "296",
-          "y": "24",
+          "y": "24 + 14 * opencode.external.enabled",
           "width": "102",
           "height": "44 + 20 * opencode.monthly.available",
           "content": {
@@ -2224,7 +2224,7 @@
           "parent": "opencode-provider",
           "render": "system.dark && opencode.five_hour.available",
           "x": "30",
-          "y": "31",
+          "y": "31 + 14 * opencode.external.enabled",
           "width": "26",
           "height": "12",
           "content": {
@@ -2247,7 +2247,7 @@
           "parent": "opencode-provider",
           "render": "system.dark && opencode.five_hour.available",
           "x": "216",
-          "y": "29",
+          "y": "29 + 14 * opencode.external.enabled",
           "width": "64",
           "height": "14",
           "content": {
@@ -2270,7 +2270,7 @@
           "parent": "opencode-provider",
           "render": "system.dark && opencode.five_hour.available && opencode.session.reset.unix > 0",
           "x": "58",
-          "y": "31",
+          "y": "31 + 14 * opencode.external.enabled",
           "width": "44",
           "height": "12",
           "content": {
@@ -2293,7 +2293,7 @@
           "parent": "opencode-provider",
           "render": "system.dark && opencode.weekly.available",
           "x": "30",
-          "y": "51",
+          "y": "51 + 14 * opencode.external.enabled",
           "width": "26",
           "height": "12",
           "content": {
@@ -2316,7 +2316,7 @@
           "parent": "opencode-provider",
           "render": "system.dark && opencode.weekly.available",
           "x": "216",
-          "y": "49",
+          "y": "49 + 14 * opencode.external.enabled",
           "width": "64",
           "height": "14",
           "content": {
@@ -2339,7 +2339,7 @@
           "parent": "opencode-provider",
           "render": "system.dark && opencode.weekly.reset.unix > 0",
           "x": "58",
-          "y": "51",
+          "y": "51 + 14 * opencode.external.enabled",
           "width": "44",
           "height": "12",
           "content": {
@@ -2385,7 +2385,7 @@
           "parent": "opencode-provider",
           "render": "1 - system.dark && opencode.five_hour.available",
           "x": "30",
-          "y": "31",
+          "y": "31 + 14 * opencode.external.enabled",
           "width": "26",
           "height": "12",
           "content": {
@@ -2408,7 +2408,7 @@
           "parent": "opencode-provider",
           "render": "1 - system.dark && opencode.five_hour.available",
           "x": "216",
-          "y": "29",
+          "y": "29 + 14 * opencode.external.enabled",
           "width": "64",
           "height": "14",
           "content": {
@@ -2431,7 +2431,7 @@
           "parent": "opencode-provider",
           "render": "1 - system.dark && opencode.five_hour.available && opencode.session.reset.unix > 0",
           "x": "58",
-          "y": "31",
+          "y": "31 + 14 * opencode.external.enabled",
           "width": "44",
           "height": "12",
           "content": {
@@ -2454,7 +2454,7 @@
           "parent": "opencode-provider",
           "render": "1 - system.dark && opencode.weekly.available",
           "x": "30",
-          "y": "51",
+          "y": "51 + 14 * opencode.external.enabled",
           "width": "26",
           "height": "12",
           "content": {
@@ -2477,7 +2477,7 @@
           "parent": "opencode-provider",
           "render": "1 - system.dark && opencode.weekly.available",
           "x": "216",
-          "y": "49",
+          "y": "49 + 14 * opencode.external.enabled",
           "width": "64",
           "height": "14",
           "content": {
@@ -2500,7 +2500,7 @@
           "parent": "opencode-provider",
           "render": "1 - system.dark && opencode.weekly.reset.unix > 0",
           "x": "58",
-          "y": "51",
+          "y": "51 + 14 * opencode.external.enabled",
           "width": "44",
           "height": "12",
           "content": {
@@ -2523,7 +2523,7 @@
           "parent": "opencode-provider",
           "render": "opencode.five_hour.available",
           "x": "106",
-          "y": "34",
+          "y": "34 + 14 * opencode.external.enabled",
           "width": "106",
           "height": "6",
           "content": {
@@ -2547,7 +2547,7 @@
           "parent": "opencode-provider",
           "render": "opencode.weekly.available",
           "x": "106",
-          "y": "54",
+          "y": "54 + 14 * opencode.external.enabled",
           "width": "106",
           "height": "6",
           "content": {
@@ -2571,7 +2571,7 @@
           "parent": "opencode-provider",
           "render": "system.dark && opencode.monthly.available",
           "x": "30",
-          "y": "71",
+          "y": "71 + 14 * opencode.external.enabled",
           "width": "26",
           "height": "12",
           "content": {
@@ -2594,7 +2594,7 @@
           "parent": "opencode-provider",
           "render": "1 - system.dark && opencode.monthly.available",
           "x": "30",
-          "y": "71",
+          "y": "71 + 14 * opencode.external.enabled",
           "width": "26",
           "height": "12",
           "content": {
@@ -2617,7 +2617,7 @@
           "parent": "opencode-provider",
           "render": "system.dark && opencode.monthly.available",
           "x": "216",
-          "y": "69",
+          "y": "69 + 14 * opencode.external.enabled",
           "width": "64",
           "height": "14",
           "content": {
@@ -2640,7 +2640,7 @@
           "parent": "opencode-provider",
           "render": "1 - system.dark && opencode.monthly.available",
           "x": "216",
-          "y": "69",
+          "y": "69 + 14 * opencode.external.enabled",
           "width": "64",
           "height": "14",
           "content": {
@@ -2663,7 +2663,7 @@
           "parent": "opencode-provider",
           "render": "system.dark && opencode.monthly.reset.unix > 0",
           "x": "58",
-          "y": "71",
+          "y": "71 + 14 * opencode.external.enabled",
           "width": "44",
           "height": "12",
           "content": {
@@ -2686,7 +2686,7 @@
           "parent": "opencode-provider",
           "render": "1 - system.dark && opencode.monthly.reset.unix > 0",
           "x": "58",
-          "y": "71",
+          "y": "71 + 14 * opencode.external.enabled",
           "width": "44",
           "height": "12",
           "content": {
@@ -2709,7 +2709,7 @@
           "parent": "opencode-provider",
           "render": "opencode.monthly.available",
           "x": "106",
-          "y": "74",
+          "y": "74 + 14 * opencode.external.enabled",
           "width": "106",
           "height": "6",
           "content": {
@@ -7078,6 +7078,747 @@
             "color": {
               "color": "#4A4F55FF"
             }
+          }
+        },
+        {
+          "id": "opencode-caption-1-dark",
+          "name": "opencode-caption-1-dark",
+          "parent": "opencode-provider",
+          "render": "system.dark && opencode.external.enabled",
+          "x": "30",
+          "y": "27",
+          "width": "200",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{i18n.account_1} · {opencode.account.name}",
+            "font_family": "Segoe UI",
+            "font_size": "10",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#B6BCC4FF"
+            }
+          }
+        },
+        {
+          "id": "opencode-caption-1-light",
+          "name": "opencode-caption-1-light",
+          "parent": "opencode-provider",
+          "render": "1 - system.dark && opencode.external.enabled",
+          "x": "30",
+          "y": "27",
+          "width": "200",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{i18n.account_1} · {opencode.account.name}",
+            "font_family": "Segoe UI",
+            "font_size": "10",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#4A4F55FF"
+            }
+          }
+        },
+        {
+          "id": "opencode-external-caption-dark",
+          "name": "opencode-external-caption-dark",
+          "parent": "opencode-provider",
+          "render": "system.dark && opencode.external.enabled",
+          "x": "30",
+          "y": "109",
+          "width": "200",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{i18n.account_2} · {opencode.external.account.name}",
+            "font_family": "Segoe UI",
+            "font_size": "10",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#B6BCC4FF"
+            }
+          }
+        },
+        {
+          "id": "opencode-external-caption-light",
+          "name": "opencode-external-caption-light",
+          "parent": "opencode-provider",
+          "render": "1 - system.dark && opencode.external.enabled",
+          "x": "30",
+          "y": "109",
+          "width": "200",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{i18n.account_2} · {opencode.external.account.name}",
+            "font_family": "Segoe UI",
+            "font_size": "10",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#4A4F55FF"
+            }
+          }
+        },
+        {
+          "id": "opencode-external-axis-100",
+          "name": "opencode-external-axis-100",
+          "parent": "opencode-provider",
+          "render": "opencode.external.available",
+          "x": "296",
+          "y": "104",
+          "width": "102",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "100%",
+            "font_family": "Segoe UI",
+            "font_size": "7",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "opencode-external-grid-25",
+          "name": "opencode-external-grid-25",
+          "parent": "opencode-provider",
+          "render": "opencode.external.available",
+          "x": "296",
+          "y": "129 + 5 * opencode.external.monthly.available",
+          "width": "102",
+          "height": "1",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#9AA0A624"
+            }
+          }
+        },
+        {
+          "id": "opencode-external-grid-50",
+          "name": "opencode-external-grid-50",
+          "parent": "opencode-provider",
+          "render": "opencode.external.available",
+          "x": "296",
+          "y": "140 + 10 * opencode.external.monthly.available",
+          "width": "102",
+          "height": "1",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#9AA0A624"
+            }
+          }
+        },
+        {
+          "id": "opencode-external-grid-75",
+          "name": "opencode-external-grid-75",
+          "parent": "opencode-provider",
+          "render": "opencode.external.available",
+          "x": "296",
+          "y": "151 + 15 * opencode.external.monthly.available",
+          "width": "102",
+          "height": "1",
+          "background": {
+            "type": "colour",
+            "colour": {
+              "color": "#9AA0A624"
+            }
+          }
+        },
+        {
+          "id": "opencode-external-axis-0",
+          "name": "opencode-external-axis-0",
+          "parent": "opencode-provider",
+          "render": "opencode.external.available",
+          "x": "296",
+          "y": "163 + 20 * opencode.external.monthly.available",
+          "width": "102",
+          "height": "7",
+          "content": {
+            "type": "text",
+            "template": "0%",
+            "font_family": "Segoe UI",
+            "font_size": "7",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#9AA0A6FF"
+            }
+          }
+        },
+        {
+          "id": "opencode-external-chart-monthly",
+          "name": "opencode-external-chart-monthly",
+          "parent": "opencode-provider",
+          "render": "opencode.external.monthly.available",
+          "x": "296",
+          "y": "118",
+          "width": "102",
+          "height": "44 + 20 * opencode.external.monthly.available",
+          "content": {
+            "type": "sparkline",
+            "source": "opencode.external.monthly.history.cycle",
+            "color": {
+              "color": "#3F18D4"
+            },
+            "fill": {
+              "color": "#00000000"
+            },
+            "invert": "display.countdown",
+            "line_width": "2 + 0.2 * (1 - opencode.external.five_hour.available) * (1 - opencode.external.weekly.available)",
+            "dashed": "0"
+          }
+        },
+        {
+          "id": "opencode-external-chart-weekly",
+          "name": "opencode-external-chart-weekly",
+          "parent": "opencode-provider",
+          "render": "opencode.external.weekly.available",
+          "x": "296",
+          "y": "118",
+          "width": "102",
+          "height": "44 + 20 * opencode.external.monthly.available",
+          "content": {
+            "type": "sparkline",
+            "source": "opencode.external.weekly.history.cycle",
+            "color": {
+              "color": "#7E31EE"
+            },
+            "fill": {
+              "color": "#00000000"
+            },
+            "invert": "display.countdown",
+            "line_width": "1.4 + 0.4 * (1 - opencode.external.five_hour.available)",
+            "dashed": "0"
+          }
+        },
+        {
+          "id": "opencode-external-chart-session",
+          "name": "opencode-external-chart-session",
+          "parent": "opencode-provider",
+          "render": "opencode.external.five_hour.available",
+          "x": "296",
+          "y": "118",
+          "width": "102",
+          "height": "44 + 20 * opencode.external.monthly.available",
+          "content": {
+            "type": "sparkline",
+            "source": "opencode.external.session.history.cycle",
+            "color": {
+              "color": "#8B5CF6"
+            },
+            "fill": {
+              "color": "#00000000"
+            },
+            "invert": "display.countdown",
+            "line_width": "1",
+            "dashed": "1"
+          }
+        },
+        {
+          "id": "opencode-external-session-label-dark",
+          "name": "opencode-external-session-label-dark",
+          "parent": "opencode-provider",
+          "render": "system.dark && opencode.external.five_hour.available",
+          "x": "30",
+          "y": "125",
+          "width": "26",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{opencode.external.session.label}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#8B5CF6"
+            }
+          }
+        },
+        {
+          "id": "opencode-external-session-value-dark",
+          "name": "opencode-external-session-value-dark",
+          "parent": "opencode-provider",
+          "render": "system.dark && opencode.external.five_hour.available",
+          "x": "216",
+          "y": "123",
+          "width": "64",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{opencode.external.five_hour.display:0}%",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#ECECECFF"
+            }
+          }
+        },
+        {
+          "id": "opencode-external-session-reset-dark",
+          "name": "opencode-external-session-reset-dark",
+          "parent": "opencode-provider",
+          "render": "system.dark && opencode.external.five_hour.available && opencode.external.session.reset.unix > 0",
+          "x": "58",
+          "y": "125",
+          "width": "44",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{opencode.external.session.reset.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "regular",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#B6BCC4FF"
+            }
+          }
+        },
+        {
+          "id": "opencode-external-weekly-label-dark",
+          "name": "opencode-external-weekly-label-dark",
+          "parent": "opencode-provider",
+          "render": "system.dark && opencode.external.weekly.available",
+          "x": "30",
+          "y": "145",
+          "width": "26",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{opencode.external.weekly.label}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#7E31EE"
+            }
+          }
+        },
+        {
+          "id": "opencode-external-weekly-value-dark",
+          "name": "opencode-external-weekly-value-dark",
+          "parent": "opencode-provider",
+          "render": "system.dark && opencode.external.weekly.available",
+          "x": "216",
+          "y": "143",
+          "width": "64",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{opencode.external.weekly.display:0}%",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#ECECECFF"
+            }
+          }
+        },
+        {
+          "id": "opencode-external-weekly-reset-dark",
+          "name": "opencode-external-weekly-reset-dark",
+          "parent": "opencode-provider",
+          "render": "system.dark && opencode.external.weekly.reset.unix > 0",
+          "x": "58",
+          "y": "145",
+          "width": "44",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{opencode.external.weekly.reset.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "regular",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#B6BCC4FF"
+            }
+          }
+        },
+        {
+          "id": "opencode-external-session-label-light",
+          "name": "opencode-external-session-label-light",
+          "parent": "opencode-provider",
+          "render": "1 - system.dark && opencode.external.five_hour.available",
+          "x": "30",
+          "y": "125",
+          "width": "26",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{opencode.external.session.label}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#8B5CF6"
+            }
+          }
+        },
+        {
+          "id": "opencode-external-session-value-light",
+          "name": "opencode-external-session-value-light",
+          "parent": "opencode-provider",
+          "render": "1 - system.dark && opencode.external.five_hour.available",
+          "x": "216",
+          "y": "123",
+          "width": "64",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{opencode.external.five_hour.display:0}%",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#1A1A1AFF"
+            }
+          }
+        },
+        {
+          "id": "opencode-external-session-reset-light",
+          "name": "opencode-external-session-reset-light",
+          "parent": "opencode-provider",
+          "render": "1 - system.dark && opencode.external.five_hour.available && opencode.external.session.reset.unix > 0",
+          "x": "58",
+          "y": "125",
+          "width": "44",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{opencode.external.session.reset.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "regular",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#4A4F55FF"
+            }
+          }
+        },
+        {
+          "id": "opencode-external-weekly-label-light",
+          "name": "opencode-external-weekly-label-light",
+          "parent": "opencode-provider",
+          "render": "1 - system.dark && opencode.external.weekly.available",
+          "x": "30",
+          "y": "145",
+          "width": "26",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{opencode.external.weekly.label}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#6728C3"
+            }
+          }
+        },
+        {
+          "id": "opencode-external-weekly-value-light",
+          "name": "opencode-external-weekly-value-light",
+          "parent": "opencode-provider",
+          "render": "1 - system.dark && opencode.external.weekly.available",
+          "x": "216",
+          "y": "143",
+          "width": "64",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{opencode.external.weekly.display:0}%",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#1A1A1AFF"
+            }
+          }
+        },
+        {
+          "id": "opencode-external-weekly-reset-light",
+          "name": "opencode-external-weekly-reset-light",
+          "parent": "opencode-provider",
+          "render": "1 - system.dark && opencode.external.weekly.reset.unix > 0",
+          "x": "58",
+          "y": "145",
+          "width": "44",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{opencode.external.weekly.reset.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "regular",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#4A4F55FF"
+            }
+          }
+        },
+        {
+          "id": "opencode-external-session-bar",
+          "name": "opencode-external-session-bar",
+          "parent": "opencode-provider",
+          "render": "opencode.external.five_hour.available",
+          "x": "106",
+          "y": "128",
+          "width": "106",
+          "height": "6",
+          "content": {
+            "type": "progress",
+            "value": "opencode.external.five_hour.display",
+            "direction": "left_to_right",
+            "fill": {
+              "color": "#8B5CF6"
+            },
+            "track": {
+              "color": "#FFFFFF1A"
+            },
+            "corner_radius": "3",
+            "segments": 10,
+            "segment_gap": "1"
+          }
+        },
+        {
+          "id": "opencode-external-weekly-bar",
+          "name": "opencode-external-weekly-bar",
+          "parent": "opencode-provider",
+          "render": "opencode.external.weekly.available",
+          "x": "106",
+          "y": "148",
+          "width": "106",
+          "height": "6",
+          "content": {
+            "type": "progress",
+            "value": "opencode.external.weekly.display",
+            "direction": "left_to_right",
+            "fill": {
+              "color": "#7E31EE"
+            },
+            "track": {
+              "color": "#FFFFFF1A"
+            },
+            "corner_radius": "3",
+            "segments": 10,
+            "segment_gap": "1"
+          }
+        },
+        {
+          "id": "opencode-external-monthly-label-dark",
+          "name": "opencode-external-monthly-label-dark",
+          "parent": "opencode-provider",
+          "render": "system.dark && opencode.external.monthly.available",
+          "x": "30",
+          "y": "165",
+          "width": "26",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{opencode.external.monthly.label}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#3F18D4"
+            }
+          }
+        },
+        {
+          "id": "opencode-external-monthly-label-light",
+          "name": "opencode-external-monthly-label-light",
+          "parent": "opencode-provider",
+          "render": "1 - system.dark && opencode.external.monthly.available",
+          "x": "30",
+          "y": "165",
+          "width": "26",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{opencode.external.monthly.label}",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "bold",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#3414AE"
+            }
+          }
+        },
+        {
+          "id": "opencode-external-monthly-value-dark",
+          "name": "opencode-external-monthly-value-dark",
+          "parent": "opencode-provider",
+          "render": "system.dark && opencode.external.monthly.available",
+          "x": "216",
+          "y": "163",
+          "width": "64",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{opencode.external.monthly.display:0}%",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#ECECECFF"
+            }
+          }
+        },
+        {
+          "id": "opencode-external-monthly-value-light",
+          "name": "opencode-external-monthly-value-light",
+          "parent": "opencode-provider",
+          "render": "1 - system.dark && opencode.external.monthly.available",
+          "x": "216",
+          "y": "163",
+          "width": "64",
+          "height": "14",
+          "content": {
+            "type": "text",
+            "template": "{opencode.external.monthly.display:0}%",
+            "font_family": "Segoe UI",
+            "font_size": "11",
+            "weight": "medium",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "left",
+            "color": {
+              "color": "#1A1A1AFF"
+            }
+          }
+        },
+        {
+          "id": "opencode-external-monthly-reset-dark",
+          "name": "opencode-external-monthly-reset-dark",
+          "parent": "opencode-provider",
+          "render": "system.dark && opencode.external.monthly.reset.unix > 0",
+          "x": "58",
+          "y": "165",
+          "width": "44",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{opencode.external.monthly.reset.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "regular",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#B6BCC4FF"
+            }
+          }
+        },
+        {
+          "id": "opencode-external-monthly-reset-light",
+          "name": "opencode-external-monthly-reset-light",
+          "parent": "opencode-provider",
+          "render": "1 - system.dark && opencode.external.monthly.reset.unix > 0",
+          "x": "58",
+          "y": "165",
+          "width": "44",
+          "height": "12",
+          "content": {
+            "type": "text",
+            "template": "{opencode.external.monthly.reset.seconds:duration}",
+            "font_family": "Segoe UI",
+            "font_size": "9",
+            "weight": "regular",
+            "rendering": "clear_type",
+            "contrast": "1",
+            "align": "right",
+            "color": {
+              "color": "#4A4F55FF"
+            }
+          }
+        },
+        {
+          "id": "opencode-external-monthly-bar",
+          "name": "opencode-external-monthly-bar",
+          "parent": "opencode-provider",
+          "render": "opencode.external.monthly.available",
+          "x": "106",
+          "y": "168",
+          "width": "106",
+          "height": "6",
+          "content": {
+            "type": "progress",
+            "value": "opencode.external.monthly.display",
+            "direction": "left_to_right",
+            "fill": {
+              "color": "#3F18D4"
+            },
+            "track": {
+              "color": "#FFFFFF1A"
+            },
+            "corner_radius": "3",
+            "segments": 10,
+            "segment_gap": "1"
           }
         }
       ],

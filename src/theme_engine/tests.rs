@@ -1042,7 +1042,7 @@ fn the_second_pools_history_is_bound_for_every_window() {
 
 #[test]
 fn grid_panel_second_account_mirrors_the_first_columns() {
-    // Two Command Code plans share one block: the second account must sit in
+    // Two plans of one provider share a block: the second account must sit in
     // exactly the same columns as the first (label, reset, bar, value) and only
     // move down, or the two halves look like different tables.
     let (_, source) = BUILTIN_THEME_SOURCES
@@ -1054,7 +1054,10 @@ fn grid_panel_second_account_mirrors_the_first_columns() {
     let mut canvas = Canvas::default();
     canvas.width = 412;
     canvas.height = 790;
-    let runtime = ThemeRuntime::from_providers(ProviderSet::from_enabled([ProviderId::CommandCode]));
+    let runtime = ThemeRuntime::from_providers(ProviderSet::from_enabled([
+        ProviderId::CommandCode,
+        ProviderId::OpenCode,
+    ]));
     let context = DataContext::from_usage_with_runtime(None, &canvas, runtime);
 
     let rect = |id: &str| -> (f64, f64, f64, f64) {
@@ -1071,27 +1074,59 @@ fn grid_panel_second_account_mirrors_the_first_columns() {
         )
     };
 
-    for window in ["session", "weekly", "monthly"] {
-        for kind in ["label", "value", "reset"] {
-            let first = rect(&format!("commandcode-{window}-{kind}-dark"));
-            let second = rect(&format!("commandcode-external-{window}-{kind}-dark"));
-            assert_eq!(first.0, second.0, "{window} {kind}: left edge");
-            assert_eq!(first.2, second.2, "{window} {kind}: width");
-            assert!(second.1 > first.1, "{window} {kind}: second account sits lower");
+    for key in ["commandcode", "opencode"] {
+        for window in ["session", "weekly", "monthly"] {
+            for kind in ["label", "value", "reset"] {
+                let first = rect(&format!("{key}-{window}-{kind}-dark"));
+                let second = rect(&format!("{key}-external-{window}-{kind}-dark"));
+                assert_eq!(first.0, second.0, "{key} {window} {kind}: left edge");
+                assert_eq!(first.2, second.2, "{key} {window} {kind}: width");
+                assert!(
+                    second.1 > first.1,
+                    "{key} {window} {kind}: second account sits lower"
+                );
+            }
+            let first = rect(&format!("{key}-{window}-bar"));
+            let second = rect(&format!("{key}-external-{window}-bar"));
+            assert_eq!(first.0, second.0, "{key} {window} bar: left edge");
+            assert_eq!(first.2, second.2, "{key} {window} bar: width");
+            assert!(
+                second.1 > first.1,
+                "{key} {window} bar: second account sits lower"
+            );
         }
-        let first = rect(&format!("commandcode-{window}-bar"));
-        let second = rect(&format!("commandcode-external-{window}-bar"));
-        assert_eq!(first.0, second.0, "{window} bar: left edge");
-        assert_eq!(first.2, second.2, "{window} bar: width");
-        assert!(second.1 > first.1, "{window} bar: second account sits lower");
-    }
 
-    // The second account gets its own chart column, aligned with the first one.
-    let first_chart = rect("commandcode-chart-session");
-    let second_chart = rect("commandcode-external-chart-session");
-    assert_eq!(first_chart.0, second_chart.0, "chart column");
-    assert_eq!(first_chart.2, second_chart.2, "chart width");
-    assert!(second_chart.1 > first_chart.1, "chart rows do not overlap");
+        // The second account gets its own chart column, aligned with the first.
+        let first_chart = rect(&format!("{key}-chart-session"));
+        let second_chart = rect(&format!("{key}-external-chart-session"));
+        assert_eq!(first_chart.0, second_chart.0, "{key}: chart column");
+        assert_eq!(first_chart.2, second_chart.2, "{key}: chart width");
+        assert!(
+            second_chart.1 > first_chart.1,
+            "{key}: chart rows do not overlap"
+        );
+
+        // And both accounts are captioned in the reader's language.
+        for suffix in ["caption-1-dark", "external-caption-dark"] {
+            let node = surface
+                .children
+                .iter()
+                .find(|object| object.id == format!("{key}-{suffix}"))
+                .unwrap_or_else(|| panic!("{key}-{suffix} is missing"));
+            let template = match &node.content {
+                SceneContent::Text { template, .. } => template.as_str(),
+                other => panic!("{key}-{suffix} is not a text node: {other:?}"),
+            };
+            assert!(
+                template.contains("i18n.account_"),
+                "{key}-{suffix} must use a translated caption, got {template}"
+            );
+            assert!(
+                template.contains("account.name"),
+                "{key}-{suffix} must name the subscription, got {template}"
+            );
+        }
+    }
 }
 
 #[test]

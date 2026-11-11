@@ -237,6 +237,7 @@ impl SettingsFile {
         self.accounts.claude.normalize();
         self.accounts.codex.normalize();
         self.accounts.commandcode.normalize();
+        self.accounts.opencode.normalize();
         if !(POLL_1_MIN..=MAX_POLL_MINUTES * POLL_1_MIN).contains(&self.poll_interval_ms)
             || !self.poll_interval_ms.is_multiple_of(POLL_1_MIN)
         {

@@ -182,6 +182,11 @@ pub struct AccountSettings {
     /// hide it.
     #[serde(default = "empty_provider_accounts")]
     pub commandcode: ProviderAccounts,
+    /// Key-based OpenCode Go accounts. Like Command Code there is no implicit
+    /// "default" profile: the poller already discovers a key from the
+    /// environment, the CLI auth file and the config file.
+    #[serde(default = "empty_provider_accounts")]
+    pub opencode: ProviderAccounts,
 }
 
 /// A provider account list with nothing configured.
@@ -199,6 +204,7 @@ impl Default for AccountSettings {
             claude: ProviderAccounts::default(),
             codex: ProviderAccounts::default(),
             commandcode: empty_provider_accounts(),
+            opencode: empty_provider_accounts(),
         }
     }
 }
@@ -229,6 +235,76 @@ fn environment_directory_value(value: Option<std::ffi::OsString>) -> Option<Path
         let path = Path::new(&value);
         expand_path(path).or_else(|| std::env::current_dir().ok().map(|cwd| cwd.join(path)))
     })
+}
+
+/// A profile's API key together with the place it was read from, which the
+/// pollers log when a request fails.
+pub struct ResolvedApiKey {
+    pub api_key: String,
+    pub source: String,
+}
+
+/// Resolve a key-based profile: the variable named by `api_key_env` from the
+/// process environment first, then from the `KEY=VALUE` file in
+/// `credentials_path`. A profile that names no variable, or whose variable is
+/// nowhere to be found, resolves to nothing.
+pub fn resolve_profile_api_key(profile: &AccountProfile) -> Option<ResolvedApiKey> {
+    let variable = profile.api_key_env.trim();
+    if variable.is_empty() {
+        return None;
+    }
+    if let Ok(value) = std::env::var(variable) {
+        if valid_api_key(&value) {
+            return Some(ResolvedApiKey {
+                api_key: value,
+                source: format!("environment {variable}"),
+            });
+        }
+    }
+    let path = expand_path(Path::new(profile.credentials_path.trim()))?;
+    let api_key = read_env_file_value(&path, variable)?;
+    valid_api_key(&api_key).then(|| ResolvedApiKey {
+        api_key,
+        source: path.display().to_string(),
+    })
+}
+
+/// Read one `KEY=VALUE` entry from a dotenv-style file. Blank lines and
+/// comments are ignored and surrounding quotes are stripped.
+pub fn read_env_file_value(path: &Path, variable: &str) -> Option<String> {
+    let content = std::fs::read_to_string(path).ok()?;
+    content.lines().find_map(|line| {
+        let line = line.trim();
+        if line.is_empty() || line.starts_with('#') {
+            return None;
+        }
+        let (key, value) = line.split_once('=')?;
+        if key.trim() != variable {
+            return None;
+        }
+        let value = value.trim();
+        let value = value
+            .strip_prefix('"')
+            .and_then(|value| value.strip_suffix('"'))
+            .or_else(|| {
+                value
+                    .strip_prefix('\'')
+                    .and_then(|value| value.strip_suffix('\''))
+            })
+            .unwrap_or(value)
+            .trim();
+        (!value.is_empty()).then(|| value.to_string())
+    })
+}
+
+/// A key has to survive an `Authorization` header: printable ASCII, no quotes
+/// or backslashes, and short enough to be a token rather than a file.
+pub fn valid_api_key(value: &str) -> bool {
+    !value.is_empty()
+        && value.len() <= 512
+        && value
+            .bytes()
+            .all(|byte| byte.is_ascii_graphic() && byte != b'"' && byte != b'\\')
 }
 
 pub fn expand_path(path: &Path) -> Option<PathBuf> {
