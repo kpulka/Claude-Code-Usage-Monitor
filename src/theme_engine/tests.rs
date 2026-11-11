@@ -997,6 +997,50 @@ fn horizontal_fable_columns_follow_claude_visibility_and_usage_direction() {
 }
 
 #[test]
+fn the_second_pools_history_is_bound_for_every_window() {
+    // Regression: every grid-panel sparkline asks for
+    // `<key>.<window>.history.cycle`, but only the first account was bound, so
+    // the second account's chart column drew its axis and grid over an empty
+    // plot. The pool now gets its own cycle binding, aligned with its own reset.
+    use crate::models::{UsageData, UsageSection};
+
+    let section = UsageSection {
+        available: true,
+        percentage: 40.0,
+        resets_at: None,
+    };
+    let mut usage = AppUsageData::default();
+    usage.insert(
+        ProviderId::CommandCode,
+        UsageData {
+            session: section.clone(),
+            weekly: section.clone(),
+            external_pool: Some(Box::new(UsageData {
+                session: section.clone(),
+                weekly: section.clone(),
+                ..Default::default()
+            })),
+            ..Default::default()
+        },
+    );
+
+    let runtime = ThemeRuntime::from_providers(ProviderSet::from_enabled([ProviderId::CommandCode]));
+    let context = DataContext::from_usage_with_runtime(Some(&usage), &Canvas::default(), runtime);
+
+    for window in HISTORY_WINDOWS {
+        for key in [
+            format!("commandcode.{window}.history.cycle"),
+            format!("commandcode.external.{window}.history.cycle"),
+        ] {
+            assert!(
+                context.strings.contains_key(&key),
+                "{key} is not bound, so the sparkline has nothing to draw"
+            );
+        }
+    }
+}
+
+#[test]
 fn grid_panel_second_account_mirrors_the_first_columns() {
     // Two Command Code plans share one block: the second account must sit in
     // exactly the same columns as the first (label, reset, bar, value) and only

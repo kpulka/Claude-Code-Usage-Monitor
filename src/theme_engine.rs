@@ -1754,11 +1754,35 @@ impl DataContext {
             .iter()
             .filter(|descriptor| descriptor.id != ProviderId::Antigravity)
         {
+            let pool = data
+                .and_then(|data| data.get(descriptor.id))
+                .and_then(|usage| usage.external_pool.as_deref());
             for window in HISTORY_WINDOWS {
+                let standard =
+                    crate::history::binding(&format!("{}#external", descriptor.key), window)
+                        .unwrap_or_default();
                 context.insert_string(
                     &format!("{}.external.{window}.history", descriptor.key),
-                    crate::history::binding(&format!("{}#external", descriptor.key), window)
-                        .unwrap_or_default(),
+                    &standard,
+                );
+                // The pool needs its own cycle binding: it resets on a different
+                // clock than the first account, and a theme that asks for
+                // `.history.cycle` (every sparkline in grid-panel does) would
+                // otherwise resolve nothing and draw an empty box.
+                let cycle =
+                    match (window_reset(window, pool), window_duration_seconds(window, pool)) {
+                        (Some(reset), Some(duration)) => crate::history::cycle_binding(
+                            &format!("{}#external", descriptor.key),
+                            window,
+                            reset,
+                            std::time::Duration::from_secs(duration),
+                            crate::history::CYCLE_POINTS,
+                        ),
+                        _ => None,
+                    };
+                context.insert_string(
+                    &format!("{}.external.{window}.history.cycle", descriptor.key),
+                    &cycle.unwrap_or_else(|| standard.clone()),
                 );
             }
         }
